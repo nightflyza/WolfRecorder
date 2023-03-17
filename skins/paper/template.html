@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="google" content="notranslate" />
+        <link rel="apple-touch-icon" sizes="76x76" href="<?=$system->getSkinPath(); ?>assets/img/apple-icon.png">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <title>
+            <?=__($system->getPageTitle()); ?>
+        </title>
+        <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
+        <!--     Fonts and icons     -->
+        <link href="<?=$system->getSkinPath(); ?>assets/css/montserrat.css" rel="stylesheet" />
+        <!-- CSS Files -->
+        <link href="<?=$system->getSkinPath(); ?>assets/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="<?=$system->getSkinPath(); ?>assets/css/paper-dashboard.css?v=2.0.0" rel="stylesheet" />
+        <!-- Ubilling custom styles -->
+        <link href="<?=$system->getSkinPath(); ?>assets/css/ubilling.css" rel="stylesheet" />
+        <script src="<?=$system->getSkinPath(); ?>assets/js/core/jquery.min.js"></script>
+        <!-- JQDT  -->
+        <style type="text/css" title="currentStyle">
+            @import "modules/jsc/dt3/css/jquery.dataTables_themeroller.css";
+            @import "modules/jsc/dt3/css/jquery.dataTables.ub.css";
+        </style>
+        <script type="text/javascript" src="modules/jsc/dt3/datatables.min.js"></script>
+        <script src="modules/jsc/sorttable.js" language="javascript"></script>
+    </head>
+
+    <body class="">
+        <div class="wrapper ">
+            <div class="sidebar" data-color="white" data-active-color="danger">
+                <div class="logo">
+                    <div class="logo-image-small">
+                        <?=$system->renderLogo(); ?>
+                    </div>
+
+                </div>
+                <div class="sidebar-wrapper">
+                    <ul class="nav">
+                        <?=$system->renderMenu(); ?> 
+                        
+                        <?php 
+                        if ($system->getAuthEnabled()) {
+                         if ($system->getLoggedInState()) {
+                            print(wf_tag('li').wf_link('?forceLogout=true',wf_img('skins/poweroff.png').' '.__('Log out'))).wf_tag('li',true);
+                           }
+                        }
+                        ?>
+                    </ul>
+                </div>
+            </div>
+            <div class="main-panel">
+                <!-- Navbar -->
+                <nav class="navbar navbar-expand-lg navbar-absolute fixed-top navbar-transparent">
+                    <div class="container-fluid">
+                        <div class="navbar-wrapper">
+                            <div class="navbar-toggle">
+                                <button type="button" class="navbar-toggler">
+                                    <span class="navbar-toggler-bar bar1"></span>
+                                    <span class="navbar-toggler-bar bar2"></span>
+                                    <span class="navbar-toggler-bar bar3"></span>
+                                </button>
+                            </div>
+                            <a class="navbar-brand" href="index.php"><?=__($system->getPageTitle()); ?></a>
+                        </div>
+
+                        <div class="collapse navbar-collapse justify-content-end" id="navigation">
+
+                        </div>
+                    </div>
+                </nav>
+                <!-- End Navbar -->
+                <!-- <div class="panel-header panel-header-sm">
+            
+            
+          </div> -->
+                <div class="content">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="table">
+                                    <?=$contentContainer ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="footer footer-black  footer-white ">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <nav class="footer-nav">
+                                <?php
+                                if ($system->isLocaleSwitchable()) {
+                                 print(YalfLangSwitch::render());
+                                }
+                                ?>
+                                <div style="float:left;"> </div>
+                            </nav>
+                            <div class="credits ml-auto">
+                                <span class="copyright">
+                                    <?php
+                                    // Page generation time end
+                                    $mtime = explode(' ', microtime());
+                                    $totaltime = $mtime[0] + $mtime[1] - $starttime;
+                                    print(__('GT:') . round($totaltime, 4));
+                                    print(' QC: ' . $query_counter);
+                                    ?> 
+                                    <? if (XHPROF) { print($xhprof_link); } ?> 
+                                    <? if (defined('SQL_DEBUG')) { print(web_SqlDebugIconShow()); }?>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+        <!--   Core JS Files   -->
+
+        <script src="<?=$system->getSkinPath(); ?>assets/js/core/jquery-migrate.min.js"></script>
+        <script src="<?=$system->getSkinPath(); ?>assets/js/core/popper.min.js"></script>
+        <script src="<?=$system->getSkinPath(); ?>assets/js/core/bootstrap.min.js"></script>
+        <script src="<?=$system->getSkinPath(); ?>assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
+        <!-- Chart JS -->
+        <script src="<?=$system->getSkinPath(); ?>assets/js/plugins/chartjs.min.js"></script>
+        <!--  Notifications Plugin    -->
+        <script src="<?=$system->getSkinPath(); ?>assets/js/plugins/bootstrap-notify.js"></script>
+        <!-- Control Center for Now Ui Dashboard: parallax effects, scripts for the example pages etc -->
+        <script src="<?=$system->getSkinPath(); ?>assets/js/paper-dashboard.min.js?v=2.0.0" type="text/javascript"></script>
+
+        <!-- JUI -->
+        <link type="text/css" href="modules/jsc/jui/css/smoothness/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
+        <script type="text/javascript" language="javascript" src="modules/jsc/jui/js/jquery-ui-1.8.23.custom.min.js"></script>
+    </body>
+
+</html>

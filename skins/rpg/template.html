@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+    <head>
+        <title><?=__($system->getPageTitle()); ?></title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+        <!-- include rpgui -->
+        <link href="<?=$system->getSkinPath(); ?>rpgui.min.css" rel="stylesheet" type="text/css" >
+        <link href="<?=$system->getSkinPath(); ?>ubilling.css" rel="stylesheet" type="text/css" >
+
+        <script src="<?=$system->getSkinPath(); ?>rpgui.min.js"></script>
+        <!-- jQuery -->		
+        <script type="text/javascript" language="javascript" src="modules/jsc/jquery/jquery.min.js"></script>
+        <!-- JQDT  -->
+        <style type="text/css" title="currentStyle">
+            @import "modules/jsc/dt3/css/jquery.dataTables_themeroller.css";
+            @import "modules/jsc/dt3/css/jquery.dataTables.ub.css";
+        </style>
+
+        <!-- jQuery UI -->
+        <link type="text/css" href="modules/jsc/jui3/jquery-ui.css" rel="stylesheet" />
+        <script type="text/javascript" language="javascript" src="modules/jsc/jui3/jquery-ui.min.js"></script>
+
+
+        <!-- JQDT  -->
+        <style type="text/css" title="currentStyle">
+            @import "modules/jsc/dt3/css/jquery.dataTables_themeroller.css";
+            @import "modules/jsc/dt3/css/jquery.dataTables.ub.css";
+        </style>
+        <script type="text/javascript" src="modules/jsc/dt3/datatables.min.js"></script>
+
+        <!-- timepicker -->
+        <script type="text/javascript" src="modules/jsc/timepick/jquery.timepicker.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="modules/jsc/timepick/jquery.timepicker.css" />
+    </head>
+
+    <body>
+
+        <style>
+
+            body {
+                background: #444;
+            }
+
+            .rpgui-container {
+                background: #222;
+                padding-top:20px;
+                padding-bottom:20px;
+            }
+
+        </style>
+
+        <!-- all rpgui elements must be inside the rpgui-content -->
+        <div class="rpgui-content">
+            <!-- navigation section -->
+            <div class="rpgui-container framed" style="width:30%;">
+                <?=$system->renderMenu(); ?> 
+
+                <?php 
+                if ($system->getAuthEnabled()) {
+                if ($system->getLoggedInState()) {
+                print(wf_tag('li').wf_link('?forceLogout=true',wf_img('skins/poweroff.png').' '.__('Log out'))).wf_tag('li',true);
+                }
+                }
+                ?>
+            </div>
+
+            <!-- primary content here -->
+            <div class="rpgui-container framed rpgui-draggable" style="left:30%; width:70%; height: 100%;">
+
+                <?=$contentContainer ?>
+
+                <p style="position:fixed; right:25px; bottom:0px;">
+                    <?php
+                    if ($system->isLocaleSwitchable()) {
+                    print(YalfLangSwitch::render());
+                    }
+                    ?>
+                    <?php
+                    // Page generation time end
+                    $mtime = explode(' ', microtime());
+                    $totaltime = $mtime[0] + $mtime[1] - $starttime;
+                    print(__('GT:') . round($totaltime, 4));
+                    print(' QC: ' . $query_counter);
+                    ?> 
+                    <? if (XHPROF) { print($xhprof_link); } ?> 
+                    <? if (defined('SQL_DEBUG')) { print(web_SqlDebugIconShow()); }?>
+                </p>
+
+            </div>
+
+        </div>
+    </body>
