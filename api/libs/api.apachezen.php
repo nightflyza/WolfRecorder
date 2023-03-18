@@ -244,7 +244,8 @@ class ApacheZen {
                 '/var/www/html/',
                 '/data/',
                 'dev/WolfRecorder/',
-                'wolfrecorder/'
+                'wolfrecorder/',
+                'wr/'
             );
 
             $hlights = array(
