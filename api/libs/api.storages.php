@@ -68,6 +68,36 @@ class Storages {
     }
 
     /**
+     * Returns storage data by its ID
+     * 
+     * @param int $storageId
+     * 
+     * @return array
+     */
+    public function getStorageData($storageId) {
+        $result = array();
+        if (isset($this->allStorages[$storageId])) {
+            $result = $this->allStorages[$storageId];
+        }
+        return($result);
+    }
+
+    /**
+     * Returns all existing storages names as id=>name
+     * 
+     * @return array
+     */
+    public function getAllStorageNames() {
+        $result = array();
+        if (!empty($this->allStorages)) {
+            foreach ($this->allStorages as $io => $each) {
+                $result[$each['id']] = $each['name'];
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Creates new storage in database
      * 
      * @param string $path
