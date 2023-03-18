@@ -106,7 +106,7 @@ class Taskbar {
      */
     protected function setCategories() {
         $this->categories['widgets'] = '';
-        $this->categories['directories'] = __('Directories');
+        $this->categories['settings'] = __('Settings');
         $this->categories['reports'] = __('Reports');
         $this->categories['system'] = __('System');
     }
