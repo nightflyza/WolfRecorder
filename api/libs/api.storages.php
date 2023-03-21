@@ -180,7 +180,7 @@ class Storages {
      * 
      * @return bool
      */
-    protected function checkPath($path) {
+    public function checkPath($path) {
         $result = false;
         if (file_exists($path)) {
             if (is_dir($path)) {
