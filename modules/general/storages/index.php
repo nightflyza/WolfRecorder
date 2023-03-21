@@ -1,6 +1,6 @@
 <?php
 
-if (cfr('ROOT')) {
+if (cfr('STORAGES')) {
     $storages = new Storages();
 
     //storage creation

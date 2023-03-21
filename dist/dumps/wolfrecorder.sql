@@ -14,3 +14,11 @@ CREATE TABLE IF NOT EXISTS `storages` (
   `name` varchar(64) NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `models` (
+  `id` int(11) NOT NULL auto_increment,
+  `modelname` varchar(255) NOT NULL,
+  `template` varchar(64) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;

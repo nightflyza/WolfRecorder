@@ -1,0 +1,6 @@
+DEVICE="Dahua NVR"
+PROTO="rtsp"
+MAIN_STREAM="/cam/realmonitor?channel=7&subtype=0"
+SUB_STREAM="/cam/realmonitor?channel=7&subtype=1"
+RTSP_PORT=554
+HTTP_PORT=80
