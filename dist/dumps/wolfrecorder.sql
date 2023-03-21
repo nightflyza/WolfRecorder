@@ -22,3 +22,16 @@ CREATE TABLE IF NOT EXISTS `models` (
   `template` varchar(64) NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `cameras` (
+  `id` int(11) NOT NULL auto_increment,
+  `modelid` INT(11) NOT NULL,
+  `ip` varchar(64) NOT NULL,
+  `login` varchar(128) NOT NULL,
+  `password` varchar(128) NOT NULL,
+  `active` tinyint(2) NOT NULL DEFAULT 0,
+  `storageid` INT(11) NOT NULL,
+  `channel`  varchar(64) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;

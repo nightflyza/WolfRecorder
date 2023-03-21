@@ -46,6 +46,7 @@ class Models {
     const PROUTE_NEWMODELNAME = 'newmodelname';
     const PROUTE_NEWMODELTPL = 'newmodeltemplate';
     const ROUTE_DELMODEL = 'deletemodelid';
+    const DATA_TABLE = 'models';
 
     public function __construct() {
         $this->initMessages();
@@ -69,7 +70,7 @@ class Models {
      * @return void
      */
     protected function initModelsDb() {
-        $this->modelsDb = new NyanORM('models');
+        $this->modelsDb = new NyanORM(self::DATA_TABLE);
     }
 
     /**
@@ -215,6 +216,21 @@ class Models {
             $result .= wf_TableBody($rows, '100%', 0, 'sortable');
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
+        }
+        return($result);
+    }
+
+    /**
+     * Returns all available model names as id=>modelName
+     * 
+     * @return array
+     */
+    public function getAllModelNames() {
+        $result = array();
+        if (!empty($this->allModels)) {
+            foreach ($this->allModels as $io => $each) {
+                $result[$each['id']] = $each['modelname'];
+            }
         }
         return($result);
     }

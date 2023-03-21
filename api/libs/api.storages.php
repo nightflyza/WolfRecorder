@@ -33,6 +33,7 @@ class Storages {
     const PROUTE_NAME = 'newstoragename';
     const ROUTE_DEL = 'deletestorageid';
     const URL_ME = '?module=storages';
+    const DATA_TABLE = 'storages';
 
     public function __construct() {
         $this->initMessages();
@@ -55,7 +56,7 @@ class Storages {
      * @return void
      */
     protected function initStoragesDb() {
-        $this->storagesDb = new NyanORM('storages');
+        $this->storagesDb = new NyanORM(self::DATA_TABLE);
     }
 
     /**
