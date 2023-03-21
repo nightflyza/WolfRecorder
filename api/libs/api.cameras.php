@@ -178,28 +178,34 @@ class Cameras {
         $allStorages = $this->storages->getAllStorageNames();
         $allModels = $this->models->getAllModelNames();
         if (isset($allStorages[$storageId])) {
-            if (isset($allModels[$modelId])) {
-                if (zb_isIPValid($ipF)) {
-                    if (zb_PingICMP($ipF)) {
-                        if (!empty($loginF) AND ! empty($passwordF)) {
-                            $this->camerasDb->data('modelid', $modelId);
-                            $this->camerasDb->data('ip', $ipF);
-                            $this->camerasDb->data('login', $loginF);
-                            $this->camerasDb->data('password', $passwordF);
-                            $this->camerasDb->data('active', $actF);
-                            $this->camerasDb->data('storageid', $storageId);
-                            $this->camerasDb->data('channel', $channelId);
-                            $this->camerasDb->create();
-                            $newId = $this->camerasDb->getLastId();
-                            log_register('CAMERA CREATE [' . $newId . ']  MODEL [' . $modelId . '] IP `' . $ip . '` STORAGE [' . $storageId . ']');
+            $storageData = $this->storages->getStorageData($storageId);
+            $storagePathValid = $this->storages->checkPath($storageData['path']);
+            if ($storagePathValid) {
+                if (isset($allModels[$modelId])) {
+                    if (zb_isIPValid($ipF)) {
+                        if (zb_PingICMP($ipF)) {
+                            if (!empty($loginF) AND ! empty($passwordF)) {
+                                $this->camerasDb->data('modelid', $modelId);
+                                $this->camerasDb->data('ip', $ipF);
+                                $this->camerasDb->data('login', $loginF);
+                                $this->camerasDb->data('password', $passwordF);
+                                $this->camerasDb->data('active', $actF);
+                                $this->camerasDb->data('storageid', $storageId);
+                                $this->camerasDb->data('channel', $channelId);
+                                $this->camerasDb->create();
+                                $newId = $this->camerasDb->getLastId();
+                                log_register('CAMERA CREATE [' . $newId . ']  MODEL [' . $modelId . '] IP `' . $ip . '` STORAGE [' . $storageId . ']');
+                            } else {
+                                $result .= __('Login or password is empty');
+                            }
                         } else {
-                            $result .= __('Login or password is empty');
+                            $result .= __('IP') . ' `' . $ip . '`' . __('is not accessible');
                         }
                     } else {
-                        $result .= __('IP') . ' `' . $ip . '`' . __('is not accessible');
+                        $result .= __('Wrong IP format') . ': `' . $ip . '`';
                     }
                 } else {
-                    $result .= __('Wrong IP format') . ': `' . $ip . '`';
+                    $result .= __('Storage path is not writable');
                 }
             } else {
                 $result .= __('Model') . ' [' . $modelId . '] ' . __('not exists');
@@ -269,6 +275,15 @@ class Cameras {
         }
 
         return($result);
+    }
+
+    /**
+     * Returns all available cameras data as id=>cameraData
+     * 
+     * @return array
+     */
+    public function getAllCamerasData() {
+        return($this->allCameras);
     }
 
 }
