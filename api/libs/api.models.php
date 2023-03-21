@@ -41,6 +41,7 @@ class Models {
      * some predefined stuff here
      */
     const TEMPLATES_PATH = 'config/modeltemplates/';
+    const CUSTOM_TEMPLATES_PATH = 'config/mymodeltemplates/';
     const URL_ME = '?module=models';
     const PROUTE_NEWMODELNAME = 'newmodelname';
     const PROUTE_NEWMODELTPL = 'newmodeltemplate';
@@ -86,10 +87,22 @@ class Models {
      * @return void
      */
     protected function loadAllTemplates() {
+        //basic templates loading
         $templatesRaw = rcms_scandir(self::TEMPLATES_PATH);
         if (!empty($templatesRaw)) {
             foreach ($templatesRaw as $io => $eachTemplate) {
                 $templateData = rcms_parse_ini_file(self::TEMPLATES_PATH . $eachTemplate);
+                if (is_array($templateData)) {
+                    $this->allTemplatesData[$eachTemplate] = $templateData;
+                    $this->allTemplateNames[$eachTemplate] = $templateData['DEVICE'];
+                }
+            }
+        }
+        //custom user templates after-loading as overrides
+        $customTemplatesRaw = rcms_scandir(self::CUSTOM_TEMPLATES_PATH);
+        if (!empty($customTemplatesRaw)) {
+            foreach ($customTemplatesRaw as $io => $eachTemplate) {
+                $templateData = rcms_parse_ini_file(self::CUSTOM_TEMPLATES_PATH . $eachTemplate);
                 if (is_array($templateData)) {
                     $this->allTemplatesData[$eachTemplate] = $templateData;
                     $this->allTemplateNames[$eachTemplate] = $templateData['DEVICE'];
@@ -111,13 +124,17 @@ class Models {
         $modelNameF = ubRouting::filters($modelName, 'mres');
         $templateF = ubRouting::filters($modelTemplate, 'mres');
         if (!empty($modelNameF)) {
-            $this->modelsDb->data('modelname', $modelNameF);
-            $this->modelsDb->data('template', $templateF);
-            $this->modelsDb->create();
-            $newId = $this->modelsDb->getLastId();
-            log_register('MODEL CREATE [' . $newId . '] NAME `' . $modelName . '` TEMPLATE `' . $modelTemplate . '`');
+            if (isset($this->allTemplatesData[$templateF])) {
+                $this->modelsDb->data('modelname', $modelNameF);
+                $this->modelsDb->data('template', $templateF);
+                $this->modelsDb->create();
+                $newId = $this->modelsDb->getLastId();
+                log_register('MODEL CREATE [' . $newId . '] NAME `' . $modelName . '` TEMPLATE `' . $modelTemplate . '`');
+            } else {
+                $result .= __('Template not exists');
+            }
         } else {
-            $result = __('Model name is empty');
+            $result .= __('Model name is empty');
         }
         return($result);
     }
