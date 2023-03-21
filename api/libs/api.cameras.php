@@ -48,6 +48,7 @@ class Cameras {
     const PROUTE_NEWPASS = 'newcamerapassword';
     const PROUTE_NEWACT = 'newcameraactive';
     const PROUTE_NEWSTORAGE = 'newcamerastorageid';
+    const ROUTE_DEL = 'deletecameraid';
 
     public function __construct() {
         $this->initMessages();
@@ -205,6 +206,44 @@ class Cameras {
             }
         } else {
             $result .= __('Storage') . ' [' . $storageId . '] ' . __('not exists');
+        }
+        return($result);
+    }
+
+    /**
+     * Renders available cameras list
+     * 
+     * @return string
+     */
+    public function renderList() {
+        $result = '';
+        if (!empty($this->allCameras)) {
+            $allModels= $this->models->getAllModelNames();
+            $allStorages= $this->storages->getAllStorageNames();
+            
+            $cells = wf_TableCell(__('ID'));
+            $cells .= wf_TableCell(__('Model'));
+            $cells .= wf_TableCell(__('IP'));
+            $cells .= wf_TableCell(__('Login'));
+            $cells .= wf_TableCell(__('Password'));
+            $cells .= wf_TableCell(__('Enabled'));
+            $cells .= wf_TableCell(__('Storage'));
+            $cells .= wf_TableCell(__('Actions'));
+            $rows = wf_TableRow($cells, 'row1');
+            foreach ($this->allCameras as $io => $each) {
+                $cells = wf_TableCell($each['id']);
+                $cells .= wf_TableCell($allModels[$each['modelid']]);
+                $cells .= wf_TableCell($each['ip']);
+                $cells .= wf_TableCell($each['login']);
+                $cells .= wf_TableCell($each['password']);
+                $cells .= wf_TableCell(web_bool_led($each['active']));
+                $cells .= wf_TableCell(__($allStorages[$each['storageid']]));
+                $cells .= wf_TableCell(__('TODO'));
+                $rows .= wf_TableRow($cells, 'row5');
+            }
+            $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
         }
         return($result);
     }

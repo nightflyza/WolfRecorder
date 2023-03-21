@@ -5,21 +5,18 @@ if (cfr('CAMERAS')) {
 
     //new camera creation
     if (ubRouting::checkPost(array($cameras::PROUTE_NEWMODEL, $cameras::PROUTE_NEWIP, $cameras::PROUTE_NEWLOGIN, $cameras::PROUTE_NEWPASS, $cameras::PROUTE_NEWSTORAGE))) {
-        $creationResult=$cameras->create(
-                ubRouting::post($cameras::PROUTE_NEWMODEL), 
-                ubRouting::post($cameras::PROUTE_NEWIP),
-                ubRouting::post($cameras::PROUTE_NEWLOGIN),
-                ubRouting::post($cameras::PROUTE_NEWPASS),
-                ubRouting::post($cameras::PROUTE_NEWACT),
-                ubRouting::post($cameras::PROUTE_NEWSTORAGE)
-                );
+        $creationResult = $cameras->create(ubRouting::post($cameras::PROUTE_NEWMODEL), ubRouting::post($cameras::PROUTE_NEWIP), ubRouting::post($cameras::PROUTE_NEWLOGIN), ubRouting::post($cameras::PROUTE_NEWPASS), ubRouting::post($cameras::PROUTE_NEWACT), ubRouting::post($cameras::PROUTE_NEWSTORAGE));
         if ($creationResult) {
             show_error($creationResult);
         } else {
             ubRouting::nav($cameras::URL_ME);
         }
     }
+
+    //camera deletion
+
     show_window(__('Create new camera'), $cameras->renderCreateForm());
+    show_window(__('Available cameras'), $cameras->renderList());
 } else {
     show_error(__('Access denied'));
 }

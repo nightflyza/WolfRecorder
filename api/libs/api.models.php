@@ -162,9 +162,15 @@ class Models {
      * @return bool
      */
     protected function isProtected($modelId) {
-        $result = false;
+        $result = true;
         $modelId = ubRouting::filters($modelId, 'int');
-        //TODO: some checks here to check is this model used for some cameras or not?
+        $camerasDb = new NyanORM(Cameras::DATA_TABLE);
+        $camerasDb->where('modelid', '=', $modelId);
+        $camerasDb->selectable('id');
+        $usedByCameras = $camerasDb->getAll();
+        if (!$usedByCameras) {
+            $result = false;
+        }
         return($result);
     }
 

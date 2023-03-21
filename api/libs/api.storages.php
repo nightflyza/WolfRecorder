@@ -236,8 +236,15 @@ class Storages {
      * @return bool
      */
     protected function isProtected($storageId) {
-        $result = false;
-        //TODO: do here few checks to prevent deletion of storage which is used now
+        $result = true;
+        $storageId = ubRouting::filters($storageId, 'int');
+        $camerasDb = new NyanORM(Cameras::DATA_TABLE);
+        $camerasDb->where('storageid', '=', $storageId);
+        $camerasDb->selectable('id');
+        $usedByCameras = $camerasDb->getAll();
+        if (!$usedByCameras) {
+            $result = false;
+        }
         return($result);
     }
 
