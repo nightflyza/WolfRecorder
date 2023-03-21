@@ -14,6 +14,14 @@ if (cfr('CAMERAS')) {
     }
 
     //camera deletion
+    if (ubRouting::checkGet($cameras::ROUTE_DEL)) {
+        $deletionResult = $cameras->delete(ubRouting::get($cameras::ROUTE_DEL));
+        if ($deletionResult) {
+            show_error($deletionResult);
+        } else {
+            ubRouting::nav($cameras::URL_ME);
+        }
+    }
 
     show_window(__('Create new camera'), $cameras->renderCreateForm());
     show_window(__('Available cameras'), $cameras->renderList());

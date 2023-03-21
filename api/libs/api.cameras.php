@@ -218,9 +218,9 @@ class Cameras {
     public function renderList() {
         $result = '';
         if (!empty($this->allCameras)) {
-            $allModels= $this->models->getAllModelNames();
-            $allStorages= $this->storages->getAllStorageNames();
-            
+            $allModels = $this->models->getAllModelNames();
+            $allStorages = $this->storages->getAllStorageNames();
+
             $cells = wf_TableCell(__('ID'));
             $cells .= wf_TableCell(__('Model'));
             $cells .= wf_TableCell(__('IP'));
@@ -238,13 +238,36 @@ class Cameras {
                 $cells .= wf_TableCell($each['password']);
                 $cells .= wf_TableCell(web_bool_led($each['active']));
                 $cells .= wf_TableCell(__($allStorages[$each['storageid']]));
-                $cells .= wf_TableCell(__('TODO'));
+                $actLinks = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert());
+                $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
             }
             $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
         }
+        return($result);
+    }
+
+    /**
+     * Deletes existing camera from database
+     * 
+     * @param int $cameraId
+     * 
+     * @return void/string on error
+     */
+    public function delete($cameraId) {
+        $result = '';
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        //TODO: do something around camera deactivation and checks for running recording
+        if (isset($this->allCameras[$cameraId])) {
+            $this->camerasDb->where('id', '=', $cameraId);
+            $this->camerasDb->delete();
+            log_register('CAMERA DELETE [' . $cameraId . ']');
+        } else {
+            $result .= __('Camera not exists') . ' [' . $cameraId . ']';
+        }
+
         return($result);
     }
 

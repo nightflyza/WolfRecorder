@@ -99,6 +99,25 @@ class Storages {
     }
 
     /**
+     * Checks is some path not used by another storage?
+     * 
+     * @param string $path
+     * 
+     * @return bool
+     */
+    protected function isPathUnique($path) {
+        $result = true;
+        if (!empty($this->allStorages)) {
+            foreach ($this->allStorages as $io => $each) {
+                if ($each['path'] == $path) {
+                    $result = false;
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Creates new storage in database
      * 
      * @param string $path
@@ -111,22 +130,26 @@ class Storages {
         $pathF = ubRouting::filters($path, 'mres');
         $nameF = ubRouting::filters($name, 'mres');
         if (!empty($pathF) AND ! empty($nameF)) {
-            if (file_exists($pathF)) {
-                if (is_dir($pathF)) {
-                    if (is_writable($pathF)) {
-                        $this->storagesDb->data('path', $pathF);
-                        $this->storagesDb->data('name', $nameF);
-                        $this->storagesDb->create();
-                        $storageId = $this->storagesDb->getLastId();
-                        log_register('STORAGE CREATE [' . $storageId . '] PATH `' . $path . '` NAME `' . $name . '`');
+            if ($this->isPathUnique($pathF)) {
+                if (file_exists($pathF)) {
+                    if (is_dir($pathF)) {
+                        if (is_writable($pathF)) {
+                            $this->storagesDb->data('path', $pathF);
+                            $this->storagesDb->data('name', $nameF);
+                            $this->storagesDb->create();
+                            $storageId = $this->storagesDb->getLastId();
+                            log_register('STORAGE CREATE [' . $storageId . '] PATH `' . $path . '` NAME `' . $name . '`');
+                        } else {
+                            $result = __('Storage path is not writable');
+                        }
                     } else {
-                        $result = __('Storage path is not writable');
+                        $result = __('Storage path is not directory');
                     }
                 } else {
-                    $result = __('Storage path is not directory');
+                    $result = __('Storage path not exists');
                 }
             } else {
-                $result = __('Storage path not exists');
+                $result = __('Another storage with such path is already exists');
             }
         } else {
             $result = __('Storage path or name is empty');
