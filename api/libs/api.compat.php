@@ -724,3 +724,39 @@ function zb_ParseTagData($openTag, $closeTag, $stringToParse = '', $mutipleResul
     }
     return($result);
 }
+
+
+/**
+ * Renders time duration in seconds into formatted human-readable view
+ *      
+ * @param int $seconds
+ * 
+ * @return string
+ */
+function zb_formatTime($seconds) {
+    $init = $seconds;
+    $days = floor($seconds / 86400);
+    $hours = floor($seconds / 3600);
+    $minutes = floor(($seconds / 60) % 60);
+    $seconds = $seconds % 60;
+
+    if ($init < 3600) {
+//less than 1 hour
+        if ($init < 60) {
+//less than minute
+            $result = $seconds . ' ' . __('sec.');
+        } else {
+//more than one minute
+            $result = $minutes . ' ' . __('minutes') . ' ' . $seconds . ' ' . __('seconds');
+        }
+    } else {
+        if ($init < 86400) {
+//more than hour
+            $result = $hours . ' ' . __('hour') . ' ' . $minutes . ' ' . __('minutes') . ' ' . $seconds . ' ' . __('seconds');
+        } else {
+            $hoursLeft = $hours - ($days * 24);
+            $result = $days . ' ' . __('days') . ' ' . $hoursLeft . ' ' . __('hour') . ' ' . $minutes . ' ' . __('minutes') . ' ' . $seconds . ' ' . __('seconds');
+        }
+    }
+    return ($result);
+}

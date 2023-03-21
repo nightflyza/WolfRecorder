@@ -99,6 +99,15 @@ class Storages {
     }
 
     /**
+     * Returns all storages data as id=>storageData
+     * 
+     * @return array
+     */
+    public function getAllStoragesData() {
+        return($this->allStorages);
+    }
+
+    /**
      * Checks is some path not used by another storage?
      * 
      * @param string $path

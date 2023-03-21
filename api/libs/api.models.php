@@ -241,4 +241,21 @@ class Models {
         return($result);
     }
 
+    /**
+     * Returns all models templates as modelId=>templateData
+     * 
+     * @return array
+     */
+    public function getAllModelTemplates() {
+        $result = array();
+        if (!empty($this->allModels)) {
+            foreach ($this->allModels as $io => $each) {
+                if (isset($this->allTemplatesData[$each['template']])) {
+                    $result[$each['id']] = $this->allTemplatesData[$each['template']];
+                }
+            }
+        }
+        return($result);
+    }
+
 }
