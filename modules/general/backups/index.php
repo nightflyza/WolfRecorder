@@ -3,11 +3,12 @@
 if (cfr('BACKUP')) {
     set_time_limit(0);
     $alterConf = $ubillingConfig->getAlter();
+    $binPathsConf=$ubillingConfig->getBinpaths();
 
     if (!ubRouting::checkGet(array('restore'))) {
         if (ubRouting::post('createbackup')) {
             if (ubRouting::post('imready')) {
-                if (!empty($alterConf['MYSQLDUMP_PATH'])) {
+                if (!empty($binPathsConf['MYSQLDUMP_PATH'])) {
                     //run system mysqldump command
                     zb_BackupDatabase();
                 } else {
@@ -87,7 +88,7 @@ if (cfr('BACKUP')) {
     } else {
         //database restoration functionality
         if (cfr('ROOT')) {
-            if (!empty($alterConf['MYSQL_PATH'])) {
+            if (!empty($binPathsConf['MYSQL_PATH'])) {
                 if (ubRouting::checkGet(array('restoredump'))) {
                     $mysqlConf = rcms_parse_ini_file(CONFIG_PATH . 'mysql.ini');
                     $restoreFilename = base64_decode(ubRouting::get('restoredump'));
@@ -104,7 +105,7 @@ if (cfr('BACKUP')) {
                             show_window(__('Warning'), $lastChanceForm);
                             show_window('', wf_BackLink('?module=backups', __('Back'), true, 'ubButton'));
                         } else {
-                            $restoreCommand = $alterConf['MYSQL_PATH'] . ' --host ' . $mysqlConf['server'] . ' -u ' . $mysqlConf['username'] . ' -p' . $mysqlConf['password'] . ' ' . $mysqlConf['db'] . ' --default-character-set=utf8 < ' . $restoreFilename . ' 2>&1';
+                            $restoreCommand = $binPathsConf['MYSQL_PATH'] . ' --host ' . $mysqlConf['server'] . ' -u ' . $mysqlConf['username'] . ' -p' . $mysqlConf['password'] . ' ' . $mysqlConf['db'] . ' --default-character-set=utf8 < ' . $restoreFilename . ' 2>&1';
                             $restoreResult = shell_exec($restoreCommand);
                             if (ispos($restoreResult, 'command line interface')) {
                                 $restoreResult = '';

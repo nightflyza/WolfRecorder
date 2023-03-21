@@ -124,7 +124,7 @@ class ApacheZen {
      */
     protected function loadConfigs() {
         global $ubillingConfig;
-        $this->billCfg = $ubillingConfig->getBilling();
+        $this->billCfg = $ubillingConfig->getBinpaths();
         $this->grep = $this->billCfg['GREP'];
         $this->tail = $this->billCfg['TAIL'];
         $this->cat = $this->billCfg['CAT'];

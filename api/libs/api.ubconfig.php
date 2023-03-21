@@ -8,13 +8,13 @@ class UbillingConfig {
 
     //stores system configs
     protected $alterCfg = array();
-    protected $billingCfg = array();
+    protected $binpathsCfg = array();
     protected $photoCfg = array();
     protected $ymapsCfg = array();
 
     public function __construct() {
         $this->loadAlter();
-        $this->loadBilling();
+        $this->loadBinpaths();
     }
 
     /**
@@ -49,17 +49,17 @@ class UbillingConfig {
      * 
      * @return void
      */
-    protected function loadBilling() {
-        $this->billingCfg = rcms_parse_ini_file(CONFIG_PATH . 'billing.ini');
+    protected function loadBinpaths() {
+        $this->binpathsCfg = rcms_parse_ini_file(CONFIG_PATH . 'binpaths.ini');
     }
 
     /**
-     * getter of private billingCfg prop
+     * getter of private binpathsCfg prop
      * 
      * @return array
      */
-    public function getBilling() {
-        return ($this->billingCfg);
+    public function getBinpaths() {
+        return ($this->binpathsCfg);
     }
 
     /**

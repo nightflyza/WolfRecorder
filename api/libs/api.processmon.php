@@ -135,7 +135,7 @@ class ProcessMon {
             $processPid = $processData['pid'];
             $runningPids = $this->getRunningPids();
             if (isset($runningPids[$processPid])) {
-                $billCfg = $ubillingConfig->getBilling();
+                $billCfg = $ubillingConfig->getBinpaths();
                 $sudoPath = $billCfg['SUDO'];
                 $killPath = $billCfg['KILL'];
                 $stopModifier = ($brutal) ? '-9' : '';
