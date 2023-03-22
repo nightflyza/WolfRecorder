@@ -8,7 +8,7 @@ if (cfr('ROOT')) {
 
     debarr($recorder->runRecord(2));
     debarr($recorder->runRecord(3));
-      debarr($recorder->runRecord(4));
+    debarr($recorder->runRecord(4));
 } else {
     show_error(__('Access denied'));
 }
