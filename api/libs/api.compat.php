@@ -725,7 +725,6 @@ function zb_ParseTagData($openTag, $closeTag, $stringToParse = '', $mutipleResul
     return($result);
 }
 
-
 /**
  * Renders time duration in seconds into formatted human-readable view
  *      
@@ -759,4 +758,70 @@ function zb_formatTime($seconds) {
         }
     }
     return ($result);
+}
+
+/**
+ * Validate a Gregorian date 
+ * 
+ * @param string $date Date in MySQL format
+ * @return bool
+ */
+function zb_checkDate($date) {
+    $explode = explode('-', $date);
+    @$year = $explode[0];
+    @$month = $explode[1];
+    @$day = $explode[2];
+    $result = @checkdate($month, $day, $year);
+    return ($result);
+}
+
+
+/**
+ * Checks is time between some other time ranges?
+ * 
+ * @param string $fromTime start time (format hh:mm OR hh:mm:ss with seconds)
+ * @param string $toTime end time
+ * @param string $checkTime time to check
+ * @param bool $seconds 
+ * 
+ * @return bool
+ */
+function zb_isTimeBetween($fromTime, $toTime, $checkTime, $seconds = false) {
+    if ($seconds) {
+        $formatPostfix = ':s';
+    } else {
+        $formatPostfix = '';
+    }
+    $checkTime = strtotime($checkTime);
+    $checkTime = date("H:i" . $formatPostfix, $checkTime);
+    $f = DateTime::createFromFormat('!H:i' . $formatPostfix, $fromTime);
+    $t = DateTime::createFromFormat('!H:i' . $formatPostfix, $toTime);
+    $i = DateTime::createFromFormat('!H:i' . $formatPostfix, $checkTime);
+    if ($f > $t) {
+        $t->modify('+1 day');
+    }
+    return ($f <= $i && $i <= $t) || ($f <= $i->modify('+1 day') && $i <= $t);
+}
+
+/**
+ * Checks is date between some other date ranges?
+ * 
+ * @param string $fromDate start date (format Y-m-d)
+ * @param string $toDate end date
+ * @param string $checkDate date to check
+ * @param bool $seconds 
+ * 
+ * @return bool
+ */
+function zb_isDateBetween($fromDate, $toDate, $checkDate) {
+    $result = false;
+    $fromDate = strtotime($fromDate);
+    $toDate = strtotime($toDate);
+    $checkDate = strtotime($checkDate);
+    $checkDate = date("Y-m-d", $checkDate);
+    $checkDate = strtotime($checkDate);
+    if ($checkDate >= $fromDate AND $checkDate <= $toDate) {
+        $result = true;
+    }
+    return($result);
 }

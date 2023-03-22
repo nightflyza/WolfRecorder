@@ -226,8 +226,6 @@ class Cameras {
             $cells = wf_TableCell(__('ID'));
             $cells .= wf_TableCell(__('Model'));
             $cells .= wf_TableCell(__('IP'));
-            $cells .= wf_TableCell(__('Login'));
-            $cells .= wf_TableCell(__('Password'));
             $cells .= wf_TableCell(__('Enabled'));
             $cells .= wf_TableCell(__('Storage'));
             $cells .= wf_TableCell(__('Actions'));
@@ -236,8 +234,6 @@ class Cameras {
                 $cells = wf_TableCell($each['id']);
                 $cells .= wf_TableCell($allModels[$each['modelid']]);
                 $cells .= wf_TableCell($each['ip']);
-                $cells .= wf_TableCell($each['login']);
-                $cells .= wf_TableCell($each['password']);
                 $cells .= wf_TableCell(web_bool_led($each['active']));
                 $cells .= wf_TableCell(__($allStorages[$each['storageid']]));
                 $actLinks = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert());
@@ -263,9 +259,13 @@ class Cameras {
         $cameraId = ubRouting::filters($cameraId, 'int');
         //TODO: do something around camera deactivation and checks for running recording
         if (isset($this->allCameras[$cameraId])) {
-            $this->camerasDb->where('id', '=', $cameraId);
-            $this->camerasDb->delete();
-            log_register('CAMERA DELETE [' . $cameraId . ']');
+            if (!$this->allCameras[$cameraId]['active']) {
+                $this->camerasDb->where('id', '=', $cameraId);
+                $this->camerasDb->delete();
+                log_register('CAMERA DELETE [' . $cameraId . ']');
+            } else {
+                $result .= __('You cant delete camera which is now active');
+            }
         } else {
             $result .= __('Camera not exists') . ' [' . $cameraId . ']';
         }
