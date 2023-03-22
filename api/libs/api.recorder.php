@@ -315,7 +315,7 @@ class Recorder {
                         $cameraId = $eachCamera['CAMERA']['id'];
                         $recordingProcess = new StarDust(self::PID_PREFIX . $cameraId);
                         if ($recordingProcess->notRunning()) {
-                            $recordingProcess->runBackgroundProcess(self::WRAPPER . ' "recherd&cameraid=' . $cameraId . '"');
+                            $recordingProcess->runBackgroundProcess(self::WRAPPER . ' "recherd&cameraid=' . $cameraId . '"',1);
                         }
                     }
                 }

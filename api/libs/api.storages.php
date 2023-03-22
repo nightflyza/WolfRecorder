@@ -247,8 +247,8 @@ class Storages {
                 $storageState = ($this->checkPath($each['path'])) ? true : false;
                 $stateIcon = web_bool_led($storageState);
                 $cells .= wf_TableCell($stateIcon);
-                $storageSize = disk_total_space($each['path']);
-                $storageFree = disk_free_space($each['path']);
+                $storageSize = @disk_total_space($each['path']);
+                $storageFree = @disk_free_space($each['path']);
                 $storageSizeLabel = ($storageState) ? stg_convert_size($storageSize) : '-';
                 $storageFreeLabel = ($storageState) ? stg_convert_size($storageFree) : '-';
                 $cells .= wf_TableCell($storageSizeLabel);

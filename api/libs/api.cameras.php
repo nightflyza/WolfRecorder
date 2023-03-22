@@ -129,13 +129,17 @@ class Cameras {
         $allStorages = $this->storages->getAllStorageNames();
         $allModels = $this->models->getAllModelNames();
         if (!empty($allStorages)) {
+            $storagesParams=array();
+            foreach ($allStorages as $eachStorageId=>$eachStorageName) {
+                $storagesParams[$eachStorageId]=__($eachStorageName);
+            }
             if (!empty($allModels)) {
                 $inputs = wf_Selector(self::PROUTE_NEWMODEL, $allModels, __('Model'), '', false) . ' ';
                 $inputs .= wf_TextInput(self::PROUTE_NEWIP, __('IP'), '', false, 12, 'ip') . ' ';
                 $inputs .= wf_TextInput(self::PROUTE_NEWLOGIN, __('Login'), '', false, 12, 'alphanumeric') . ' ';
                 $inputs .= wf_TextInput(self::PROUTE_NEWPASS, __('Password'), '', false, 12, '') . ' ';
                 $inputs .= wf_CheckInput(self::PROUTE_NEWACT, __('Enabled'), false, true) . ' ';
-                $inputs .= wf_Selector(self::PROUTE_NEWSTORAGE, $allStorages, __('Storage'), '', false) . ' ';
+                $inputs .= wf_Selector(self::PROUTE_NEWSTORAGE,  $storagesParams, __('Storage'), '', false) . ' ';
                 $inputs .= wf_Submit(__('Create'));
                 $result .= wf_Form('', 'POST', $inputs, 'glamour');
             } else {
