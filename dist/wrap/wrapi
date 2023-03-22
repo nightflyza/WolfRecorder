@@ -1,0 +1,15 @@
+#!/bin/sh
+
+#= Change this to your real WolfRecorder serial ==
+WRSERIAL=WR00000000000000000000000000000000
+#=============================================
+if [ $# -ne 1 ]
+then
+  echo "Usage: /bin/wrapi \"action\""
+  echo "Example: /bin/wrapi \"backupdb\"" 
+  exit
+fi
+
+ACTION=$1
+/usr/local/bin/curl -o /dev/null "http://127.0.0.1/wr/?module=remoteapi&key=${WRSERIAL}&action=${ACTION}"
+
