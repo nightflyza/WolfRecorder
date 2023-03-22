@@ -156,3 +156,46 @@ function rcms_delete_files($file, $recursive = false) {
         return unlink($file);
     }
 }
+
+
+/**
+ * Cleanups backups directory dumps older than X days encoded in filename.
+ * 
+ * @param int $maxAge
+ * 
+ * @return void
+ */
+function zb_BackupsRotate($maxAge) {
+    $maxAge = vf($maxAge, 3);
+    if ($maxAge) {
+        if (is_numeric($maxAge)) {
+            $curTimeStamp = curdate();
+            $curTimeStamp = strtotime($curTimeStamp);
+            $cleanupTimeStamp = $curTimeStamp - ($maxAge * 86400); // Option is in days
+            $backupsDirectory = DATA_PATH . 'backups/sql/';
+            $backupsPrefix = 'wolfrecorder-';
+            $backupsExtension = '.sql';
+            $allBackups = rcms_scandir($backupsDirectory, '*' . $backupsExtension);
+            if (!empty($allBackups)) {
+                foreach ($allBackups as $io => $eachDump) {
+//trying to extract date from filename
+                    $cleanName = $eachDump;
+                    $cleanName = str_replace($backupsPrefix, '', $cleanName);
+                    $cleanName = str_replace($backupsExtension, '', $cleanName);
+                    if (ispos($cleanName, '_')) {
+                        $explode = explode('_', $cleanName);
+                        $cleanName = $explode[0];
+                        if (zb_checkDate($cleanName)) {
+                            $dumpTimeStamp = strtotime($cleanName);
+                            if ($dumpTimeStamp < $cleanupTimeStamp) {
+                                $rotateBackupPath = $backupsDirectory . $eachDump;
+                                rcms_delete_files($rotateBackupPath);
+                                log_register('BACKUP ROTATE `' . $rotateBackupPath . '`');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
