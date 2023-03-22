@@ -15,14 +15,12 @@ CREATE TABLE IF NOT EXISTS `storages` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-
 CREATE TABLE IF NOT EXISTS `models` (
   `id` int(11) NOT NULL auto_increment,
   `modelname` varchar(255) NOT NULL,
   `template` varchar(64) NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
-
 
 CREATE TABLE IF NOT EXISTS `cameras` (
   `id` int(11) NOT NULL auto_increment,
@@ -35,3 +33,10 @@ CREATE TABLE IF NOT EXISTS `cameras` (
   `channel`  varchar(64) NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+CREATE TABLE `lair` (
+ `id` int(11) NOT NULL auto_increment,
+ `key` VARCHAR( 40 ) NOT NULL ,
+ `value` VARCHAR ( 255 ) NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE = MYISAM CHARSET=utf8 AUTO_INCREMENT=1;

@@ -28,7 +28,8 @@ if (cfr('CAMERAS')) {
         $cameras->deactivate(ubRouting::get($cameras::ROUTE_DEACTIVATE));
         ubRouting::nav($cameras::URL_ME . '&' . $cameras::ROUTE_EDIT . '=' . ubRouting::get($cameras::ROUTE_DEACTIVATE));
     }
-
+    
+    //camera activation here
     if (ubRouting::checkGet($cameras::ROUTE_ACTIVATE)) {
         $cameras->activate(ubRouting::get($cameras::ROUTE_ACTIVATE));
         ubRouting::nav($cameras::URL_ME . '&' . $cameras::ROUTE_EDIT . '=' . ubRouting::get($cameras::ROUTE_ACTIVATE));

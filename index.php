@@ -12,7 +12,7 @@ define('CONFIG_PATH', 'config/');
 define('DATA_PATH', 'content/');
 define('USERS_PATH', 'content/users/');
 define('MODULES_PATH', 'modules/general/');
-
+define('REMOTEAPI_PATH', 'modules/remoteapi/');
 
 /**
  * Profiler init
