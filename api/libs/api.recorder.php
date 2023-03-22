@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Camera streams capture/recording implementation
+ */
 class Recorder {
 
     /**
@@ -71,6 +74,16 @@ class Recorder {
      */
     const PID_PREFIX = 'RECORD_';
 
+    /**
+     * Dinosaurs are my best friends
+     * Through thick and thin, until the very end
+     * People tell me, do not pretend
+     * Stop living in your made up world again
+     * But the dinosaurs, they're real to me
+     * They bring me up and make me happy
+     * Hold on now, I think I see
+     * A dinosaur wants to play with me
+     */
     public function __construct() {
         $this->initMessages();
         $this->loadConfigs();

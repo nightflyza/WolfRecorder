@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Camera devices management
+ */
 class Cameras {
 
     /**
@@ -53,6 +56,16 @@ class Cameras {
     const ROUTE_ACTIVATE = 'activatecameraid';
     const ROUTE_DEACTIVATE = 'deactivatecameraid';
 
+    /**
+     * Dinosaurs are my best friends
+     * Through thick and thin, until the very end
+     * People tell me, do not pretend
+     * Stop living in your made up world again
+     * But the dinosaurs, they're real to me
+     * They bring me up and make me happy
+     * I wish that the world could see
+     * The dinosaurs are a part of me
+     */
     public function __construct() {
         $this->initMessages();
         $this->initCamerasDb();
@@ -385,7 +398,7 @@ class Cameras {
         if (isset($this->allCameras[$cameraId])) {
             $recorder = new Recorder();
             //shutdown recording process
-            $recorder->stopRecord($cameraId);
+            $recorder->stopRecord($cameraId); //this method locks execution until capture process will be really killed
             //disabling camera activity flag
             $this->camerasDb->where('id', '=', $cameraId);
             $this->camerasDb->data('active', 0);
