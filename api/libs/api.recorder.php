@@ -212,8 +212,8 @@ class Recorder {
                                     $fullCommand = 'cd ' . $channelPath . ' && ' . $captureCommand;
 
                                     $this->stardust->start();
-                                    shell_exec($fullCommand);
                                     log_register('RECORDER STARTED [' . $cameraId . ']');
+                                    shell_exec($fullCommand);
                                     $this->stardust->stop();
                                 }
                             }
