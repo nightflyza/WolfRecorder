@@ -23,8 +23,12 @@ if (cfr('CAMERAS')) {
         }
     }
 
-    show_window(__('Create new camera'), $cameras->renderCreateForm());
-    show_window(__('Available cameras'), $cameras->renderList());
+    if (!ubRouting::checkGet($cameras::ROUTE_EDIT)) {
+        show_window(__('Create new camera'), $cameras->renderCreateForm());
+        show_window(__('Available cameras'), $cameras->renderList());
+    } else {
+        show_window(__('Edit camera'), $cameras->renderEditForm(ubRouting::get($cameras::ROUTE_EDIT)));
+    }
 } else {
     show_error(__('Access denied'));
 }

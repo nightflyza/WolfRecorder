@@ -214,7 +214,7 @@ class Models {
             foreach ($this->allModels as $io => $each) {
                 $cells = wf_TableCell($each['id']);
                 $cells .= wf_TableCell($each['modelname']);
-                $cells .= wf_TableCell($each['template']);
+                $cells .= wf_TableCell($this->allTemplateNames[$each['template']]);
                 $actLinks = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DELMODEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert());
                 $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');

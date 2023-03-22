@@ -50,6 +50,8 @@ class Cameras {
     const PROUTE_NEWSTORAGE = 'newcamerastorageid';
     const ROUTE_DEL = 'deletecameraid';
     const ROUTE_EDIT = 'editcameraid';
+    const ROUTE_ACTIVATE = 'activatecameraid';
+    const ROUTE_DEACTIVATE = 'deactivatecameraid';
 
     public function __construct() {
         $this->initMessages();
@@ -223,11 +225,13 @@ class Cameras {
         if (!empty($this->allCameras)) {
             $allModels = $this->models->getAllModelNames();
             $allStorages = $this->storages->getAllStorageNames();
+            $starDust = new StarDust();
 
             $cells = wf_TableCell(__('ID'));
             $cells .= wf_TableCell(__('Model'));
             $cells .= wf_TableCell(__('IP'));
             $cells .= wf_TableCell(__('Enabled'));
+            $cells .= wf_TableCell(__('Recording'));
             $cells .= wf_TableCell(__('Storage'));
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
@@ -236,8 +240,12 @@ class Cameras {
                 $cells .= wf_TableCell($allModels[$each['modelid']]);
                 $cells .= wf_TableCell($each['ip']);
                 $cells .= wf_TableCell(web_bool_led($each['active']));
+                $starDust->setProcess(Recorder::PID_PREFIX . $each['id']);
+                $recordingFlag = $starDust->isRunning();
+                $cells .= wf_TableCell(web_bool_led($recordingFlag));
                 $cells .= wf_TableCell(__($allStorages[$each['storageid']]));
-                $actLinks = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert());
+                $actLinks = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert()) . ' ';
+                $actLinks .= wf_Link(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $each['id'], web_edit_icon(), false);
                 $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
             }
@@ -290,6 +298,77 @@ class Cameras {
                 $result[$each['id']]['STORAGE'] = $allStoragesData[$each['storageid']];
             }
         }
+        return($result);
+    }
+
+    /**
+     * Renders camera editing interface
+     * 
+     * @param int $cameraId
+     * 
+     * @return string
+     */
+    public function renderEditForm($cameraId) {
+        $result = '';
+        $cameraControls = '';
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        if (isset($this->allCameras[$cameraId])) {
+            $allModels = $this->models->getAllModelNames();
+            $allStorages = $this->storages->getAllStorageNames();
+            $cameraData = $this->allCameras[$cameraId];
+            $starDust = new StarDust();
+
+            //camera profile here
+            $cells = wf_TableCell(__('Model'), '40%', 'row2');
+            $cells .= wf_TableCell($allModels[$cameraData['modelid']]);
+            $rows = wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('IP'), '', 'row2');
+            $cells .= wf_TableCell($cameraData['ip']);
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Login'), '', 'row2');
+            $cells .= wf_TableCell($cameraData['login']);
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Password'), '', 'row2');
+            $cells .= wf_TableCell($cameraData['password']);
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Enabled'), '', 'row2');
+            $cells .= wf_TableCell(web_bool_led($cameraData['active']));
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Recording'), '', 'row2');
+            $starDust->setProcess(Recorder::PID_PREFIX . $cameraData['id']);
+            $recordingFlag = $starDust->isRunning();
+            $cells .= wf_TableCell(web_bool_led($recordingFlag));
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Storage'), '', 'row2');
+            $cells .= wf_TableCell(__($allStorages[$cameraData['storageid']]));
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Channel'), '', 'row2');
+            $cells .= wf_TableCell($cameraData['channel']);
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
+
+            //some controls here
+            if ($cameraData['active']) {
+                $cameraControls .= wf_Link(self::URL_ME . '&' . self::ROUTE_DEACTIVATE . '=' . $cameraData['id'], web_bool_led(0) . ' ' . __('Disable'), false, 'ubButton') . ' ';
+            } else {
+                $cameraControls .= wf_Link(self::URL_ME . '&' . self::ROUTE_ACTIVATE . '=' . $cameraData['id'], web_bool_led(0) . ' ' . __('Enable'), false, 'ubButton') . ' ';
+            }
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
+        }
+
+
+        $result .= wf_delimiter(0);
+        $result .= wf_BackLink(self::URL_ME) . ' ';
+        $result .= $cameraControls;
         return($result);
     }
 
