@@ -1,0 +1,9 @@
+kern.hz="1000"
+ipfw_load="YES"
+net.inet.ip.fw.default_to_accept="1"
+libalias_load="YES"
+ipfw_nat_load="YES"
+dummynet_load="YES"
+
+bridge_load="YES"
+net.link.bridge.inherit_mac="1"

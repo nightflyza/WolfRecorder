@@ -1,0 +1,33 @@
+# ====== added by WRinstaller ====
+
+gateway_enable="YES"
+
+# required services
+mysql_enable="YES"
+apache24_enable="YES"
+
+# NTP
+ntpdate_enable="YES"
+ntpdate_hosts="ntp.wolfrecorder.com"
+
+# Firewall
+firewall_enable="YES"
+firewall_nat_enable="YES"
+dummynet_enable="YES"
+firewall_script="/etc/firewall.conf"
+
+# Caching engines
+memcached_enable="YES"
+memcached_flags="-l 127.0.0.1 -m 256 -I 16M"
+
+# FS check options
+fsck_y_enable="YES"
+background_fsck="NO"
+
+# supress sendmail
+sendmail_enable="NO"
+sendmail_submit_enable="NO"
+sendmail_outbound_enable="NO"
+sendmail_msp_queue_enable="NO"
+
+# ==========
