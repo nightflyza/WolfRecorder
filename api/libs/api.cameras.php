@@ -357,9 +357,10 @@ class Cameras {
 
             //some controls here
             if ($cameraData['active']) {
-                $cameraControls .= wf_Link(self::URL_ME . '&' . self::ROUTE_DEACTIVATE . '=' . $cameraData['id'], web_bool_led(0) . ' ' . __('Disable'), false, 'ubButton') . ' ';
+                $deactUrl = self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $cameraData['id'] . '&' . self::ROUTE_DEACTIVATE . '=' . $cameraData['id'];
+                $cameraControls .= wf_Link($deactUrl, web_bool_led(0) . ' ' . __('Disable'), false, 'ubButton') . ' ';
             } else {
-                $cameraControls .= wf_Link(self::URL_ME . '&' . self::ROUTE_ACTIVATE . '=' . $cameraData['id'], web_bool_led(0) . ' ' . __('Enable'), false, 'ubButton') . ' ';
+                $cameraControls .= wf_Link(self::URL_ME . '&' . self::ROUTE_ACTIVATE . '=' . $cameraData['id'], web_bool_led(1) . ' ' . __('Enable'), false, 'ubButton') . ' ';
             }
         } else {
             $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
@@ -370,6 +371,45 @@ class Cameras {
         $result .= wf_BackLink(self::URL_ME) . ' ';
         $result .= $cameraControls;
         return($result);
+    }
+
+    /**
+     * Shutdown camera to unlock its settings
+     * 
+     * @param int $cameraId
+     * 
+     * @return void
+     */
+    public function deactivate($cameraId) {
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        if (isset($this->allCameras[$cameraId])) {
+            $recorder = new Recorder();
+            //shutdown recording process
+            $recorder->stopRecord($cameraId);
+            //disabling camera activity flag
+            $this->camerasDb->where('id', '=', $cameraId);
+            $this->camerasDb->data('active', 0);
+            $this->camerasDb->save();
+            log_register('CAMERA DEACTIVATE [' . $cameraId . ']');
+        }
+    }
+
+    /**
+     * Enables camera to lock its settings
+     * 
+     * @param int $cameraId
+     * 
+     * @return void
+     */
+    public function activate($cameraId) {
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        if (isset($this->allCameras[$cameraId])) {
+            //enabling camera activity flag
+            $this->camerasDb->where('id', '=', $cameraId);
+            $this->camerasDb->data('active', 1);
+            $this->camerasDb->save();
+            log_register('CAMERA ACTIVATE [' . $cameraId . ']');
+        }
     }
 
 }

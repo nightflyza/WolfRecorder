@@ -23,10 +23,22 @@ if (cfr('CAMERAS')) {
         }
     }
 
+    //camera deactivation
+    if (ubRouting::checkGet($cameras::ROUTE_DEACTIVATE)) {
+        $cameras->deactivate(ubRouting::get($cameras::ROUTE_DEACTIVATE));
+        ubRouting::nav($cameras::URL_ME . '&' . $cameras::ROUTE_EDIT . '=' . ubRouting::get($cameras::ROUTE_DEACTIVATE));
+    }
+
+    if (ubRouting::checkGet($cameras::ROUTE_ACTIVATE)) {
+        $cameras->activate(ubRouting::get($cameras::ROUTE_ACTIVATE));
+        ubRouting::nav($cameras::URL_ME . '&' . $cameras::ROUTE_EDIT . '=' . ubRouting::get($cameras::ROUTE_ACTIVATE));
+    }
+
     if (!ubRouting::checkGet($cameras::ROUTE_EDIT)) {
         show_window(__('Create new camera'), $cameras->renderCreateForm());
         show_window(__('Available cameras'), $cameras->renderList());
     } else {
+        //render camera profile
         show_window(__('Edit camera'), $cameras->renderEditForm(ubRouting::get($cameras::ROUTE_EDIT)));
     }
 } else {

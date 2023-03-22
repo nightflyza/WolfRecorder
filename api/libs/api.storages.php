@@ -236,6 +236,7 @@ class Storages {
             $cells .= wf_TableCell(__('Path'));
             $cells .= wf_TableCell(__('Name'));
             $cells .= wf_TableCell(__('State'));
+            $cells .= wf_TableCell(__('Capacity'));
             $cells .= wf_TableCell(__('Free'));
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
@@ -245,15 +246,19 @@ class Storages {
                 $cells .= wf_TableCell($each['name']);
                 $storageState = ($this->checkPath($each['path'])) ? true : false;
                 $stateIcon = web_bool_led($storageState);
-                $storageFree = ($storageState) ? stg_convert_size(disk_free_space($each['path'])) : '-';
                 $cells .= wf_TableCell($stateIcon);
-                $cells .= wf_TableCell($storageFree);
+                $storageSize = disk_total_space($each['path']);
+                $storageFree = disk_free_space($each['path']);
+                $storageSizeLabel = ($storageState) ? stg_convert_size($storageSize) : '-';
+                $storageFreeLabel = ($storageState) ? stg_convert_size($storageFree) : '-';
+                $cells .= wf_TableCell($storageSizeLabel);
+                $cells .= wf_TableCell($storageFreeLabel);
                 $actControls = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert());
                 $cells .= wf_TableCell($actControls);
                 $rows .= wf_TableRow($cells, 'row5');
             }
 
-            $result .= wf_TableBody($rows, '100%', 0, 'sortable');
+            $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
         }

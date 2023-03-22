@@ -197,12 +197,87 @@ class Recorder {
 
                                 $this->stardust->start();
                                 shell_exec($fullCommand);
+                                log_register('RECORDER STARTED [' . $cameraId . ']');
                                 $this->stardust->stop();
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Returns all running recorders real process PID-s array as pid=>processString
+     * 
+     * @return array
+     */
+    protected function getRecordersPids() {
+        $result = array();
+        $command = $this->binPaths['PS'] . ' ax | ' . $this->binPaths['GREP'] . ' ' . $this->ffmpgPath . ' | ' . $this->binPaths['GREP'] . ' -v grep';
+        $rawResult = shell_exec($command);
+        if (!empty($rawResult)) {
+            $rawResult = explodeRows($rawResult);
+            foreach ($rawResult as $io => $eachLine) {
+                $eachLine = trim($eachLine);
+                $rawLine = $eachLine;
+                $eachLine = explode(' ', $eachLine);
+                if (isset($eachLine[0])) {
+                    $eachPid = $eachLine[0];
+                    if (is_numeric($eachPid)) {
+                        //is this really capture process?
+                        if (ispos($rawLine, $this->recordOpts)) {
+                            $result[$eachPid] = $rawLine;
+                        }
+                    }
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Returns running cameras recording processes as cameraId=>realPid
+     * 
+     * @return array
+     */
+    protected function getRunningRecorders() {
+        $result = array();
+        if (!empty($this->allCamerasData)) {
+            $recorderPids = $this->getRecordersPids();
+            if (!empty($recorderPids)) {
+                foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
+                    foreach ($recorderPids as $eachPid => $eachProcess) {
+                        //looks familiar?
+                        if (ispos($eachProcess, $eachCameraData['CAMERA']['ip']) AND ispos($eachProcess, $eachCameraData['CAMERA']['login'])) {
+                            $result[$eachCameraId] = $eachPid;
+                        }
+                    }
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Shutdowns recorder process if its running
+     * 
+     * @param int $cameraId
+     * 
+     * @return void
+     */
+    public function stopRecord($cameraId) {
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        $allRunningRecorders = $this->getRunningRecorders();
+        if (isset($allRunningRecorders[$cameraId])) {
+            $count = 0;
+            while (isset($allRunningRecorders[$cameraId])) {
+                $count++;
+                $command = $this->binPaths['SUDO'] . ' ' . $this->binPaths['KILL'] . ' ' . $allRunningRecorders[$cameraId];
+                shell_exec($command);
+                $allRunningRecorders = $this->getRunningRecorders();
+            }
+            log_register('RECORDER STOPPED [' . $cameraId . '] ATTEMPT `' . $count . '`');
         }
     }
 

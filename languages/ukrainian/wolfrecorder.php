@@ -103,5 +103,7 @@ $lang['def']['Enable']='Увімкнути';
 $lang['def']['Recording']='Запис';
 $lang['def']['Default']='За замовчуванням';
 $lang['def']['Test Storage']='Тестове сховище';
+$lang['def']['Capacity']='Ємність';
+$lang['def']['']='';
 $lang['def']['']='';
 $lang['def']['']='';
