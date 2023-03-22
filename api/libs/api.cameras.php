@@ -49,6 +49,7 @@ class Cameras {
     const PROUTE_NEWACT = 'newcameraactive';
     const PROUTE_NEWSTORAGE = 'newcamerastorageid';
     const ROUTE_DEL = 'deletecameraid';
+    const ROUTE_EDIT = 'editcameraid';
 
     public function __construct() {
         $this->initMessages();

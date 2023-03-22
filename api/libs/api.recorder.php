@@ -102,7 +102,7 @@ class Recorder {
         $this->cdPath = $this->binPaths['CD'];
         $this->chunkTime = $this->altCfg['RECORDER_CHUNK_TIME'];
         $this->transportTemplate = '-rtsp_transport tcp -f rtsp -i';
-        $this->recordOpts = '-strict -2 -acodec copy -vcodec copy -f segment -segment_time ' . $this->chunkTime . ' -strftime 1 -segment_format mp4';
+        $this->recordOpts = '-strict -2 -acodec copy -vcodec copy -f segment -segment_time ' . $this->chunkTime . ' -strftime 1 -segment_atclocktime 1 -segment_clocktime_offset 30 -reset_timestamps 1 -segment_format mp4';
     }
 
     /**
@@ -194,6 +194,7 @@ class Recorder {
                                 $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "' " . $this->recordOpts . ' ' . $this->chunksMask;
                                 $captureCommand = $this->ffmpgPath . ' ' . $this->transportTemplate . ' ' . $captureFullUrl;
                                 $fullCommand = 'cd ' . $channelPath . ' && ' . $captureCommand;
+
                                 $this->stardust->start();
                                 shell_exec($fullCommand);
                                 $this->stardust->stop();
