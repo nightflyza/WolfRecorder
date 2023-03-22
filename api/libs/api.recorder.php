@@ -73,6 +73,8 @@ class Recorder {
      * Some predefined stuff
      */
     const PID_PREFIX = 'RECORD_';
+    const CAPTURE_PID = 'CAPTURE';
+    const WRAPPER = '/bin/wrapi';
 
     /**
      * Dinosaurs are my best friends
@@ -188,34 +190,38 @@ class Recorder {
      * 
      * @param int $cameraId
      * 
-     * @return ???
+     * @return void
      */
     public function runRecord($cameraId) {
         $cameraId = ubRouting::filters($cameraId, 'int');
         if (isset($this->allCamerasData[$cameraId])) {
             $cameraData = $this->allCamerasData[$cameraId];
-            $pid = self::PID_PREFIX . $cameraId;
-            $this->stardust->setProcess($pid);
-            if ($this->stardust->notRunning()) {
-                if (zb_PingICMP($cameraData['CAMERA']['ip'])) {
-                    $channelPath = $this->initChannel($cameraData['STORAGE']['path'], $cameraData['CAMERA']['channel']);
-                    if ($channelPath) {
-                        if ($cameraData['TEMPLATE']['MAIN_STREAM']) {
-                            if ($cameraData['TEMPLATE']['PROTO'] == 'rtsp') {
-                                $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
-                                $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $cameraData['TEMPLATE']['MAIN_STREAM'];
-                                $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "' " . $this->recordOpts . ' ' . $this->chunksMask;
-                                $captureCommand = $this->ffmpgPath . ' ' . $this->transportTemplate . ' ' . $captureFullUrl;
-                                $fullCommand = 'cd ' . $channelPath . ' && ' . $captureCommand;
+            if ($cameraData['CAMERA']['active']) {
+                $pid = self::PID_PREFIX . $cameraId;
+                $this->stardust->setProcess($pid);
+                if ($this->stardust->notRunning()) {
+                    if (zb_PingICMP($cameraData['CAMERA']['ip'])) {
+                        $channelPath = $this->initChannel($cameraData['STORAGE']['path'], $cameraData['CAMERA']['channel']);
+                        if ($channelPath) {
+                            if ($cameraData['TEMPLATE']['MAIN_STREAM']) {
+                                if ($cameraData['TEMPLATE']['PROTO'] == 'rtsp') {
+                                    $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
+                                    $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $cameraData['TEMPLATE']['MAIN_STREAM'];
+                                    $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "' " . $this->recordOpts . ' ' . $this->chunksMask;
+                                    $captureCommand = $this->ffmpgPath . ' ' . $this->transportTemplate . ' ' . $captureFullUrl;
+                                    $fullCommand = 'cd ' . $channelPath . ' && ' . $captureCommand;
 
-                                $this->stardust->start();
-                                shell_exec($fullCommand);
-                                log_register('RECORDER STARTED [' . $cameraId . ']');
-                                $this->stardust->stop();
+                                    $this->stardust->start();
+                                    shell_exec($fullCommand);
+                                    log_register('RECORDER STARTED [' . $cameraId . ']');
+                                    $this->stardust->stop();
+                                }
                             }
                         }
                     }
                 }
+            } else {
+                log_register('RECORDER NOTSTARTED [' . $cameraId . '] CAMERA DISABLED');
             }
         }
     }
@@ -291,6 +297,30 @@ class Recorder {
                 $allRunningRecorders = $this->getRunningRecorders();
             }
             log_register('RECORDER STOPPED [' . $cameraId . '] ATTEMPT `' . $count . '`');
+        }
+    }
+
+    /**
+     * Runs all recorders for active cameras in background
+     * 
+     * @return void
+     */
+    public function captureAll() {
+        $captureProcess = new StarDust(self::CAPTURE_PID);
+        if ($captureProcess->notRunning()) {
+            $captureProcess->start();
+            if (!empty($this->allCamerasData)) {
+                foreach ($this->allCamerasData as $io => $eachCamera) {
+                    if ($eachCamera['CAMERA']['active']) {
+                        $cameraId = $eachCamera['CAMERA']['id'];
+                        $recordingProcess = new StarDust(self::PID_PREFIX . $cameraId);
+                        if ($recordingProcess->notRunning()) {
+                            $recordingProcess->runBackgroundProcess(self::WRAPPER . ' "recherd&cameraid=' . $cameraId . '"');
+                        }
+                    }
+                }
+            }
+            $captureProcess->stop();
         }
     }
 
