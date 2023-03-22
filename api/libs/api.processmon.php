@@ -261,6 +261,7 @@ class ProcessMon {
                     if (!$zenFlag) {
                         if (!isset($runningPids[$processData['pid']]) AND $activityFlag) {
                             $pidLabel = $pidLabel . ' ' . wf_img_sized('skins/skull.png', __('Dead'), '12');
+                            $activityLed=wf_img('skins/yellow_led.png');
                         }
                     }
                     $cells = wf_TableCell($pidLabel);
