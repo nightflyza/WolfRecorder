@@ -6,6 +6,13 @@
 class Cameras {
 
     /**
+     * Contains alter config as key=>value
+     *
+     * @var array
+     */
+    protected $altCfg = array();
+
+    /**
      * Cameras database abstraction layer placeholder
      *
      * @var object
@@ -68,6 +75,7 @@ class Cameras {
      */
     public function __construct() {
         $this->initMessages();
+        $this->loadConfigs();
         $this->initCamerasDb();
         $this->initStorages();
         $this->initModels();
@@ -81,6 +89,18 @@ class Cameras {
      */
     protected function initMessages() {
         $this->messages = new UbillingMessageHelper();
+    }
+
+    /**
+     * Loads all required configs
+     * 
+     * @global object $ubillingConfig
+     * 
+     * @return void
+     */
+    protected function loadConfigs() {
+        global $ubillingConfig;
+        $this->altCfg = $ubillingConfig->getAlter();
     }
 
     /**
@@ -129,9 +149,9 @@ class Cameras {
         $allStorages = $this->storages->getAllStorageNames();
         $allModels = $this->models->getAllModelNames();
         if (!empty($allStorages)) {
-            $storagesParams=array();
-            foreach ($allStorages as $eachStorageId=>$eachStorageName) {
-                $storagesParams[$eachStorageId]=__($eachStorageName);
+            $storagesParams = array();
+            foreach ($allStorages as $eachStorageId => $eachStorageName) {
+                $storagesParams[$eachStorageId] = __($eachStorageName);
             }
             if (!empty($allModels)) {
                 $inputs = wf_Selector(self::PROUTE_NEWMODEL, $allModels, __('Model'), '', false) . ' ';
@@ -139,7 +159,7 @@ class Cameras {
                 $inputs .= wf_TextInput(self::PROUTE_NEWLOGIN, __('Login'), '', false, 12, 'alphanumeric') . ' ';
                 $inputs .= wf_TextInput(self::PROUTE_NEWPASS, __('Password'), '', false, 12, '') . ' ';
                 $inputs .= wf_CheckInput(self::PROUTE_NEWACT, __('Enabled'), false, true) . ' ';
-                $inputs .= wf_Selector(self::PROUTE_NEWSTORAGE,  $storagesParams, __('Storage'), '', false) . ' ';
+                $inputs .= wf_Selector(self::PROUTE_NEWSTORAGE, $storagesParams, __('Storage'), '', false) . ' ';
                 $inputs .= wf_Submit(__('Create'));
                 $result .= wf_Form('', 'POST', $inputs, 'glamour');
             } else {
@@ -425,7 +445,14 @@ class Cameras {
             $this->camerasDb->where('id', '=', $cameraId);
             $this->camerasDb->data('active', 1);
             $this->camerasDb->save();
+            $this->loadAllCameras();
             log_register('CAMERA ACTIVATE [' . $cameraId . ']');
+
+            //starting capture now if enabled
+            if ($this->altCfg['RECORDER_ON_CAMERA_ACTIVATION']) {
+                $recorder = new Recorder();
+                $recorder->runRecordBackground($cameraId);
+            }
         }
     }
 

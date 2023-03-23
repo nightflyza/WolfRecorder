@@ -243,7 +243,7 @@ class Storages {
             foreach ($this->allStorages as $io => $each) {
                 $cells = wf_TableCell($each['id']);
                 $cells .= wf_TableCell($each['path']);
-                $cells .= wf_TableCell($each['name']);
+                $cells .= wf_TableCell(__($each['name']));
                 $storageState = ($this->checkPath($each['path'])) ? true : false;
                 $stateIcon = web_bool_led($storageState);
                 $cells .= wf_TableCell($stateIcon);
