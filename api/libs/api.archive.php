@@ -164,9 +164,10 @@ class Archive {
         $result = '';
         $cameraId = ubRouting::filters($cameraId, 'int');
         if (isset($this->allCamerasData[$cameraId])) {
-            $cameraData = $this->allCamerasData[$cameraId];
+            $cameraData = $this->allCamerasData[$cameraId]['CAMERA'];
+            $chunksList = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
             //TODO: finish it later
-            debarr($cameraData);
+            debarr($chunksList);
         } else {
             $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
         }
