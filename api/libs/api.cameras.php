@@ -281,7 +281,12 @@ class Cameras {
                 $recordingFlag = $starDust->isRunning();
                 $cells .= wf_TableCell(web_bool_led($recordingFlag));
                 $cells .= wf_TableCell(__($allStorages[$each['storageid']]));
-                $actLinks = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert()) . ' ';
+                $deletionUrl = self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'];
+                $cancelUrl = self::URL_ME;
+                $deletionAlert = $this->messages->getDeleteAlert().'. '.wf_tag('br');
+                $deletionAlert.= __('Also all archive data for this camera will be destroyed permanently').'.';
+                $deletionTitle = __('Delete') . ' ' . __('Camera') . ' ' . $each['ip'] . '?';
+                $actLinks = wf_ConfirmDialog($deletionUrl, web_delete_icon(), $deletionAlert, '', $cancelUrl, $deletionTitle) . ' ';
                 $actLinks .= wf_Link(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $each['id'], web_edit_icon(), false);
                 $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
@@ -305,10 +310,13 @@ class Cameras {
         $cameraId = ubRouting::filters($cameraId, 'int');
         //TODO: do something around camera deactivation and checks for running recording
         if (isset($this->allCameras[$cameraId])) {
-            if (!$this->allCameras[$cameraId]['active']) {
+            $cameraData = $this->allCameras[$cameraId];
+            if ($cameraData['active'] == 0) {
                 $this->camerasDb->where('id', '=', $cameraId);
                 $this->camerasDb->delete();
                 log_register('CAMERA DELETE [' . $cameraId . ']');
+                //flushing camera channel
+                $this->storages->flushChannel($cameraData['storageid'], $cameraData['channel']);
             } else {
                 $result .= __('You cant delete camera which is now active');
             }
@@ -375,7 +383,7 @@ class Cameras {
             $chanBitrateLabel = '-';
             if ($archiveSeconds AND $chanSizeRaw) {
                 $chanBitrate = ($chanSizeRaw * 8) / $archiveSeconds / 1024; // in kbits
-                $chanBitrateLabel = round(($chanBitrate / 1024),2) . ' ' . __('Mbit/s');
+                $chanBitrateLabel = round(($chanBitrate / 1024), 2) . ' ' . __('Mbit/s');
             }
 
             //camera profile here
@@ -412,8 +420,7 @@ class Cameras {
             $cells .= wf_TableCell($cameraData['channel']);
             $rows .= wf_TableRow($cells, 'row3');
 
-
-            $cells = wf_TableCell(__('Archive'), '', 'row2');
+            $cells = wf_TableCell(__('Archive depth'), '', 'row2');
             $cells .= wf_TableCell($archiveDepth);
             $rows .= wf_TableRow($cells, 'row3');
 

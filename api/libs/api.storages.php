@@ -412,4 +412,39 @@ class Storages {
         return($result);
     }
 
+    /**
+     * Deletes allocated channel with all data inside
+     * 
+     * @param int $storageId
+     * @param string $channel
+     * 
+     * @return void
+     */
+    public function flushChannel($storageId, $channel) {
+        $storageId = ubRouting::filters($storageId, 'int');
+        $channel = ubRouting::filters($channel, 'mres');
+        if (isset($this->allStorages[$storageId])) {
+            $storagePath = $this->allStorages[$storageId]['path'];
+            $delimiter = '';
+            if (!empty($storagePath) AND ! empty($channel)) {
+                if (file_exists($storagePath)) {
+                    if (is_dir($storagePath)) {
+                        if (is_writable($storagePath)) {
+                            $pathLastChar = substr($storagePath, -1);
+                            if ($pathLastChar != '/') {
+                                $delimiter = '/';
+                            }
+                            $fullPath = $storagePath . $delimiter . $channel;
+                            //seems ok?
+                            if (is_writable($fullPath)) {
+                                rcms_delete_files($fullPath, true);
+                                log_register('STORAGE FLUSH [' . $storageId . '] PATH `' . $storagePath . '` CHANNEL `' . $channel . '`');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

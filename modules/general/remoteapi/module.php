@@ -1,3 +1,3 @@
 <?php
-$this->registerModule($module, 'main', __('Ubilling remote API'), 'Nightfly');
-?>
+
+$this->registerModule($module, 'main', __('WolfRecorder RemoteAPI'), 'Nightfly');
