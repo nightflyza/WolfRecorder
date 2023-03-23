@@ -34,11 +34,11 @@ class Cameras {
     protected $models = '';
 
     /**
-     * Storages instance placeholder
+     * Storages instance placeholder.
      *
      * @var object
      */
-    public $storages = '';
+    protected $storages = '';
 
     /**
      * System messages helper instance placeholder

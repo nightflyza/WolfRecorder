@@ -41,6 +41,13 @@ class Recorder {
     protected $allCamerasData = array();
 
     /**
+     * Storages instance placeholder.
+     *
+     * @var object
+     */
+    protected $storages = '';
+
+    /**
      * Contains ffmpeg binary path
      *
      * @var string
@@ -93,6 +100,7 @@ class Recorder {
         $this->loadConfigs();
         $this->setOptions();
         $this->initStardust();
+        $this->initStorages();
         $this->initCameras();
     }
 
@@ -143,6 +151,15 @@ class Recorder {
     }
 
     /**
+     * Inits storages into protected prop for further usage
+     * 
+     * @return void
+     */
+    protected function initStorages() {
+        $this->storages = new Storages();
+    }
+
+    /**
      * Inits stardust process manager
      * 
      * @return void
@@ -169,7 +186,7 @@ class Recorder {
                     if (zb_PingICMP($cameraData['CAMERA']['ip'])) {
                         $storageId = $cameraData['CAMERA']['storageid'];
                         $channel = $cameraData['CAMERA']['channel'];
-                        $channelPath = $this->cameras->storages->initChannel($storageId, $channel);
+                        $channelPath = $this->storages->initChannel($storageId, $channel);
                         if ($channelPath) {
                             if ($cameraData['TEMPLATE']['MAIN_STREAM']) {
                                 //rtsp proto capture
