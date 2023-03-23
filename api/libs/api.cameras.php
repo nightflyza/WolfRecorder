@@ -38,7 +38,7 @@ class Cameras {
      *
      * @var object
      */
-    protected $storages = '';
+    public $storages = '';
 
     /**
      * System messages helper instance placeholder
@@ -374,7 +374,7 @@ class Cameras {
 
             $chanBitrateLabel = '-';
             if ($archiveSeconds AND $chanSizeRaw) {
-                $chanBitrate = ($chanSizeRaw * 8) / $archiveSeconds / 1024;
+                $chanBitrate = ($chanSizeRaw * 8) / $archiveSeconds / 1024; // in kbits
                 $chanBitrateLabel = round(($chanBitrate / 1024),2) . ' ' . __('Mbit/s');
             }
 

@@ -152,44 +152,6 @@ class Recorder {
     }
 
     /**
-     * Allocates path in storage for channel recording if required
-     * 
-     * @param string $storagePath
-     * @param string $channel
-     * 
-     * @return string/bool
-     */
-    protected function initChannel($storagePath, $channel) {
-        $result = false;
-        $delimiter = '';
-        if (!empty($storagePath) AND ! empty($channel)) {
-            if (file_exists($storagePath)) {
-                if (is_dir($storagePath)) {
-                    if (is_writable($storagePath)) {
-                        $pathLastChar = substr($storagePath, -1);
-                        if ($pathLastChar != '/') {
-                            $delimiter = '/';
-                        }
-                        $fullPath = $storagePath . $delimiter . $channel . '/';
-                        //allocate channel dir
-                        if (!file_exists($fullPath)) {
-                            mkdir($fullPath, 0777);
-                            chmod($fullPath, 0777);
-                            log_register('RECORDER ALLOCATED STORAGE `' . $storagePath . '` CHANNEL `' . $channel . '`');
-                        }
-
-                        //seems ok?
-                        if (is_writable($fullPath)) {
-                            $result = $fullPath;
-                        }
-                    }
-                }
-            }
-        }
-        return($result);
-    }
-
-    /**
      * Runs recording process of some camera
      * 
      * @param int $cameraId
@@ -205,7 +167,9 @@ class Recorder {
                 $this->stardust->setProcess($pid);
                 if ($this->stardust->notRunning()) {
                     if (zb_PingICMP($cameraData['CAMERA']['ip'])) {
-                        $channelPath = $this->initChannel($cameraData['STORAGE']['path'], $cameraData['CAMERA']['channel']);
+                        $storageId = $cameraData['CAMERA']['storageid'];
+                        $channel = $cameraData['CAMERA']['channel'];
+                        $channelPath = $this->cameras->storages->initChannel($storageId, $channel);
                         if ($channelPath) {
                             if ($cameraData['TEMPLATE']['MAIN_STREAM']) {
                                 //rtsp proto capture

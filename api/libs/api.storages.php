@@ -354,4 +354,62 @@ class Storages {
         return($result);
     }
 
+    /**
+     * Allocates path in storage for channel recording if required
+     * 
+     * @param string $storagePath
+     * @param string $channel
+     * 
+     * @return string/bool
+     */
+    protected function allocateChannel($storagePath, $channel) {
+        $result = false;
+        $delimiter = '';
+        if (!empty($storagePath) AND ! empty($channel)) {
+            if (file_exists($storagePath)) {
+                if (is_dir($storagePath)) {
+                    if (is_writable($storagePath)) {
+                        $pathLastChar = substr($storagePath, -1);
+                        if ($pathLastChar != '/') {
+                            $delimiter = '/';
+                        }
+                        $fullPath = $storagePath . $delimiter . $channel . '/';
+                        //allocate channel dir
+                        if (!file_exists($fullPath)) {
+                            mkdir($fullPath, 0777);
+                            chmod($fullPath, 0777);
+                            log_register('STORAGE ALLOCATED `' . $storagePath . '` CHANNEL `' . $channel . '`');
+                        }
+
+                        //seems ok?
+                        if (is_writable($fullPath)) {
+                            $result = $fullPath;
+                        }
+                    }
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Allocates path in storage for channel recording if required
+     * 
+     * @param int $storageId
+     * @param string $channel
+     * 
+     * @return string/bool
+     */
+    public function initChannel($storageId, $channel) {
+        $result = false;
+        $storageId = ubRouting::filters($storageId, 'int');
+        $channel = ubRouting::filters($channel, 'mres');
+
+        if (isset($this->allStorages[$storageId])) {
+            $storagePath = $this->allStorages[$storageId]['path'];
+            $result = $this->allocateChannel($storagePath, $channel);
+        }
+        return($result);
+    }
+
 }
