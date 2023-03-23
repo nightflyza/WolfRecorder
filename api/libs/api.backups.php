@@ -23,18 +23,18 @@ function web_BackupForm() {
  * 
  * @return string
  */
-function stg_convert_size($fs, $traffsize = 'float') {
+function wr_convertSize($fs, $traffsize = 'float') {
     if ($traffsize == 'float') {
         if ($fs >= (1073741824 * 1024))
-            $fs = round($fs / (1073741824 * 1024) * 100) / 100 . " Tb";
+            $fs = round($fs / (1073741824 * 1024) * 100) / 100 . ' ' . __('Tb');
         elseif ($fs >= 1073741824)
-            $fs = round($fs / 1073741824 * 100) / 100 . " Gb";
+            $fs = round($fs / 1073741824 * 100) / 100 . ' ' . __('Gb');
         elseif ($fs >= 1048576)
-            $fs = round($fs / 1048576 * 100) / 100 . " Mb";
+            $fs = round($fs / 1048576 * 100) / 100 . ' ' . __('Mb');
         elseif ($fs >= 1024)
-            $fs = round($fs / 1024 * 100) / 100 . " Kb";
+            $fs = round($fs / 1024 * 100) / 100 . ' ' . __('Kb');
         else
-            $fs = $fs . " b";
+            $fs = $fs . ' ' . __('b');
         return ($fs);
     }
 
@@ -43,21 +43,21 @@ function stg_convert_size($fs, $traffsize = 'float') {
     }
 
     if ($traffsize == 'Kb') {
-        $fs = round($fs / 1024 * 100) / 100 . " Kb";
+        $fs = round($fs / 1024 * 100) / 100 . ' ' . __('Kb');
         return ($fs);
     }
 
     if ($traffsize == 'Mb') {
-        $fs = round($fs / 1048576 * 100) / 100 . " Mb";
+        $fs = round($fs / 1048576 * 100) / 100 . ' ' . __('Mb');
         return ($fs);
     }
     if ($traffsize == 'Gb') {
-        $fs = round($fs / 1073741824 * 100) / 100 . " Gb";
+        $fs = round($fs / 1073741824 * 100) / 100 . ' ' . __('Gb');
         return ($fs);
     }
 
     if ($traffsize == 'Tb') {
-        $fs = round($fs / (1073741824 * 1024) * 100) / 100 . " Tb";
+        $fs = round($fs / (1073741824 * 1024) * 100) / 100 . ' ' . __('Tb');
         return ($fs);
     }
 }
@@ -76,7 +76,7 @@ function zb_BackupDatabase($silent = false) {
     if ($backupProcess->notRunning()) {
         $backupProcess->start();
         $alterConf = $ubillingConfig->getAlter();
-        $binPathsConf=$ubillingConfig->getBinpaths();
+        $binPathsConf = $ubillingConfig->getBinpaths();
         $mysqlConf = rcms_parse_ini_file(CONFIG_PATH . 'mysql.ini');
 
         $backname = DATA_PATH . 'backups/sql/wolfrecorder-' . date("Y-m-d_H_i_s", time()) . '.sql';
@@ -117,7 +117,7 @@ function web_DBCleanupForm() {
         foreach ($cleanupData as $io => $each) {
             $cells = wf_TableCell($each['name']);
             $cells .= wf_TableCell($each['rows']);
-            $cells .= wf_TableCell(stg_convert_size($each['size']), '', '', 'sorttable_customkey="' . $each['size'] . '"');
+            $cells .= wf_TableCell(wr_convertSize($each['size']), '', '', 'sorttable_customkey="' . $each['size'] . '"');
             $actlink = wf_JSAlert("?module=backups&tableclean=" . $each['name'], web_delete_icon(), 'Are you serious');
             $cells .= wf_TableCell($actlink);
             $rows .= wf_TableRow($cells, 'row5');
@@ -128,7 +128,7 @@ function web_DBCleanupForm() {
     }
 
     $result = wf_TableBody($rows, '100%', '0', 'sortable');
-    $result .= wf_tag('b') . __('Total') . ': ' . $totalCount . ' / ' . $totalRows . ' / ' . stg_convert_size($totalSize) . wf_tag('b', true);
+    $result .= wf_tag('b') . __('Total') . ': ' . $totalCount . ' / ' . $totalRows . ' / ' . wr_convertSize($totalSize) . wf_tag('b', true);
 
     return ($result);
 }
@@ -156,7 +156,6 @@ function rcms_delete_files($file, $recursive = false) {
         return unlink($file);
     }
 }
-
 
 /**
  * Cleanups backups directory dumps older than X days encoded in filename.

@@ -761,6 +761,41 @@ function zb_formatTime($seconds) {
 }
 
 /**
+ * Renders time duration in seconds into formatted human-readable view without seconds
+ *      
+ * @param int $seconds
+ * 
+ * @return string
+ */
+function wr_formatTimeArchive($seconds) {
+    $init = $seconds;
+    $days = floor($seconds / 86400);
+    $hours = floor($seconds / 3600);
+    $minutes = floor(($seconds / 60) % 60);
+    $seconds = $seconds % 60;
+
+    if ($init < 3600) {
+//less than 1 hour
+        if ($init < 60) {
+//less than minute
+            $result = $seconds . ' ' . __('sec.');
+        } else {
+//more than one minute
+            $result = $minutes . ' ' . __('minutes');
+        }
+    } else {
+        if ($init < 86400) {
+//more than hour
+            $result = $hours . ' ' . __('hour') . ' ' . $minutes . ' ' . __('minutes');
+        } else {
+            $hoursLeft = $hours - ($days * 24);
+            $result = $days . ' ' . __('days') . ' ' . $hoursLeft . ' ' . __('hour') . ' ' . $minutes . ' ' . __('minutes');
+        }
+    }
+    return ($result);
+}
+
+/**
  * Validate a Gregorian date 
  * 
  * @param string $date Date in MySQL format
@@ -774,7 +809,6 @@ function zb_checkDate($date) {
     $result = @checkdate($month, $day, $year);
     return ($result);
 }
-
 
 /**
  * Checks is time between some other time ranges?

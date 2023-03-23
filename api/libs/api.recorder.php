@@ -68,7 +68,6 @@ class Recorder {
     protected $transportTemplate = '';
     protected $recordOpts = '';
     protected $supressOutput = '';
-    protected $chunksMask = '%Y-%m-%d_%H-%M-%S.mp4';
 
     /**
      * Some predefined stuff
@@ -76,6 +75,8 @@ class Recorder {
     const PID_PREFIX = 'RECORD_';
     const CAPTURE_PID = 'CAPTURE';
     const WRAPPER = '/bin/wrapi';
+    const CHUNKS_MASK = '%Y-%m-%d_%H-%M-%S';
+    const CHUNKS_EXT = '.mp4';
 
     /**
      * Dinosaurs are my best friends
@@ -211,7 +212,7 @@ class Recorder {
                                 if ($cameraData['TEMPLATE']['PROTO'] == 'rtsp') {
                                     $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
                                     $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $cameraData['TEMPLATE']['MAIN_STREAM'];
-                                    $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "' " . $this->recordOpts . ' ' . $this->chunksMask;
+                                    $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "' " . $this->recordOpts . ' ' . self::CHUNKS_MASK . self::CHUNKS_EXT;
                                     $captureCommand = $this->ffmpgPath . ' ' . $this->transportTemplate . ' ' . $captureFullUrl . ' ' . $this->supressOutput;
                                     $fullCommand = 'cd ' . $channelPath . ' && ' . $captureCommand;
 

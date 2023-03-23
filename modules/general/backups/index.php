@@ -63,7 +63,7 @@ if (cfr('BACKUP')) {
                         $fileDate = filectime($backupsPath . $eachDump);
                         $fileDate = date("Y-m-d H:i:s", $fileDate);
                         $fileSize = filesize($backupsPath . $eachDump);
-                        $fileSize = stg_convert_size($fileSize);
+                        $fileSize = wr_convertSize($fileSize);
                         $encodedDumpPath = base64_encode($backupsPath . $eachDump);
                         $downloadLink = wf_Link('?module=backups&download=' . $encodedDumpPath, $eachDump, false, '');
                         $actLinks = wf_JSAlert('?module=backups&deletedump=' . $encodedDumpPath, web_delete_icon(), __('Removing this may lead to irreparable results')) . ' ';

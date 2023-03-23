@@ -249,8 +249,8 @@ class Storages {
                 $cells .= wf_TableCell($stateIcon);
                 $storageSize = @disk_total_space($each['path']);
                 $storageFree = @disk_free_space($each['path']);
-                $storageSizeLabel = ($storageState) ? stg_convert_size($storageSize) : '-';
-                $storageFreeLabel = ($storageState) ? stg_convert_size($storageFree) : '-';
+                $storageSizeLabel = ($storageState) ? wr_convertSize($storageSize) : '-';
+                $storageFreeLabel = ($storageState) ? wr_convertSize($storageFree) : '-';
                 $cells .= wf_TableCell($storageSizeLabel);
                 $cells .= wf_TableCell($storageFreeLabel);
                 $actControls = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert());
@@ -281,6 +281,75 @@ class Storages {
         $usedByCameras = $camerasDb->getAll();
         if (!$usedByCameras) {
             $result = false;
+        }
+        return($result);
+    }
+
+    /**
+     * Returns all chunks stored in some channel as timestamp=>fullPath
+     * 
+     * @param int $storageId
+     * @param string $channel
+     * 
+     * @return array
+     */
+    public function getChannelChunks($storageId, $channel) {
+        $result = array();
+        $storageId = ubRouting::filters($storageId, 'int');
+        $channel = ubRouting::filters($channel, 'mres');
+        if ($storageId AND $channel) {
+            if (isset($this->allStorages[$storageId])) {
+                $storagePath = $this->allStorages[$storageId]['path'];
+                $storageLastChar = substr($storagePath, -1);
+                if ($storageLastChar != '/') {
+                    $storagePath .= '/';
+                }
+                if (file_exists($storagePath)) {
+                    if (file_exists($storagePath . $channel)) {
+                        $chunksExt = Recorder::CHUNKS_EXT;
+                        $chunksMask = Recorder::CHUNKS_MASK;
+                        $allChunksNames = scandir($storagePath . $channel);
+                        if (!empty($allChunksNames)) {
+                            foreach ($allChunksNames as $io => $eachFileName) {
+                                if ($eachFileName != '.' AND $eachFileName != '..') {
+                                    $cleanChunkName = str_replace($chunksExt, '', $eachFileName);
+                                    $cleanChunkName = str_replace('_', ' ', $cleanChunkName);
+                                    $explodedName = explode(' ', $cleanChunkName);
+                                    $chunkDate = $explodedName[0];
+                                    $chunkTime = $explodedName[1];
+                                    $chunkTime = str_replace('-', ':', $chunkTime);
+                                    $chunkDateTime = $chunkDate . ' ' . $chunkTime;
+                                    $cleanChunkTimeStamp = strtotime($chunkDateTime);
+                                    $result[$cleanChunkTimeStamp] = $storagePath . $channel . '/' . $eachFileName;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Returns bytes count that some channel currently stores
+     * 
+     * @param int $storageId
+     * @param string $channel
+     * 
+     * @return string
+     */
+    public function getChannelSize($storageId, $channel) {
+        $result = 0;
+        $storageId = ubRouting::filters($storageId, 'int');
+        $channel = ubRouting::filters($channel, 'mres');
+        if ($storageId AND $channel) {
+            $channelChunks = $this->getChannelChunks($storageId, $channel);
+            if (!empty($channelChunks)) {
+                foreach ($channelChunks as $io => $eachChunk) {
+                    $result += filesize($eachChunk);
+                }
+            }
         }
         return($result);
     }

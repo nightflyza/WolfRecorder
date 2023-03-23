@@ -390,6 +390,23 @@ class Cameras {
             $cells .= wf_TableCell($cameraData['channel']);
             $rows .= wf_TableRow($cells, 'row3');
 
+            $channelChunks = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
+            $chunksCount = sizeof($channelChunks);
+            $archiveDepth = '-';
+            if ($chunksCount > 0) {
+                $archiveSeconds = $this->altCfg['RECORDER_CHUNK_TIME'] * $chunksCount;
+                $archiveDepth = wr_formatTimeArchive($archiveSeconds);
+            }
+            $cells = wf_TableCell(__('Archive'), '', 'row2');
+            $cells .= wf_TableCell($archiveDepth);
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Size'), '', 'row2');
+            $chanSize = $this->storages->getChannelSize($cameraData['storageid'], $cameraData['channel']);
+            $chanSizeLabel = wr_convertSize($chanSize);
+            $cells .= wf_TableCell($chanSizeLabel);
+            $rows .= wf_TableRow($cells, 'row3');
+
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
 
             //some controls here
@@ -445,7 +462,7 @@ class Cameras {
             $this->camerasDb->where('id', '=', $cameraId);
             $this->camerasDb->data('active', 1);
             $this->camerasDb->save();
-            $this->loadAllCameras();
+            $this->allCameras[$cameraId]['active'] = 1;
             log_register('CAMERA ACTIVATE [' . $cameraId . ']');
 
             //starting capture now if enabled
