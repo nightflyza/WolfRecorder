@@ -99,6 +99,21 @@ class Storages {
     }
 
     /**
+     * Returns all existing storages names as id=>name
+     * 
+     * @return array
+     */
+    public function getAllStorageNamesLocalized() {
+        $result = array();
+        if (!empty($this->allStorages)) {
+            foreach ($this->allStorages as $io => $each) {
+                $result[$each['id']] = __($each['name']);
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Returns all storages data as id=>storageData
      * 
      * @return array
