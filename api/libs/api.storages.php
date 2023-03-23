@@ -326,7 +326,7 @@ class Storages {
                         $allChunksNames = scandir($storagePath . $channel);
                         if (!empty($allChunksNames)) {
                             foreach ($allChunksNames as $io => $eachFileName) {
-                                if ($eachFileName != '.' AND $eachFileName != '..') {
+                                if ($eachFileName != '.' AND $eachFileName != '..' AND ispos($eachFileName, $chunksExt)) {
                                     $cleanChunkName = str_replace($chunksExt, '', $eachFileName);
                                     $cleanChunkName = str_replace('_', ' ', $cleanChunkName);
                                     $explodedName = explode(' ', $cleanChunkName);

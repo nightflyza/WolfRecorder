@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * VOD archive implementation
+ */
 class Archive {
 
     /**
