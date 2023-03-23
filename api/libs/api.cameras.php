@@ -353,7 +353,30 @@ class Cameras {
             $allModels = $this->models->getAllModelNames();
             $allStorages = $this->storages->getAllStorageNames();
             $cameraData = $this->allCameras[$cameraId];
+
+            //recorder process now is running?
             $starDust = new StarDust();
+            $starDust->setProcess(Recorder::PID_PREFIX . $cameraData['id']);
+            $recordingFlag = $starDust->isRunning();
+
+            //some channel data collecting
+            $channelChunks = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
+            $chunksCount = sizeof($channelChunks);
+            $archiveDepth = '-';
+            $archiveSeconds = 0;
+            if ($chunksCount > 0) {
+                $archiveSeconds = $this->altCfg['RECORDER_CHUNK_TIME'] * $chunksCount;
+                $archiveDepth = wr_formatTimeArchive($archiveSeconds);
+            }
+
+            $chanSizeRaw = $this->storages->getChannelSize($cameraData['storageid'], $cameraData['channel']);
+            $chanSizeLabel = wr_convertSize($chanSizeRaw);
+
+            $chanBitrateLabel = '-';
+            if ($archiveSeconds AND $chanSizeRaw) {
+                $chanBitrate = ($chanSizeRaw * 8) / $archiveSeconds / 1024;
+                $chanBitrateLabel = round(($chanBitrate / 1024),2) . ' ' . __('Mbit/s');
+            }
 
             //camera profile here
             $cells = wf_TableCell(__('Model'), '40%', 'row2');
@@ -377,8 +400,7 @@ class Cameras {
             $rows .= wf_TableRow($cells, 'row3');
 
             $cells = wf_TableCell(__('Recording'), '', 'row2');
-            $starDust->setProcess(Recorder::PID_PREFIX . $cameraData['id']);
-            $recordingFlag = $starDust->isRunning();
+
             $cells .= wf_TableCell(web_bool_led($recordingFlag));
             $rows .= wf_TableRow($cells, 'row3');
 
@@ -390,22 +412,20 @@ class Cameras {
             $cells .= wf_TableCell($cameraData['channel']);
             $rows .= wf_TableRow($cells, 'row3');
 
-            $channelChunks = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
-            $chunksCount = sizeof($channelChunks);
-            $archiveDepth = '-';
-            if ($chunksCount > 0) {
-                $archiveSeconds = $this->altCfg['RECORDER_CHUNK_TIME'] * $chunksCount;
-                $archiveDepth = wr_formatTimeArchive($archiveSeconds);
-            }
+
             $cells = wf_TableCell(__('Archive'), '', 'row2');
             $cells .= wf_TableCell($archiveDepth);
             $rows .= wf_TableRow($cells, 'row3');
 
+            $cells = wf_TableCell(__('Bitrate'), '', 'row2');
+            $cells .= wf_TableCell($chanBitrateLabel);
+            $rows .= wf_TableRow($cells, 'row3');
+
             $cells = wf_TableCell(__('Size'), '', 'row2');
-            $chanSize = $this->storages->getChannelSize($cameraData['storageid'], $cameraData['channel']);
-            $chanSizeLabel = wr_convertSize($chanSize);
             $cells .= wf_TableCell($chanSizeLabel);
             $rows .= wf_TableRow($cells, 'row3');
+
+
 
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
 
