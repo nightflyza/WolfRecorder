@@ -65,6 +65,7 @@ class Archive {
     const PLAYLIST_MASK = '_arch.txt';
     const URL_ME = '?module=archive';
     const ROUTE_VIEW = 'viewcameraarchive';
+    const ROUTE_SHOWDATE = 'renderdatearchive';
 
     public function __construct() {
         $this->initMessages();
@@ -178,11 +179,50 @@ class Archive {
                      <div style="float:left; width:' . $width . '; margin:5px;">
                      <div id="' . $playerId . '" style="width:90%;"></div >
         	    <script >var player = new Playerjs({id:"' . $playerId . '", file:"' . $playlistPath . '", autoplay:' . $autoPlay . '});</script >
+                   </div>
             ';
+        $result .= wf_CleanDiv();
         return($result);
     }
 
     /**
+     * Renders basic timeline for some chunks list
+     * 
+     * @param array $cameraId
+     * @param array $chunksList
+     * 
+     * @return string
+     */
+    protected function renderDaysTimeline($cameraId, $chunksList) {
+        $result = '';
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        if (!empty($chunksList)) {
+            $datesTmp = array();
+            foreach ($chunksList as $timeStamp => $chunkName) {
+                $chunkDate = date("Y-m-d", $timeStamp);
+                if (!isset($datesTmp[$chunkDate])) {
+                    $datesTmp[$chunkDate] = 1;
+                } else {
+                    $datesTmp[$chunkDate] ++;
+                }
+            }
+
+            if (!empty($datesTmp)) {
+                $result .= wf_delimiter(0);
+                $chunkTime = $this->altCfg['RECORDER_CHUNK_TIME'];
+                foreach ($datesTmp as $eachDate => $chunksCount) {
+                    $baseUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $cameraId . '&' . self::ROUTE_SHOWDATE . '=' . $eachDate;
+                    $recordsTime = wr_formatTimeArchive($chunksCount * $chunkTime);
+                    $result .= wf_Link($baseUrl, wf_img('skins/icon_calendar.gif', $recordsTime) . ' ' . $eachDate, false, 'ubButton') . ' ';
+                }
+                $result .= wf_CleanDiv();
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Renders basic archive lookup interface
      * 
      * @param int $cameraId
      * 
@@ -193,17 +233,25 @@ class Archive {
         $cameraId = ubRouting::filters($cameraId, 'int');
         if (isset($this->allCamerasData[$cameraId])) {
             $cameraData = $this->allCamerasData[$cameraId]['CAMERA'];
+            $showDate = (ubRouting::checkGet(self::ROUTE_SHOWDATE)) ? ubRouting::get(self::ROUTE_SHOWDATE) : curdate();
             $chunksList = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
-            $archivePlayList = $this->generateArchivePlaylist($cameraId, '2023-03-24', '2023-03-24');
-            if ($archivePlayList) {
-                $result .= $this->renderArchivePlayer($archivePlayList, '800px', true);
+            if (!empty($chunksList)) {
+
+                $archivePlayList = $this->generateArchivePlaylist($cameraId, $showDate, $showDate);
+                if ($archivePlayList) {
+                    $result .= $this->renderArchivePlayer($archivePlayList, '70%', true);
+                } else {
+                    $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
+                }
+                //some timeline here
+                $result .= $this->renderDaysTimeline($cameraId, $chunksList);
             } else {
                 $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
             }
         } else {
             $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
         }
-        $result .= wf_delimiter(0);
+        $result .= wf_delimiter(1);
         $result .= wf_BackLink(self::URL_ME);
         return($result);
     }
