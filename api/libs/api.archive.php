@@ -222,41 +222,6 @@ class Archive {
     }
 
     /**
-     * Renders basic archive lookup interface
-     * 
-     * @param int $cameraId
-     * 
-     * @return string
-     */
-    public function renderLookup($cameraId) {
-        $result = '';
-        $cameraId = ubRouting::filters($cameraId, 'int');
-        if (isset($this->allCamerasData[$cameraId])) {
-            $cameraData = $this->allCamerasData[$cameraId]['CAMERA'];
-            $showDate = (ubRouting::checkGet(self::ROUTE_SHOWDATE)) ? ubRouting::get(self::ROUTE_SHOWDATE) : curdate();
-            $chunksList = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
-            if (!empty($chunksList)) {
-
-                $archivePlayList = $this->generateArchivePlaylist($cameraId, $showDate, $showDate);
-                if ($archivePlayList) {
-                    $result .= $this->renderArchivePlayer($archivePlayList, '70%', true);
-                } else {
-                    $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
-                }
-                //some timeline here
-                $result .= $this->renderDaysTimeline($cameraId, $chunksList);
-            } else {
-                $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
-            }
-        } else {
-            $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
-        }
-        $result .= wf_delimiter(1);
-        $result .= wf_BackLink(self::URL_ME);
-        return($result);
-    }
-
-    /**
      * Saves playlist and returns its path in howl ready for player rendering
      * 
      * @param int $cameraId
@@ -310,6 +275,41 @@ class Archive {
                 $result = $playListPath;
             }
         }
+        return($result);
+    }
+
+    /**
+     * Renders basic archive lookup interface
+     * 
+     * @param int $cameraId
+     * 
+     * @return string
+     */
+    public function renderLookup($cameraId) {
+        $result = '';
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        if (isset($this->allCamerasData[$cameraId])) {
+            $cameraData = $this->allCamerasData[$cameraId]['CAMERA'];
+            $showDate = (ubRouting::checkGet(self::ROUTE_SHOWDATE)) ? ubRouting::get(self::ROUTE_SHOWDATE) : curdate();
+            $chunksList = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
+            if (!empty($chunksList)) {
+
+                $archivePlayList = $this->generateArchivePlaylist($cameraId, $showDate, $showDate);
+                if ($archivePlayList) {
+                    $result .= $this->renderArchivePlayer($archivePlayList, '70%', true);
+                } else {
+                    $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
+                }
+                //some timeline here
+                $result .= $this->renderDaysTimeline($cameraId, $chunksList);
+            } else {
+                $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
+            }
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
+        }
+        $result .= wf_delimiter(1);
+        $result .= wf_BackLink(self::URL_ME);
         return($result);
     }
 

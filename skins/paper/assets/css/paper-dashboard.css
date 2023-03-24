@@ -2334,14 +2334,14 @@ h1 small,
 
 h2,
 .h2 {
-    font-size: 2.5em;
-    margin-bottom: 30px;
+    font-size: 2.4em;
+    margin-bottom: 8px;
 }
 
 h3,
 .h3 {
-    font-size: 2em;
-    margin-bottom: 30px;
+    font-size: 1.8em;
+    margin-bottom: 8px;
     line-height: 1.4em;
 }
 
@@ -2349,7 +2349,7 @@ h4,
 .h4 {
     font-size: 1.714em;
     line-height: 1.45em;
-    margin-top: 30px;
+    margin-top: 10px;
     margin-bottom: 15px;
 }
 
