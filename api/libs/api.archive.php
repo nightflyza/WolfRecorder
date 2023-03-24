@@ -211,9 +211,10 @@ class Archive {
                 $result .= wf_delimiter(0);
                 $chunkTime = $this->altCfg['RECORDER_CHUNK_TIME'];
                 foreach ($datesTmp as $eachDate => $chunksCount) {
+                    $justDay = date("d", strtotime($eachDate));
                     $baseUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $cameraId . '&' . self::ROUTE_SHOWDATE . '=' . $eachDate;
                     $recordsTime = wr_formatTimeArchive($chunksCount * $chunkTime);
-                    $result .= wf_Link($baseUrl, wf_img('skins/icon_calendar.gif', $recordsTime) . ' ' . $eachDate, false, 'ubButton') . ' ';
+                    $result .= wf_Link($baseUrl, wf_img('skins/icon_calendar.gif', $eachDate . ' - ' . $recordsTime) . ' ' . $justDay, false, 'ubButton') . ' ';
                 }
                 $result .= wf_CleanDiv();
             }
