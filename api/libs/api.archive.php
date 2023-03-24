@@ -290,7 +290,7 @@ class Archive {
         $cameraId = ubRouting::filters($cameraId, 'int');
         if (isset($this->allCamerasData[$cameraId])) {
             $cameraData = $this->allCamerasData[$cameraId]['CAMERA'];
-            $showDate = (ubRouting::checkGet(self::ROUTE_SHOWDATE)) ? ubRouting::get(self::ROUTE_SHOWDATE) : curdate();
+            $showDate = (ubRouting::checkGet(self::ROUTE_SHOWDATE)) ? ubRouting::get(self::ROUTE_SHOWDATE, 'mres') : curdate();
             $chunksList = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
             if (!empty($chunksList)) {
                 $archivePlayList = $this->generateArchivePlaylist($cameraId, $showDate, $showDate);
