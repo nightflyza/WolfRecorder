@@ -1,0 +1,6 @@
+DEVICE="Trassir TR-D8121IR2v6"
+PROTO="rtsp"
+MAIN_STREAM="/live/main"
+SUB_STREAM="/live/sub"
+RTSP_PORT=554
+HTTP_PORT=80
