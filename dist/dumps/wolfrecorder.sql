@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `cameras` (
   `active` tinyint(2) NOT NULL DEFAULT 0,
   `storageid` INT(11) NOT NULL,
   `channel`  varchar(64) NOT NULL,
+  `comment`  varchar(255) DEFAULT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 

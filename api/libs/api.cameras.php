@@ -58,6 +58,7 @@ class Cameras {
     const PROUTE_NEWPASS = 'newcamerapassword';
     const PROUTE_NEWACT = 'newcameraactive';
     const PROUTE_NEWSTORAGE = 'newcamerastorageid';
+    const PROUTE_NEWCOMMENT = 'newcameracomment';
     const ROUTE_DEL = 'deletecameraid';
     const ROUTE_EDIT = 'editcameraid';
     const ROUTE_ACTIVATE = 'activatecameraid';
@@ -202,10 +203,11 @@ class Cameras {
      * @param string $password
      * @param bool $active
      * @param int $storageId
+     * @param comment $comment
      * 
      * @return void/string on error
      */
-    public function create($modelId, $ip, $login, $password, $active, $storageId) {
+    public function create($modelId, $ip, $login, $password, $active, $storageId, $comment = '') {
         $result = '';
         $modelId = ubRouting::filters($modelId, 'int');
         $ipF = ubRouting::filters($ip, 'mres');
@@ -261,7 +263,7 @@ class Cameras {
         $result = '';
         if (!empty($this->allCameras)) {
             $allModels = $this->models->getAllModelNames();
-            $allStorages = $this->storages->getAllStorageNames();
+
             $starDust = new StarDust();
 
             $cells = wf_TableCell(__('ID'));
@@ -269,7 +271,7 @@ class Cameras {
             $cells .= wf_TableCell(__('IP'));
             $cells .= wf_TableCell(__('Enabled'));
             $cells .= wf_TableCell(__('Recording'));
-            $cells .= wf_TableCell(__('Storage'));
+            $cells .= wf_TableCell(__('Description'));
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
             foreach ($this->allCameras as $io => $each) {
@@ -280,11 +282,11 @@ class Cameras {
                 $starDust->setProcess(Recorder::PID_PREFIX . $each['id']);
                 $recordingFlag = $starDust->isRunning();
                 $cells .= wf_TableCell(web_bool_led($recordingFlag));
-                $cells .= wf_TableCell(__($allStorages[$each['storageid']]));
+                $cells .= wf_TableCell($each['comment']);
                 $deletionUrl = self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'];
                 $cancelUrl = self::URL_ME;
-                $deletionAlert = $this->messages->getDeleteAlert().'. '.wf_tag('br');
-                $deletionAlert.= __('Also all archive data for this camera will be destroyed permanently').'.';
+                $deletionAlert = $this->messages->getDeleteAlert() . '. ' . wf_tag('br');
+                $deletionAlert .= __('Also all archive data for this camera will be destroyed permanently') . '.';
                 $deletionTitle = __('Delete') . ' ' . __('Camera') . ' ' . $each['ip'] . '?';
                 $actLinks = wf_ConfirmDialog($deletionUrl, web_delete_icon(), $deletionAlert, '', $cancelUrl, $deletionTitle) . ' ';
                 $actLinks .= wf_Link(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $each['id'], web_edit_icon(), false);
@@ -408,8 +410,11 @@ class Cameras {
             $rows .= wf_TableRow($cells, 'row3');
 
             $cells = wf_TableCell(__('Recording'), '', 'row2');
-
             $cells .= wf_TableCell(web_bool_led($recordingFlag));
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Description'), '', 'row2');
+            $cells .= wf_TableCell($cameraData['comment']);
             $rows .= wf_TableRow($cells, 'row3');
 
             $cells = wf_TableCell(__('Storage'), '', 'row2');

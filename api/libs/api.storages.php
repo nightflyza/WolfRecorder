@@ -459,9 +459,13 @@ class Storages {
                             $fullPath = $storagePath . $delimiter . $channel;
                             //seems ok?
                             if (is_writable($fullPath)) {
+                                //unlink howl
+                                unlink(self::PATH_HOWL.$channel);
+                                //destroy channel dir
                                 rcms_delete_files($fullPath, true);
                                 log_register('STORAGE FLUSH [' . $storageId . '] PATH `' . $storagePath . '` CHANNEL `' . $channel . '`');
                             }
+
                         }
                     }
                 }
