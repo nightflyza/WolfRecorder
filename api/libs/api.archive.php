@@ -293,7 +293,6 @@ class Archive {
             $showDate = (ubRouting::checkGet(self::ROUTE_SHOWDATE)) ? ubRouting::get(self::ROUTE_SHOWDATE) : curdate();
             $chunksList = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
             if (!empty($chunksList)) {
-
                 $archivePlayList = $this->generateArchivePlaylist($cameraId, $showDate, $showDate);
                 if ($archivePlayList) {
                     $result .= $this->renderArchivePlayer($archivePlayList, '70%', true);

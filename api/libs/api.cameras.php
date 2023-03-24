@@ -157,10 +157,11 @@ class Cameras {
             if (!empty($allModels)) {
                 $inputs = wf_Selector(self::PROUTE_NEWMODEL, $allModels, __('Model'), '', false) . ' ';
                 $inputs .= wf_TextInput(self::PROUTE_NEWIP, __('IP'), '', false, 12, 'ip') . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_NEWLOGIN, __('Login'), '', false, 12, 'alphanumeric') . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_NEWPASS, __('Password'), '', false, 12, '') . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_NEWLOGIN, __('Login'), '', false, 8, 'alphanumeric') . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_NEWPASS, __('Password'), '', false, 8, '') . ' ';
                 $inputs .= wf_CheckInput(self::PROUTE_NEWACT, __('Enabled'), false, true) . ' ';
                 $inputs .= wf_Selector(self::PROUTE_NEWSTORAGE, $storagesParams, __('Storage'), '', false) . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_NEWCOMMENT, __('Description'), '', false, 10, '') . ' ';
                 $inputs .= wf_Submit(__('Create'));
                 $result .= wf_Form('', 'POST', $inputs, 'glamour');
             } else {
@@ -215,6 +216,7 @@ class Cameras {
         $passwordF = ubRouting::filters($password, 'mres');
         $actF = ($active) ? 1 : 0;
         $storageId = ubRouting::filters($storageId, 'int');
+        $commentF = ubRouting::filters($comment, 'mres');
         $channelId = $this->getChannelId();
 
         $allStorages = $this->storages->getAllStorageNames();
@@ -233,6 +235,7 @@ class Cameras {
                             $this->camerasDb->data('active', $actF);
                             $this->camerasDb->data('storageid', $storageId);
                             $this->camerasDb->data('channel', $channelId);
+                            $this->camerasDb->data('comment', $commentF);
                             $this->camerasDb->create();
                             $newId = $this->camerasDb->getLastId();
                             log_register('CAMERA CREATE [' . $newId . ']  MODEL [' . $modelId . '] IP `' . $ip . '` STORAGE [' . $storageId . ']');
