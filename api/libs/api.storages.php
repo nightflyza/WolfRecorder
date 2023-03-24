@@ -29,6 +29,7 @@ class Storages {
     /**
      * Some predefined stuff here
      */
+    const PATH_HOWL = 'howl/';
     const PROUTE_PATH = 'newstoragepath';
     const PROUTE_NAME = 'newstoragename';
     const ROUTE_DEL = 'deletestorageid';
@@ -388,11 +389,15 @@ class Storages {
                         if ($pathLastChar != '/') {
                             $delimiter = '/';
                         }
-                        $fullPath = $storagePath . $delimiter . $channel . '/';
+                        $chanDirName = $storagePath . $delimiter . $channel;
+                        $fullPath = $chanDirName . '/';
                         //allocate channel dir
                         if (!file_exists($fullPath)) {
+                            //creating new directory
                             mkdir($fullPath, 0777);
                             chmod($fullPath, 0777);
+                            //linking to howl
+                            symlink($chanDirName, self::PATH_HOWL . $channel);
                             log_register('STORAGE ALLOCATED `' . $storagePath . '` CHANNEL `' . $channel . '`');
                         }
 
