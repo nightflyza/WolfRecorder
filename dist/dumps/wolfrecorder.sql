@@ -6,21 +6,21 @@ CREATE TABLE IF NOT EXISTS `weblogs` (
   `event` varchar(255) default NULL,
   PRIMARY KEY  (`id`),
   KEY `date` (`date`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS `storages` (
   `id` int(11) NOT NULL auto_increment,
   `path` varchar(200) NOT NULL,
   `name` varchar(64) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS `models` (
   `id` int(11) NOT NULL auto_increment,
   `modelname` varchar(255) NOT NULL,
   `template` varchar(64) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 CREATE TABLE IF NOT EXISTS `cameras` (
   `id` int(11) NOT NULL auto_increment,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `cameras` (
   `channel`  varchar(64) NOT NULL,
   `comment`  varchar(255) DEFAULT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 CREATE TABLE `lair` (
  `id` int(11) NOT NULL auto_increment,
