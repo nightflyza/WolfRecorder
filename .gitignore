@@ -1,3 +1,5 @@
 !.gitignore
 !.htaccess
 exports/*
+!howl/index.html
+!howl/.htaccess
