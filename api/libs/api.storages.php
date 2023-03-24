@@ -397,7 +397,9 @@ class Storages {
                             mkdir($fullPath, 0777);
                             chmod($fullPath, 0777);
                             //linking to howl
-                            symlink($chanDirName, self::PATH_HOWL . $channel);
+                            $howlLink = self::PATH_HOWL . $channel;
+                            symlink($chanDirName, $howlLink);
+                            chmod($howlLink, 0777);
                             log_register('STORAGE ALLOCATED `' . $storagePath . '` CHANNEL `' . $channel . '`');
                         }
 
