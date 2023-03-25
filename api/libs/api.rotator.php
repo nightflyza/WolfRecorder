@@ -54,6 +54,8 @@ class Rotator {
      */
     protected $allStoragesData = array();
 
+    const ROTATOR_PID = 'ROTATOR';
+
     public function __construct() {
         $this->loadConfigs();
         $this->initStorages();
@@ -125,25 +127,62 @@ class Rotator {
     }
 
     /**
+     * Just deletes oldest chunk from some channel
+     * 
+     * @param int $storageId
+     * @param string $channel
+     * 
+     * @return string/void
+     */
+    protected function flushChannelOldestChunk($storageId, $channel) {
+        $result = '';
+        $chunksList = $this->storages->getChannelChunks($storageId, $channel);
+        if (!empty($chunksList)) {
+            $chunksCount = sizeof($chunksList);
+            //does not kill a single chunk. It may be the current recording.
+            if ($chunksCount > 1) {
+                $oldestChunk = reset($chunksList);
+                unlink($oldestChunk);
+                $result = $oldestChunk;
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Performs old chunks rotation for all cameras
      * 
      * @return void
      */
     public function run() {
-        if (!empty($this->allStoragesData)) {
-            foreach ($this->allStoragesData as $io => $eachStorage) {
-                $storageTotalSpace = disk_total_space($eachStorage['path']);
-                $storageFreeSpace = disk_free_space($eachStorage['path']);
-                $storageFreePercent = zb_PercentValue($storageTotalSpace, $storageFreeSpace);
+        $rotatorProcess = new StarDust(self::ROTATOR_PID);
+        if ($rotatorProcess->notRunning()) {
+            $rotatorProcess->start();
+            if (!empty($this->allStoragesData)) {
+                foreach ($this->allStoragesData as $io => $eachStorage) {
+                    $storageTotalSpace = disk_total_space($eachStorage['path']);
+                    $storageFreeSpace = disk_free_space($eachStorage['path']);
+                    $storageFreePercent = zb_PercentValue($storageTotalSpace, $storageFreeSpace);
 
-                //cleanup required?
-                if ($storageFreePercent <= $this->reservedSpacePercent) {
-                    $eachStorageChannels = $this->getStorageChannels($eachStorage['id']);
-                    if (!empty($eachStorageChannels)) {
-                        debarr($eachStorageChannels);
+                    //cleanup required?
+                    if ($storageFreePercent <= $this->reservedSpacePercent) {
+                        $eachStorageChannels = $this->getStorageChannels($eachStorage['id']);
+                        if (!empty($eachStorageChannels)) {
+                            while ($storageFreePercent <= $this->reservedSpacePercent) {
+                                foreach ($eachStorageChannels as $eachChannel => $chanPath) {
+                                    $cleanupResult = $this->flushChannelOldestChunk($eachStorage['id'], $eachChannel);
+                                    //TODO: remove following debug code
+                                    file_put_contents('exports/rotator_debug.log', curdatetime() . ' ' . $cleanupResult . PHP_EOL, FILE_APPEND);
+                                }
+                                $storageTotalSpace = disk_total_space($eachStorage['path']);
+                                $storageFreeSpace = disk_free_space($eachStorage['path']);
+                                $storageFreePercent = zb_PercentValue($storageTotalSpace, $storageFreeSpace);
+                            }
+                        }
                     }
                 }
             }
+            $rotatorProcess->stop();
         }
     }
 
