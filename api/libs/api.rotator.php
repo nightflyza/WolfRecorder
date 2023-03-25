@@ -41,11 +41,18 @@ class Rotator {
     protected $cameras = '';
 
     /**
-     * Contains full cameras data as 
+     * Contains full cameras data as cameraId=>fullCameraData
      *
      * @var array
      */
     protected $allCamerasData = array();
+
+    /**
+     * Contains all storages data as storageId=>storageData
+     *
+     * @var array
+     */
+    protected $allStoragesData = array();
 
     public function __construct() {
         $this->loadConfigs();
@@ -74,6 +81,7 @@ class Rotator {
      */
     protected function initStorages() {
         $this->storages = new Storages();
+        $this->allStoragesData = $this->storages->getAllStoragesData();
     }
 
     /**
@@ -87,14 +95,55 @@ class Rotator {
     }
 
     /**
+     * Returns existing channels list available in storage depends of camera setup
+     * 
+     * @return array
+     */
+    protected function getStorageChannels($storageId) {
+        $result = array();
+        if (isset($this->allStoragesData[$storageId])) {
+            if (!empty($this->allCamerasData)) {
+                foreach ($this->allCamerasData as $io => $eachCameraData) {
+                    if ($eachCameraData['CAMERA']['storageid'] == $storageId) {
+                        $storagePath = $eachCameraData['STORAGE']['path'];
+                        $storagePathLastChar = substr($storagePath, 0, -1);
+                        if ($storagePathLastChar != '/') {
+                            $storagePath = $storagePath . '/';
+                        }
+                        $channelName = $eachCameraData['CAMERA']['channel'];
+                        $channelFullPath = $storagePath . $channelName;
+                        if (file_exists($channelFullPath)) {
+                            if (is_writable($channelFullPath)) {
+                                $result[$channelName] = $channelFullPath;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Performs old chunks rotation for all cameras
      * 
      * @return void
      */
     public function run() {
-        $allStorages = $this->storages->getAllStoragesData();
-        if (!empty($allStorages)) {
-            
+        if (!empty($this->allStoragesData)) {
+            foreach ($this->allStoragesData as $io => $eachStorage) {
+                $storageTotalSpace = disk_total_space($eachStorage['path']);
+                $storageFreeSpace = disk_free_space($eachStorage['path']);
+                $storageFreePercent = zb_PercentValue($storageTotalSpace, $storageFreeSpace);
+
+                //cleanup required?
+                if ($storageFreePercent <= $this->reservedSpacePercent) {
+                    $eachStorageChannels = $this->getStorageChannels($eachStorage['id']);
+                    if (!empty($eachStorageChannels)) {
+                        debarr($eachStorageChannels);
+                    }
+                }
+            }
         }
     }
 

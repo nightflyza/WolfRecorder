@@ -6,6 +6,7 @@ if (cfr('ROOT')) {
     
     
     $rotator=new Rotator();
+    $rotator->run();
 } else {
     show_error(__('Access denied'));
 }
