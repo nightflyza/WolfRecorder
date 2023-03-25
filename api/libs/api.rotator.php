@@ -175,6 +175,7 @@ class Rotator {
                     deb('mustbefree:'.wr_convertSize($mustBeFree));
                     //storage cleanup required?
                     if ($storageFreeSpace < $mustBeFree) {
+                        deb('creanup required');
                         $eachStorageChannels = $this->getStorageChannels($eachStorage['id']);
                         //this storage must be cleaned
                         if (!empty($eachStorageChannels)) {
@@ -186,11 +187,17 @@ class Rotator {
                             }
                             deb('used by channels:'.wr_convertSize($allChannelsSpace));
                           
-                           //fair?
-                            $maxChannelAllocSize=($storageTotalSpace-$maxUsageSpace-$allChannelsSpace)/$storageChannelsCount;
-                            deb('maxChannelAllocSize:'.wr_convertSize($maxChannelAllocSize));
+                            $avgChanSize=$allChannelsSpace/$storageChannelsCount;
+                            deb('avgChanSize:'.wr_convertSize($avgChanSize));
+                            
+                            
+                            $usedBySystem=$usedStorageSpace-$allChannelsSpace;
+                            deb('usedBySystem:'.wr_convertSize($usedBySystem));
 
-                            /**
+                            //fair?
+                            $maxChannelAllocSize=($usedStorageSpace-$usedBySystem-$mustBeFree)/$storageChannelsCount;
+                            deb('maxChannelAllocSize:'.wr_convertSize($maxChannelAllocSize));
+                            
                                 foreach ($eachStorageChannels as $eachChannel => $chanPath) {
                                     $eachChannelSize=$this->storages->getChannelSize($eachStorage['id'],$eachChannel);
                                     //this channel is exhausted his reserved size?
@@ -212,9 +219,11 @@ class Rotator {
                                 //storage cleanup end
                             }
 
-                           **/   
+                           
 
                         }
+                    } else {
+                        deb('NO storage cleanup required');
                     }
                     
                 }
