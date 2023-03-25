@@ -195,7 +195,7 @@ class Rotator {
                             deb('usedBySystem:'.wr_convertSize($usedBySystem));
 
                             //fair?
-                            $maxChannelAllocSize=abs(($mustBeFree-$storageFreeSpace)-$allChannelsSpace)/$storageChannelsCount;
+                            $maxChannelAllocSize=round((($storageFreeSpace-$mustBeFree)+$allChannelsSpace)/$storageChannelsCount);
                             deb('maxChannelAllocSize:'.wr_convertSize($maxChannelAllocSize));
                             
                                 foreach ($eachStorageChannels as $eachChannel => $chanPath) {
