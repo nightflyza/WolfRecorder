@@ -195,9 +195,9 @@ class Rotator {
                             deb('usedBySystem:'.wr_convertSize($usedBySystem));
 
                             //fair?
-                            $maxChannelAllocSize=($mustBeFree-$allChannelsSpace)/$storageChannelsCount;
+                            $maxChannelAllocSize=abs(($mustBeFree-$storageFreeSpace)-$allChannelsSpace)/$storageChannelsCount;
                             deb('maxChannelAllocSize:'.wr_convertSize($maxChannelAllocSize));
-                            /**
+                            
                                 foreach ($eachStorageChannels as $eachChannel => $chanPath) {
                                     $eachChannelSize=$this->storages->getChannelSize($eachStorage['id'],$eachChannel);
                                     //this channel is exhausted his reserved size?
@@ -217,7 +217,7 @@ class Rotator {
                                 //storage cleanup end
                             }
 
-                            **/
+                           
 
                         }
                     } else {
