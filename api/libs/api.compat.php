@@ -430,7 +430,6 @@ function web_bar($count, $total) {
  * @return float
  */
 function zb_Percent($sum, $percent) {
-    // и не надо ржать, я реально не могу запомнить чего куда делить и умножать
     $result = $percent / 100 * $sum;
     return ($result);
 }
