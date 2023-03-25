@@ -55,9 +55,16 @@ class Archive {
     protected $messages = '';
 
     /**
-     * some creepy params here
+     * Contains chunk time in seconds
      */
     protected $chunkTime = 60;
+
+    /**
+     * Contains player width by default
+     *
+     * @var string
+     */
+    protected $playerWidth = '70%';
 
     /**
      * other predefined stuff like routes
@@ -196,6 +203,7 @@ class Archive {
     protected function renderDaysTimeline($cameraId, $chunksList) {
         $result = '';
         $cameraId = ubRouting::filters($cameraId, 'int');
+        $dayPointer = ubRouting::checkGet(self::ROUTE_SHOWDATE) ? ubRouting::get(self::ROUTE_SHOWDATE) : curdate();
         if (!empty($chunksList)) {
             $datesTmp = array();
             foreach ($chunksList as $timeStamp => $chunkName) {
@@ -214,7 +222,8 @@ class Archive {
                     $justDay = date("d", strtotime($eachDate));
                     $baseUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $cameraId . '&' . self::ROUTE_SHOWDATE . '=' . $eachDate;
                     $recordsTime = wr_formatTimeArchive($chunksCount * $chunkTime);
-                    $result .= wf_Link($baseUrl, wf_img('skins/icon_calendar.gif', $eachDate . ' - ' . $recordsTime) . ' ' . $justDay, false, 'ubButton') . ' ';
+                    $buttonIcon = ($eachDate == $dayPointer) ? 'skins/icon_camera_small.png' : 'skins/icon_calendar.gif';
+                    $result .= wf_Link($baseUrl, wf_img($buttonIcon, $eachDate . ' - ' . $recordsTime) . ' ' . $justDay, false, 'ubButton') . ' ';
                 }
                 $result .= wf_CleanDiv();
             }
@@ -239,6 +248,7 @@ class Archive {
             $cameraStorageData = $this->allCamerasData[$cameraId]['STORAGE'];
             $storagePath = $cameraStorageData['path'];
             $storagePathLastChar = substr($storagePath, 0, -1);
+
             if ($storagePathLastChar != '/') {
                 $storagePath = $storagePath . '/';
             }
@@ -296,7 +306,7 @@ class Archive {
             if (!empty($chunksList)) {
                 $archivePlayList = $this->generateArchivePlaylist($cameraId, $showDate, $showDate);
                 if ($archivePlayList) {
-                    $result .= $this->renderArchivePlayer($archivePlayList, '70%', true);
+                    $result .= $this->renderArchivePlayer($archivePlayList, $this->playerWidth, true);
                 } else {
                     $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
                 }
