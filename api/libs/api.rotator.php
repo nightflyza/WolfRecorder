@@ -195,9 +195,9 @@ class Rotator {
                             deb('usedBySystem:'.wr_convertSize($usedBySystem));
 
                             //fair?
-                            $maxChannelAllocSize=($usedStorageSpace-$usedBySystem-$mustBeFree)/$storageChannelsCount;
+                            $maxChannelAllocSize=($mustBeFree-$allChannelsSpace)/$storageChannelsCount;
                             deb('maxChannelAllocSize:'.wr_convertSize($maxChannelAllocSize));
-                            
+                            /**
                                 foreach ($eachStorageChannels as $eachChannel => $chanPath) {
                                     $eachChannelSize=$this->storages->getChannelSize($eachStorage['id'],$eachChannel);
                                     //this channel is exhausted his reserved size?
@@ -213,13 +213,11 @@ class Rotator {
                                         //TODO: remove following debug code
                                         file_put_contents('exports/rotator_debug.log', curdatetime() . ' '.wr_convertSize($eachChannelSize).' < OF '. wr_convertSize($maxChannelAllocSize).' '. $eachChannel . PHP_EOL, FILE_APPEND);
                                   }
-                           
-
 
                                 //storage cleanup end
                             }
 
-                           
+                            **/
 
                         }
                     } else {
