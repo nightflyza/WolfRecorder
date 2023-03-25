@@ -162,25 +162,49 @@ class Rotator {
                 foreach ($this->allStoragesData as $io => $eachStorage) {
                     $storageTotalSpace = disk_total_space($eachStorage['path']);
                     $storageFreeSpace = disk_free_space($eachStorage['path']);
-                    $storageFreePercent = zb_PercentValue($storageTotalSpace, $storageFreeSpace);
-
-                    //cleanup required?
-                    if ($storageFreePercent <= $this->reservedSpacePercent) {
-                        //TODO: do something about per channel size limitation depends camera count
+                    $safePercent=100-($this->reservedSpacePercent);
+                    $allocatedStorageSpace=zb_Percent($storageTotalSpace,$safePercent);
+                    $usedStorageSpace=$storageTotalSpace-$storageFreeSpace;
+                    deb('used:'.wr_convertSize($usedStorageSpace));
+                    deb('allocated:'.wr_convertSize($allocatedStorageSpace));
+                    //storage cleanup required?
+                    if ($usedStorageSpace >= $allocatedStorageSpace) {
                         $eachStorageChannels = $this->getStorageChannels($eachStorage['id']);
+
                         if (!empty($eachStorageChannels)) {
-                            while ($storageFreePercent <= $this->reservedSpacePercent) {
+                            $storageChannelsCount=sizeof($eachStorageChannels);
+                            $maxChannelAllocSize=$allocatedStorageSpace/$storageChannelsCount;
+                            debarr(wr_convertSize($maxChannelAllocSize));
+                            
+                            while ($usedStorageSpace >= $allocatedStorageSpace) {
                                 foreach ($eachStorageChannels as $eachChannel => $chanPath) {
-                                    $cleanupResult = $this->flushChannelOldestChunk($eachStorage['id'], $eachChannel);
-                                    //TODO: remove following debug code
-                                    file_put_contents('exports/rotator_debug.log', curdatetime() . ' ' . $cleanupResult . PHP_EOL, FILE_APPEND);
+                                    $eachChannelSize=$this->storages->getChannelSize($eachStorage['id'],$eachChannel);
+                                    //this channel is exhausted his reserved size?
+                                    if ($eachChannelSize>=$maxChannelAllocSize) {
+                                     while ($eachChannelSize>=$maxChannelAllocSize) {
+                                        $cleanupResult = $this->flushChannelOldestChunk($eachStorage['id'], $eachChannel);
+                                        //TODO: remove following debug code
+                                        file_put_contents('exports/rotator_debug.log', curdatetime() . ' ' . $cleanupResult . PHP_EOL, FILE_APPEND);
+                                        $eachChannelSize=$this->storages->getChannelSize($eachStorage['id'],$eachChannel);
+                                     }
+                                  } else {
+                                        //TODO: remove following debug code
+                                        file_put_contents('exports/rotator_debug.log', curdatetime() . ' '.wr_convertSize($eachChannelSize).' NOT > OF '. wr_convertSize($maxChannelAllocSize).' '. $eachChannel . PHP_EOL, FILE_APPEND);
+                                  }
                                 }
-                                $storageTotalSpace = disk_total_space($eachStorage['path']);
-                                $storageFreeSpace = disk_free_space($eachStorage['path']);
-                                $storageFreePercent = zb_PercentValue($storageTotalSpace, $storageFreeSpace);
+
+                                 $storageTotalSpace = disk_total_space($eachStorage['path']);
+                                 $storageFreeSpace = disk_free_space($eachStorage['path']);
+                                 $safePercent=100-($this->reservedSpacePercent*1.2);
+                                 $allocatedStorageSpace=zb_Percent($storageTotalSpace,$safePercent);
+                                 $usedStorageSpace=$storageTotalSpace-$storageFreeSpace;
+                                
                             }
+
+                            
                         }
                     }
+                    
                 }
             }
             $rotatorProcess->stop();
