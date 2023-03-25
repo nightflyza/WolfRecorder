@@ -129,6 +129,6 @@ $lang['def']['required by']='необхідну для';
 $lang['def']['System health']='стан системи';
 $lang['def']['Storages capacity']='Ємність сховищ';
 $lang['def']['No storages available']='Немає наявних сховищ';
-$lang['def']['']='';
+$lang['def']['No record']='Немає запису';
 $lang['def']['']='';
 $lang['def']['']='';

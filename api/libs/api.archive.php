@@ -193,6 +193,55 @@ class Archive {
     }
 
     /**
+     * Allocates array with full timeline as hh:mm=>0
+     * 
+     * @return array
+     */
+    protected function allocDayTimeline() {
+        $result = array();
+        for ($h = 0; $h <= 23; $h++) {
+            for ($m = 0; $m < 60; $m++) {
+                $hLabel = ($h > 9) ? $h : '0' . $h;
+                $mLabel = ($m > 9) ? $m : '0' . $m;
+                $timeLabel = $hLabel . ':' . $mLabel;
+                $result[$timeLabel] = 0;
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Renders recordings availability due some day of month
+     * 
+     * @return string
+     */
+    protected function renderDayRecordsAvailTimeline($chunksList, $date) {
+        $result = '';
+        if (!empty($chunksList)) {
+            $dayMinAlloc = $this->allocDayTimeline();
+            foreach ($chunksList as $timeStamp => $eachChunk) {
+                $dayOfMonth = date("Y-m-d", $timeStamp);
+                if ($dayOfMonth == $date) {
+                    $timeOfDay = date("H:i", $timeStamp);
+                    if (isset($dayMinAlloc[$timeOfDay])) {
+                        $dayMinAlloc[$timeOfDay] = 1;
+                    }
+                }
+            }
+            $barWidth = 0.064;
+            $result = wf_tag('div', false, '', 'style="width:' . $this->playerWidth . ';"');
+            foreach ($dayMinAlloc as $eachMin => $recAvail) {
+                $recAvailBar = ($recAvail) ? 'skins/rec_avail.png' : 'skins/rec_unavail.png';
+                $recAvailTitle = ($recAvail) ? $eachMin : $eachMin . ' - ' . __('No record');
+                $result .= wf_img($recAvailBar, $recAvailTitle, 'width:' . $barWidth . '%;');
+            }
+            $result .= wf_tag('div', true);
+        }
+
+        return($result);
+    }
+
+    /**
      * Renders basic timeline for some chunks list
      * 
      * @param array $cameraId
@@ -216,6 +265,7 @@ class Archive {
             }
 
             if (!empty($datesTmp)) {
+                $result .= $this->renderDayRecordsAvailTimeline($chunksList, $dayPointer);
                 $result .= wf_delimiter(0);
                 $chunkTime = $this->altCfg['RECORDER_CHUNK_TIME'];
                 foreach ($datesTmp as $eachDate => $chunksCount) {

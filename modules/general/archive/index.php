@@ -1,6 +1,6 @@
 <?php
 
-if (cfr('Archive')) {
+if (cfr('ARCHIVE')) {
     $archive = new Archive();
 
     //archive lookup
