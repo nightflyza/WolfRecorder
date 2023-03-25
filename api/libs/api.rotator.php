@@ -166,6 +166,7 @@ class Rotator {
 
                     //cleanup required?
                     if ($storageFreePercent <= $this->reservedSpacePercent) {
+                        //TODO: do something about per channel size limitation depends camera count
                         $eachStorageChannels = $this->getStorageChannels($eachStorage['id']);
                         if (!empty($eachStorageChannels)) {
                             while ($storageFreePercent <= $this->reservedSpacePercent) {
