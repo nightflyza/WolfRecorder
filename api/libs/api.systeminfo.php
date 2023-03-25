@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Basic system health report
+ */
 class SystemInfo {
 
     /**
