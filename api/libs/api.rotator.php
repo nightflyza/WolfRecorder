@@ -168,36 +168,23 @@ class Rotator {
                     $mustBeFree=$storageTotalSpace-$maxUsageSpace;
                     $allChannelsSpace=0;
 
-                    deb('used:'.wr_convertSize($usedStorageSpace));
-                    deb('free:'.wr_convertSize($storageFreeSpace));
-                    deb('maxUsagePercent:'.$maxUsagePercent);
-                    deb('maxUsageSpace:'.wr_convertSize($maxUsageSpace));
-                    deb('mustbefree:'.wr_convertSize($mustBeFree));
+                    
                     //storage cleanup required?
                     if ($storageFreeSpace < $mustBeFree) {
-                        deb('creanup required');
                         $eachStorageChannels = $this->getStorageChannels($eachStorage['id']);
                         //this storage must be cleaned
                         if (!empty($eachStorageChannels)) {
                             //count of channels
                             $storageChannelsCount=sizeof($eachStorageChannels);
-
                             foreach ($eachStorageChannels as $eachChannel => $chanPath) {
                                 $allChannelsSpace+=$this->storages->getChannelSize($eachStorage['id'],$eachChannel);
                             }
-                            deb('used by channels:'.wr_convertSize($allChannelsSpace));
                           
                             $avgChanSize=$allChannelsSpace/$storageChannelsCount;
-                            deb('avgChanSize:'.wr_convertSize($avgChanSize));
-                            
-                            
                             $usedBySystem=$usedStorageSpace-$allChannelsSpace;
-                            deb('usedBySystem:'.wr_convertSize($usedBySystem));
-
                             //fair?
                             $maxChannelAllocSize=round((($storageFreeSpace-$mustBeFree)+$allChannelsSpace)/$storageChannelsCount);
-                            deb('maxChannelAllocSize:'.wr_convertSize($maxChannelAllocSize));
-                            
+                           
                                 foreach ($eachStorageChannels as $eachChannel => $chanPath) {
                                     $eachChannelSize=$this->storages->getChannelSize($eachStorage['id'],$eachChannel);
                                     //this channel is exhausted his reserved size?
