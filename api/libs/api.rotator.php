@@ -200,17 +200,9 @@ class Rotator {
                                         //TODO: remove following debug code
                                         file_put_contents('exports/rotator_debug.log', curdatetime() . ' '.wr_convertSize($eachChannelSize).' < OF '. wr_convertSize($maxChannelAllocSize).' '. $eachChannel . PHP_EOL, FILE_APPEND);
                                   }
-
-                                //storage cleanup end
                             }
-
-                           
-
                         }
-                    } else {
-                        deb('NO storage cleanup required');
-                    }
-                    
+                    }                     
                 }
             }
             $rotatorProcess->stop();
