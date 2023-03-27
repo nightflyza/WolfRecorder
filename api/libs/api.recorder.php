@@ -127,7 +127,7 @@ class Recorder {
         $this->ffmpgPath = $this->binPaths['FFMPG_PATH'];
         $this->cdPath = $this->binPaths['CD'];
         $this->chunkTime = $this->altCfg['RECORDER_CHUNK_TIME'];
-        $this->transportTemplate = '-loglevel error -rtsp_transport tcp -f rtsp -i';
+        $this->transportTemplate = '-stimeout 5000000 -loglevel error -rtsp_transport tcp -f rtsp -i';
         $this->recordOpts = '-strict -2 -vcodec copy -f segment -segment_time ' . $this->chunkTime . ' -strftime 1 -segment_atclocktime 1 -segment_clocktime_offset 30 -reset_timestamps 1 -segment_format mp4';
         $this->audioCapture = '-acodec copy' . ' ';
         $this->supressOutput = '';
