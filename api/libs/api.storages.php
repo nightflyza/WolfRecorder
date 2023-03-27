@@ -460,12 +460,16 @@ class Storages {
                             //seems ok?
                             if (is_writable($fullPath)) {
                                 //unlink howl
-                                unlink(self::PATH_HOWL.$channel);
+                                unlink(self::PATH_HOWL . $channel);
                                 //destroy channel dir
                                 rcms_delete_files($fullPath, true);
+                                //archive playlist cleanup
+                                $archPlaylistName = self::PATH_HOWL . $channel . Archive::PLAYLIST_MASK;
+                                if (file_exists($archPlaylistName)) {
+                                    rcms_delete_files($archPlaylistName);
+                                }
                                 log_register('STORAGE FLUSH [' . $storageId . '] PATH `' . $storagePath . '` CHANNEL `' . $channel . '`');
                             }
-
                         }
                     }
                 }
