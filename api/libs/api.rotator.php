@@ -193,12 +193,12 @@ class Rotator {
                                                 $this->flushChannelOldestChunk($eachStorage['id'],$eachChannel);
                                                 $eachChannelSize=$this->storages->getChannelSize($eachStorage['id'],$eachChannel);
                                                 //TODO: remove following debug code
-                                                file_put_contents('exports/rotator_debug.log', curdatetime() . ' '.wr_convertSize($eachChannelSize).' > OF '. wr_convertSize($maxChannelAllocSize).' '. $eachChannel . PHP_EOL, FILE_APPEND);
+                                                //file_put_contents('exports/rotator_debug.log', curdatetime() . ' '.wr_convertSize($eachChannelSize).' > OF '. wr_convertSize($maxChannelAllocSize).' '. $eachChannel . PHP_EOL, FILE_APPEND);
                                         }
                                         
                                   } else {
                                         //TODO: remove following debug code
-                                        file_put_contents('exports/rotator_debug.log', curdatetime() . ' '.wr_convertSize($eachChannelSize).' < OF '. wr_convertSize($maxChannelAllocSize).' '. $eachChannel . PHP_EOL, FILE_APPEND);
+                                        //file_put_contents('exports/rotator_debug.log', curdatetime() . ' '.wr_convertSize($eachChannelSize).' < OF '. wr_convertSize($maxChannelAllocSize).' '. $eachChannel . PHP_EOL, FILE_APPEND);
                                   }
                             }
                         }
