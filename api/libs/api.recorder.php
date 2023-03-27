@@ -74,6 +74,7 @@ class Recorder {
     protected $chunkTime = 60;
     protected $transportTemplate = '';
     protected $recordOpts = '';
+    protected $audioCapture = '';
     protected $supressOutput = '';
 
     /**
@@ -127,7 +128,8 @@ class Recorder {
         $this->cdPath = $this->binPaths['CD'];
         $this->chunkTime = $this->altCfg['RECORDER_CHUNK_TIME'];
         $this->transportTemplate = '-loglevel error -rtsp_transport tcp -f rtsp -i';
-        $this->recordOpts = '-strict -2 -acodec copy -vcodec copy -f segment -segment_time ' . $this->chunkTime . ' -strftime 1 -segment_atclocktime 1 -segment_clocktime_offset 30 -reset_timestamps 1 -segment_format mp4';
+        $this->recordOpts = '-strict -2 -vcodec copy -f segment -segment_time ' . $this->chunkTime . ' -strftime 1 -segment_atclocktime 1 -segment_clocktime_offset 30 -reset_timestamps 1 -segment_format mp4';
+        $this->audioCapture = '-acodec copy' . ' ';
         $this->supressOutput = '';
     }
 
@@ -193,7 +195,8 @@ class Recorder {
                                 if ($cameraData['TEMPLATE']['PROTO'] == 'rtsp') {
                                     $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
                                     $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $cameraData['TEMPLATE']['MAIN_STREAM'];
-                                    $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "' " . $this->recordOpts . ' ' . self::CHUNKS_MASK . self::CHUNKS_EXT;
+                                    $audioOpts = ($cameraData['TEMPLATE']['SOUND']) ? $this->audioCapture : '';
+                                    $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "' " . $audioOpts . $this->recordOpts . ' ' . self::CHUNKS_MASK . self::CHUNKS_EXT;
                                     $captureCommand = $this->ffmpgPath . ' ' . $this->transportTemplate . ' ' . $captureFullUrl . ' ' . $this->supressOutput;
                                     $fullCommand = 'cd ' . $channelPath . ' && ' . $captureCommand;
 
