@@ -184,10 +184,9 @@ class Archive {
         $playerId = ($playerId) ? $playerId : 'archplayer' . wf_InputId();
         $plStart = '';
         if (!ubRouting::checkGet(self::ROUTE_SHOWDATE)) {
-            $twoMinAgo = strtotime("-5 minute", time());
-            $twoMinAgo = date("H:i", $twoMinAgo);
-            $plStart = ',plstart:"s_' . $twoMinAgo . '"';
-            deb($twoMinAgo);
+            $fewMinsAgo = strtotime("-5 minute", time());
+            $fewMinsAgo = date("H:i", $fewMinsAgo);
+            $plStart = ',plstart:"s_' . $fewMinsAgo . '"';
         }
         $result = '';
         $result .= '<script src="modules/jsc/playerjs/w_playerjs.js"></script >
