@@ -269,6 +269,9 @@ else
 echo "Looks like this WolfRecorder release is not supporting automatic crontab configuration"
 fi
 
+# TODO:
+# setting autowrupdate.sh here
+
 $DIALOG --title "WolfRecorder installation has been completed" --msgbox "Now you can access your web-interface by address http://server_ip/${WR_WEB_DIR} with login and password: admin/demo. Please reboot your server to check correct startup of all services" 15 50
 
 # Finishing installation
@@ -286,6 +289,7 @@ esac
 ;;
 
 Linux)
+ echo "Coming soon..."
  # to be continued
 ;;
 esac
