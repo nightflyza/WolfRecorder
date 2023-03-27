@@ -1,3 +1,9 @@
+-- clean WolfRecorder MySQL dump. 
+
+CREATE DATABASE wr;
+
+USE wr;
+
 CREATE TABLE IF NOT EXISTS `weblogs` (
   `id` int(11) NOT NULL auto_increment,
   `date` datetime NOT NULL,
