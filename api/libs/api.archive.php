@@ -300,6 +300,8 @@ class Archive {
         $result = '';
         $cameraId = ubRouting::filters($cameraId, 'int');
         if (isset($this->allCamerasData[$cameraId])) {
+            $curDate = curdate();
+            $minuteBetweenNow = strtotime('-1 minute', time());
             $cameraData = $this->allCamerasData[$cameraId]['CAMERA'];
             $cameraStorageData = $this->allCamerasData[$cameraId]['STORAGE'];
             $storagePath = $cameraStorageData['path'];
@@ -314,13 +316,23 @@ class Archive {
             if (!empty($chunksList)) {
                 foreach ($chunksList as $timeStamp => $chunkPath) {
                     $chunkDate = date("Y-m-d", $timeStamp);
+
                     if (zb_isDateBetween($dateFrom, $dateTo, $chunkDate)) {
                         $howlChunkFullPath = str_replace($storagePath, $howlChunkPath, $chunkPath);
                         $howlChunkFullPath = str_replace('//', '/', $howlChunkFullPath);
-                        $filteredChunks[$timeStamp] = $howlChunkFullPath;
+                        //exclude last minute chunk - it may be unfinished now
+                        if ($chunkDate == $curDate) {
+                            if ($timeStamp < $minuteBetweenNow) {
+                                $filteredChunks[$timeStamp] = $howlChunkFullPath;
+                            }
+                        } else {
+                            //or just push to playlist
+                            $filteredChunks[$timeStamp] = $howlChunkFullPath;
+                        }
                     }
                 }
             }
+
 
             //generating playlist
             if (!empty($filteredChunks)) {
