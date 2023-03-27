@@ -79,6 +79,7 @@ class Models {
      * @return void
      */
     protected function loadAllModels() {
+        $this->modelsDb->orderBy('id', 'DESC');
         $this->allModels = $this->modelsDb->getAll('id');
     }
 
@@ -106,7 +107,7 @@ class Models {
                 $templateData = rcms_parse_ini_file(self::CUSTOM_TEMPLATES_PATH . $eachTemplate);
                 if (is_array($templateData)) {
                     $this->allTemplatesData[$eachTemplate] = $templateData;
-                    $this->allTemplateNames[$eachTemplate] = $templateData['DEVICE'].' ⚙️'; //mark of custom template
+                    $this->allTemplateNames[$eachTemplate] = $templateData['DEVICE'] . ' ⚙️'; //mark of custom template
                 }
             }
         }

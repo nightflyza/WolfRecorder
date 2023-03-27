@@ -66,6 +66,7 @@ class Storages {
      * @return void
      */
     protected function loadStorages() {
+        $this->storagesDb->orderBy('id', 'DESC');
         $this->allStorages = $this->storagesDb->getAll('id');
     }
 

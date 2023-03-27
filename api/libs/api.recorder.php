@@ -199,6 +199,8 @@ class Recorder {
 
                                     $this->stardust->start();
                                     log_register('RECORDER STARTED [' . $cameraId . ']');
+                                    //TODO: remove following debug code
+                                    file_put_contents('exports/recorder_debug.log', $fullCommand . PHP_EOL, FILE_APPEND);
                                     shell_exec($fullCommand); //locks process till end
                                     $this->stardust->stop();
                                 }

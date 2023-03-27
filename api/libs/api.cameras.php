@@ -137,6 +137,7 @@ class Cameras {
      * @return void
      */
     protected function loadAllCameras() {
+        $this->camerasDb->orderBy('id', 'DESC');
         $this->allCameras = $this->camerasDb->getAll('id');
     }
 
