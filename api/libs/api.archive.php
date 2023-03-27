@@ -307,7 +307,7 @@ class Archive {
                     $justDay = date("d", strtotime($eachDate));
                     $baseUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $cameraId . '&' . self::ROUTE_SHOWDATE . '=' . $eachDate;
                     $recordsTime = wr_formatTimeArchive($chunksCount * $chunkTime);
-                    $buttonIcon = ($eachDate == $dayPointer) ? 'skins/icon_camera_small.png' : 'skins/icon_calendar.gif';
+                    $buttonIcon = ($eachDate == $dayPointer) ? 'skins/icon_play_small.png' : 'skins/icon_calendar.gif';
                     $result .= wf_Link($baseUrl, wf_img($buttonIcon, $eachDate . ' - ' . $recordsTime) . ' ' . $justDay, false, 'ubButton') . ' ';
                 }
                 $result .= wf_CleanDiv();
@@ -418,7 +418,7 @@ class Archive {
         }
         $result .= wf_delimiter(1);
         $result .= wf_BackLink(self::URL_ME);
-        $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, web_edit_icon() . ' ' . __('Camera'), false, 'ubButton');
+        $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, wf_img('skins/icon_camera_small.png') . ' ' . __('Camera'), false, 'ubButton');
         return($result);
     }
 
