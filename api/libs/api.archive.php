@@ -219,23 +219,29 @@ class Archive {
         $result = '';
         if (!empty($chunksList)) {
             $dayMinAlloc = $this->allocDayTimeline();
+            $chunksByDay = 0;
             foreach ($chunksList as $timeStamp => $eachChunk) {
                 $dayOfMonth = date("Y-m-d", $timeStamp);
                 if ($dayOfMonth == $date) {
                     $timeOfDay = date("H:i", $timeStamp);
                     if (isset($dayMinAlloc[$timeOfDay])) {
                         $dayMinAlloc[$timeOfDay] = 1;
+                        $chunksByDay++;
                     }
                 }
             }
-            $barWidth = 0.064;
-            $result = wf_tag('div', false, '', 'style="width:' . $this->playerWidth . ';"');
-            foreach ($dayMinAlloc as $eachMin => $recAvail) {
-                $recAvailBar = ($recAvail) ? 'skins/rec_avail.png' : 'skins/rec_unavail.png';
-                $recAvailTitle = ($recAvail) ? $eachMin : $eachMin . ' - ' . __('No record');
-                $result .= wf_img($recAvailBar, $recAvailTitle, 'width:' . $barWidth . '%;');
+
+            //any records here?
+            if ($chunksByDay) {
+                $barWidth = 0.064;
+                $result = wf_tag('div', false, '', 'style="width:' . $this->playerWidth . ';"');
+                foreach ($dayMinAlloc as $eachMin => $recAvail) {
+                    $recAvailBar = ($recAvail) ? 'skins/rec_avail.png' : 'skins/rec_unavail.png';
+                    $recAvailTitle = ($recAvail) ? $eachMin : $eachMin . ' - ' . __('No record');
+                    $result .= wf_img($recAvailBar, $recAvailTitle, 'width:' . $barWidth . '%;');
+                }
+                $result .= wf_tag('div', true);
             }
-            $result .= wf_tag('div', true);
         }
 
         return($result);
