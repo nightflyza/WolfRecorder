@@ -69,7 +69,7 @@ class Archive {
     /**
      * other predefined stuff like routes
      */
-    const PLAYLIST_MASK = '_arch.txt';
+    const PLAYLIST_MASK = '_playlist.txt';
     const URL_ME = '?module=archive';
     const ROUTE_VIEW = 'viewcameraarchive';
     const ROUTE_SHOWDATE = 'renderdatearchive';
@@ -172,20 +172,28 @@ class Archive {
     /**
      * Renders howl player for previously generated playlist
      * 
-     * @param string $playlistPath
-     * @param string $width
-     * @param bool $autoPlay
+     * @param string $playlistPath - full playlist path
+     * @param string $width - width in px or %
+     * @param bool $autoPlay - start playback right now?
+     * @param string $playerId - must be equal to channel name to access playlist in DOM
      * 
      * @return string
      */
-    protected function renderArchivePlayer($playlistPath, $width = '600px', $autoPlay = false) {
+    protected function renderArchivePlayer($playlistPath, $width = '600px', $autoPlay = false, $playerId = '') {
         $autoPlay = ($autoPlay) ? 'true' : 'false';
-        $playerId = 'archplayer' . wf_InputId();
+        $playerId = ($playerId) ? $playerId : 'archplayer' . wf_InputId();
+        $plStart = '';
+        if (!ubRouting::checkGet(self::ROUTE_SHOWDATE)) {
+            $twoMinAgo = strtotime("-5 minute", time());
+            $twoMinAgo = date("H:i", $twoMinAgo);
+            $plStart = ',plstart:"s_' . $twoMinAgo . '"';
+            deb($twoMinAgo);
+        }
         $result = '';
         $result .= '<script src="modules/jsc/playerjs/w_playerjs.js"></script >
                      <div style="float:left; width:' . $width . '; margin:5px;">
                      <div id="' . $playerId . '" style="width:90%;"></div >
-        	    <script >var player = new Playerjs({id:"' . $playerId . '", file:"' . $playlistPath . '", autoplay:' . $autoPlay . '});</script >
+        	    <script >var player = new Playerjs({id:"' . $playerId . '", file:"' . $playlistPath . '", autoplay:' . $autoPlay . ' ' . $plStart . '});</script >
                    </div>
             ';
         $result .= wf_CleanDiv();
@@ -343,7 +351,8 @@ class Archive {
                 foreach ($filteredChunks as $chunkTimeStamp => $chunkFile) {
                     $i++;
                     $chunkTitle = date("Y-m-d H:i:s", $chunkTimeStamp);
-                    $playlistContent .= '{"title":"' . $chunkTitle . '","file":"' . $chunkFile . '","id":"s' . $i . '"}';
+                    $segmentId = 's' . '_' . date("H:i", $chunkTimeStamp);
+                    $playlistContent .= '{"title":"' . $chunkTitle . '","file":"' . $chunkFile . '","id":"' . $segmentId . '"}';
                     if ($i < $segmentsCount) {
                         $playlistContent .= ',';
                     }
@@ -374,7 +383,7 @@ class Archive {
             if (!empty($chunksList)) {
                 $archivePlayList = $this->generateArchivePlaylist($cameraId, $showDate, $showDate);
                 if ($archivePlayList) {
-                    $result .= $this->renderArchivePlayer($archivePlayList, $this->playerWidth, true);
+                    $result .= $this->renderArchivePlayer($archivePlayList, $this->playerWidth, true, $cameraData['channel']);
                 } else {
                     $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
                 }
