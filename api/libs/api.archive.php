@@ -376,6 +376,7 @@ class Archive {
         }
         $result .= wf_delimiter(1);
         $result .= wf_BackLink(self::URL_ME);
+        $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, web_edit_icon() . ' ' . __('Camera'), false, 'ubButton');
         return($result);
     }
 
