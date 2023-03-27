@@ -73,6 +73,7 @@ class Archive {
     const URL_ME = '?module=archive';
     const ROUTE_VIEW = 'viewcameraarchive';
     const ROUTE_SHOWDATE = 'renderdatearchive';
+    const ROUTE_TIMESEGMENT = 'tseg';
 
     public function __construct() {
         $this->initMessages();
@@ -186,14 +187,20 @@ class Archive {
         if (!ubRouting::checkGet(self::ROUTE_SHOWDATE)) {
             $fewMinsAgo = strtotime("-5 minute", time());
             $fewMinsAgo = date("H:i", $fewMinsAgo);
-            $plStart = ',plstart:"s_' . $fewMinsAgo . '"';
+            $plStart = ', plstart:"s_' . $fewMinsAgo . '"';
+        }
+
+        //explict time segment setup
+        if (ubRouting::checkGet(self::ROUTE_TIMESEGMENT)) {
+            $plStart = ', plstart:"s_' . ubRouting::get(self::ROUTE_TIMESEGMENT, 'mres') . '"';
         }
         $result = '';
         $result .= '<script src="modules/jsc/playerjs/w_playerjs.js"></script >
-                     <div style="float:left; width:' . $width . '; margin:5px;">
-                     <div id="' . $playerId . '" style="width:90%;"></div >
-        	    <script >var player = new Playerjs({id:"' . $playerId . '", file:"' . $playlistPath . '", autoplay:' . $autoPlay . ' ' . $plStart . '});</script >
-                   </div>
+            <div style="float:left; width:' . $width . '; margin:5px;">
+            <div id = "' . $playerId . '" style="width:90%;"></div >
+            <script >var player = new Playerjs({id:"' . $playerId . '", file:"' . $playlistPath . '", autoplay:' . $autoPlay . ' ' . $plStart . '});
+            </script >
+            </div>
             ';
         $result .= wf_CleanDiv();
         return($result);
@@ -244,7 +251,8 @@ class Archive {
             //any records here?
             if ($chunksByDay) {
                 $barWidth = 0.064;
-                $result = wf_tag('div', false, '', 'style="width:' . $this->playerWidth . ';"');
+                $barStyle = 'width:' . $barWidth . '%;';
+                $result = wf_tag('div', false, '', 'style = "width:' . $this->playerWidth . ';"');
                 foreach ($dayMinAlloc as $eachMin => $recAvail) {
                     $recAvailBar = ($recAvail) ? 'skins/rec_avail.png' : 'skins/rec_unavail.png';
                     if ($curDate == $date) {
@@ -253,7 +261,13 @@ class Archive {
                         }
                     }
                     $recAvailTitle = ($recAvail) ? $eachMin : $eachMin . ' - ' . __('No record');
-                    $result .= wf_img($recAvailBar, $recAvailTitle, 'width:' . $barWidth . '%;');
+                    $timeBarLabel = wf_img($recAvailBar, $recAvailTitle, $barStyle);
+                    if ($recAvail) {
+                        $timeSeg = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . ubRouting::get(self::ROUTE_VIEW) . '&' . self::ROUTE_TIMESEGMENT . '=' . $eachMin;
+                        $result .= trim(wf_Link($timeSeg, $timeBarLabel));
+                    } else {
+                        $result .= $timeBarLabel;
+                    }
                 }
                 $result .= wf_tag('div', true);
             }
@@ -335,13 +349,13 @@ class Archive {
                     if (zb_isDateBetween($dateFrom, $dateTo, $chunkDate)) {
                         $howlChunkFullPath = str_replace($storagePath, $howlChunkPath, $chunkPath);
                         $howlChunkFullPath = str_replace('//', '/', $howlChunkFullPath);
-                        //exclude last minute chunk - it may be unfinished now
+//exclude last minute chunk - it may be unfinished now
                         if ($chunkDate == $curDate) {
                             if ($timeStamp < $minuteBetweenNow) {
                                 $filteredChunks[$timeStamp] = $howlChunkFullPath;
                             }
                         } else {
-                            //or just push to playlist
+//or just push to playlist
                             $filteredChunks[$timeStamp] = $howlChunkFullPath;
                         }
                     }
@@ -349,7 +363,7 @@ class Archive {
             }
 
 
-            //generating playlist
+//generating playlist
             if (!empty($filteredChunks)) {
                 $playListPath = Storages::PATH_HOWL . $cameraData['channel'] . self::PLAYLIST_MASK;
                 $segmentsCount = sizeof($filteredChunks);
@@ -394,7 +408,7 @@ class Archive {
                 } else {
                     $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
                 }
-                //some timeline here
+//some timeline here
                 $result .= $this->renderDaysTimeline($cameraId, $chunksList);
             } else {
                 $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
