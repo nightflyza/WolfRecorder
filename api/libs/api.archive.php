@@ -227,6 +227,9 @@ class Archive {
         if (!empty($chunksList)) {
             $dayMinAlloc = $this->allocDayTimeline();
             $chunksByDay = 0;
+            $curDate = curdate();
+            $fewMinAgo = date("H:i", strtotime("-5 minute", time()));
+            $fewMinLater = date("H:i", strtotime("+1 minute", time()));
             foreach ($chunksList as $timeStamp => $eachChunk) {
                 $dayOfMonth = date("Y-m-d", $timeStamp);
                 if ($dayOfMonth == $date) {
@@ -244,6 +247,11 @@ class Archive {
                 $result = wf_tag('div', false, '', 'style="width:' . $this->playerWidth . ';"');
                 foreach ($dayMinAlloc as $eachMin => $recAvail) {
                     $recAvailBar = ($recAvail) ? 'skins/rec_avail.png' : 'skins/rec_unavail.png';
+                    if ($curDate == $date) {
+                        if (zb_isTimeBetween($fewMinAgo, $fewMinLater, $eachMin)) {
+                            $recAvailBar = 'skins/rec_now.png';
+                        }
+                    }
                     $recAvailTitle = ($recAvail) ? $eachMin : $eachMin . ' - ' . __('No record');
                     $result .= wf_img($recAvailBar, $recAvailTitle, 'width:' . $barWidth . '%;');
                 }
