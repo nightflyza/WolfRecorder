@@ -75,9 +75,9 @@ $DIALOG --title "WolfRecorder serial"  --inputbox "Enter your previous installat
 ;;
 esac
 
-#setting some for future
+#setting some opts for future
 MYSQL_PASSWD=`cat /tmp/wrmypass`
-
+ARCH=`cat /tmp/wrarch`
 case $PASSW_MODE in
 NEW)
 WRSERIAL="auto"
@@ -88,6 +88,7 @@ WRSERIAL=`cat /tmp/wrsrl`
 esac
 
 # cleaning temp files
+rm -fr /tmp/wrarch
 rm -fr /tmp/wrmypass
 rm -fr /tmp/wrsrl
 
