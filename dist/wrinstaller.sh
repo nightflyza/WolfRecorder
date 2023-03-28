@@ -263,7 +263,7 @@ $DIALOG --infobox "Using WolfRecorder serial: ${NEW_WRSERIAL}" 4 60
 esac
 
 #loading default crontab preset
-crontab ./docs/crontab/crontab.preconf
+crontab ./dist/crontab/crontab.preconf
 $DIALOG --infobox "Installing default crontab preset" 4 60
 # updating serial in wrapi wrapper
 perl -e "s/WR00000000000000000000000000000000/${NEW_WRSERIAL}/g" -pi /bin/wrapi
