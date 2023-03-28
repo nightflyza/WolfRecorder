@@ -80,7 +80,7 @@ MYSQL_PASSWD=`cat /tmp/wrmypass`
 ARCH=`cat /tmp/wrarch`
 case $PASSW_MODE in
 NEW)
-WRSERIAL="auto"
+WRSERIAL="AUTO"
 ;;
 MIG)
 WRSERIAL=`cat /tmp/wrsrl`
@@ -93,7 +93,7 @@ rm -fr /tmp/wrmypass
 rm -fr /tmp/wrsrl
 
 #last chance to exit
-$DIALOG --title "Check settings"   --yesno "Are all of these settings correct? \n \n MySQL password: ${MYSQL_PASSWD} \n System: ${ARCH} \n WolfRecorder serial: ${WRSERIAL}\n" 18 60
+$DIALOG --title "Check settings"   --yesno "Are all of these settings correct? \n \n MySQL password: ${MYSQL_PASSWD} \n System: ${ARCH} \n WolfRecorder serial: ${WRSERIAL}\n" 10 60
 AGREE=$?
 clear
 
@@ -165,7 +165,7 @@ exit
 fi
 
 mkdir ${APACHE_DATA_PATH}${WR_WEB_DIR}
-cp ${DL_WR_NAME} ${APACHE_DATA_PATH}${WR_WEB_DIR}
+cp -R ${DL_WR_NAME} ${APACHE_DATA_PATH}${WR_WEB_DIR}
 cd ${APACHE_DATA_PATH}${WR_WEB_DIR}
 
 tar zxvf ${DL_WR_NAME} 2>> ${INSTALLER_LOG}
@@ -177,7 +177,7 @@ cp -R dist/presets/freebsd/${PHP_CONFIG_PRESET} /usr/local/etc/php.ini
 cat dist/presets/freebsd/rc.preconf >> /etc/rc.conf
 cat dist/presets/freebsd/sysctl.preconf >> /etc/sysctl.conf
 cat dist/presets/freebsd/loader.preconf >> /boot/loader.conf
-cp -R dist/presets/freebsd/firewall.conf > /etc/firewall.conf
+cp -R dist/presets/freebsd/firewall.conf /etc/firewall.conf
 chmod a+x /etc/firewall.conf
 
 # setting up default web awesomeness
@@ -190,7 +190,7 @@ ${MYSQL_INIT_SCRIPT} start
 ${CACHE_INIT_SCRIPT} start
 
 #Setting MySQL root password
-mysqladmin -u root password ${MYSQL_PASSWD}
+mysqladmin -u root password ${MYSQL_PASSWD} 2>> ${INSTALLER_LOG}
 
 
 # updating passwords and login in mysql.ini
@@ -199,11 +199,11 @@ perl -e "s/newpassword/${MYSQL_PASSWD}/g" -pi ./config/mysql.ini
 
 # creating wr database
 $DIALOG --infobox "Creating initial WolfRecorder DB" 4 60
-cat dist/dumps/wolfrecorder.sql | /usr/local/bin/mysql -u root --password=${MYSQL_PASSWD}
+cat dist/dumps/wolfrecorder.sql | /usr/local/bin/mysql -u root --password=${MYSQL_PASSWD} 2>> ${INSTALLER_LOG}
 
 # creation default storage
 $DIALOG --infobox "Creating default storage" 4 60
-cat dist/dumps/defaultstorage.sql | /usr/local/bin/mysql -u root  -p wr --password=${MYSQL_PASSWD}
+cat dist/dumps/defaultstorage.sql | /usr/local/bin/mysql -u root  -p wr --password=${MYSQL_PASSWD} 2>> ${INSTALLER_LOG}
 mkdir /wrstorage
 chmod 777 /wrstorage
 
@@ -252,7 +252,7 @@ then
 #generating new WolfRecorder serial or using predefined
 case $PASSW_MODE in
 NEW)
-/usr/local/bin/curl -o /dev/null "http://127.0.0.1/${WR_WEB_DIR}?module=remoteapi&action=identify&param=save"
+/usr/local/bin/curl -o /dev/null "http://127.0.0.1/${WR_WEB_DIR}?module=remoteapi&action=identify&param=save" 2>> ${INSTALLER_LOG}
 NEW_WRSERIAL=`cat ./exports/wrserial`
 $DIALOG --infobox "New WolfRecorder serial generated: ${NEW_WRSERIAL}" 4 60
 ;;
