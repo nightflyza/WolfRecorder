@@ -19,6 +19,7 @@ APACHE_CONFIG_PRESET_NAME="httpd24f7.conf"
 APACHE_CONFIG_NAME="httpd.conf"
 PHP_CONFIG_PRESET="php.ini"
 MYSQL_INIT_SCRIPT="/usr/local/etc/rc.d/mysql-server"
+CACHE_INIT_SCRIPT="/usr/local/etc/rc.d/memcached"
 WR_WEB_DIR="wr/"
 INSTALLER_WORK_DIR="/usr/local/wrinstaller/"
 INSTALLER_LOG="/var/log/wrinstaller.log"
@@ -182,9 +183,10 @@ chmod a+x /etc/firewall.conf
 cp -R dist/landing/index.html ${APACHE_DATA_PATH}/index.html
 cp -R dist/landing/bg.gif ${APACHE_DATA_PATH}/
 
-# start services
+# start reqired services
 ${APACHE_INIT_SCRIPT} start
 ${MYSQL_INIT_SCRIPT} start
+${CACHE_INIT_SCRIPT} start
 
 #Setting MySQL root password
 mysqladmin -u root password ${MYSQL_PASSWD}
