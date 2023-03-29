@@ -51,7 +51,7 @@ clear
 else
 #getting branch from CLI 1st param in batch mode
 BRANCH=$1
-AGREE="1"
+AGREE="0"
 fi
 
 case $BRANCH in
