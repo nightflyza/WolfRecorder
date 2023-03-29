@@ -34,7 +34,7 @@ set PATH=/usr/local/bin:/usr/local/sbin:$PATH
 
 # config interface section 
 clear
-$DIALOG --title "WolfRecorder installation" --msgbox "This wizard helps you to install WolfRecorder of the latest stable version to CLEAN (!) FreeBSD distribution" 10 50
+$DIALOG --title "WolfRecorder NVR installation" --msgbox "This wizard helps you to install WolfRecorder of the latest stable version to CLEAN (!) FreeBSD distribution" 10 50
 clear
 
 #new or migration installation
@@ -134,7 +134,7 @@ $FETCH ${DL_PACKAGES_URL}${ARCH}${DL_PACKAGES_EXT}
 #check is binary packages download has beed completed
 if [ -f ${ARCH}${DL_PACKAGES_EXT} ];
 then
-echo "Binary packages download has been completed."
+$DIALOG --infobox "Binary packages download has been completed." 4 60
 else
 echo "=== Error: binary packages are not available. Installation is aborted. ==="
 exit
@@ -158,7 +158,7 @@ $FETCH ${DL_WR_URL}${DL_WR_NAME}
 #check is wolfrecorder distro download complete
 if [ -f ${DL_WR_NAME} ];
 then
-echo "WolfRecorder download has been completed."
+$DIALOG --infobox "WolfRecorder download has been completed." 4 60
 else
 echo "=== Error: WolfRecorder release is not available. Installation is aborted. ==="
 exit
