@@ -129,7 +129,7 @@ exit
 fi
 
 # install prebuilded binary packages
-$DIALOG --infobox "Software installation is in progress. This takes a while." 4 60
+$DIALOG --infobox "Downloading binary packages." 4 60
 $FETCH ${DL_PACKAGES_URL}${ARCH}${DL_PACKAGES_EXT}
 #check is binary packages download has beed completed
 if [ -f ${ARCH}${DL_PACKAGES_EXT} ];
@@ -141,9 +141,12 @@ exit
 fi
 
 # unpacking and installing packages
+$DIALOG --infobox "Unpacking binary packages." 4 60
 tar zxvf ${ARCH}${DL_PACKAGES_EXT} 2>> ${INSTALLER_LOG}
 cd ${ARCH}
+$DIALOG --infobox "Software installation is in progress. This takes a while." 4 60
 ls -1 | xargs -n 1 pkg add >> ${INSTALLER_LOG}
+$DIALOG --infobox "Binary packages installation has been completed." 4 60
 
 ################################################
 # Downloading and unpacking WolfRecorder distro
