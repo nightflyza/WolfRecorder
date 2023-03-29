@@ -78,19 +78,19 @@ class SystemInfo {
     public function renderLA() {
         $loadAvg = sys_getloadavg();
         $laGauges = '';
-        $laGauges .= wf_tag('h3') . __('Load Average') . wf_tag('h3', true);
+        $laGauges .= wf_tag('h3') . __('System load') . wf_tag('h3', true);
         $laOpts = '
              max: 10,
              min: 0,
-             width: ' . 280 . ', height: ' . 280 . ',
+             width: ' . 260 . ', height: ' . 260 . ',
              greenFrom: 0, greenTo: 2,
              yellowFrom:2, yellowTo: 5,
              redFrom: 5, redTo: 10,
              minorTicks: 5
                       ';
-        $laGauges .= wf_renderGauge(round($loadAvg[0], 2), '1' . ' ' . __('minutes'), 'LA', $laOpts, 300);
-        $laGauges .= wf_renderGauge(round($loadAvg[1], 2), '5' . ' ' . __('minutes'), 'LA', $laOpts, 300);
-        $laGauges .= wf_renderGauge(round($loadAvg[2], 2), '15' . ' ' . __('minutes'), 'LA', $laOpts, 300);
+        $laGauges .= wf_renderGauge(round($loadAvg[0], 2), '1' . ' ' . __('minutes'), 'LA', $laOpts, 280);
+        $laGauges .= wf_renderGauge(round($loadAvg[1], 2), '5' . ' ' . __('minutes'), 'LA', $laOpts, 280);
+        $laGauges .= wf_renderGauge(round($loadAvg[2], 2), '15' . ' ' . __('minutes'), 'LA', $laOpts, 280);
         $laGauges .= wf_CleanDiv();
         return($laGauges);
     }
@@ -138,7 +138,7 @@ class SystemInfo {
         $opts = '
              max: 100,
              min: 0,
-             width: ' . 280 . ', height: ' . 280 . ',
+             width: ' . 260 . ', height: ' . 260 . ',
              greenFrom:' . $greenFrom . ', greenTo: ' . $greenTo . ',
              yellowFrom:' . $yellowFrom . ', yellowTo: ' . $yellowTo . ',
              redFrom:' . $redFrom . ', redTo:' . $redTo . ',
@@ -148,12 +148,28 @@ class SystemInfo {
         if (!empty($usedSpaceArr)) {
             foreach ($usedSpaceArr as $mountPoint => $spaceStats) {
                 $partitionLabel = $spaceStats['name'] . ' - ' . wr_convertSize($spaceStats['free']) . ' ' . __('Free');
-                $result .= wf_renderGauge(round($spaceStats['percent']), $partitionLabel, '%', $opts, 300);
+                $result .= wf_renderGauge(round($spaceStats['percent']), $partitionLabel, '%', $opts, 280);
             }
         } else {
             $result .= $this->messages->getStyledMessage(__('No storages available'), 'warning');
         }
         $result .= wf_CleanDiv();
+        return($result);
+    }
+
+    /**
+     * 
+     * @return type
+     */
+    public function renderSerialInfo() {
+        $result = '';
+        $instanceSerial = wr_SerialGet();
+        if (!empty($instanceSerial)) {
+            $result .= $this->messages->getStyledMessage(wf_tag('center') . __('This system serial number') . ': ' . wf_tag('b') . wr_SerialGet() . wf_tag('b', true) . wf_tag('center', true), 'info');
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Something went wrong'), 'error');
+        }
+        $result .= wf_delimiter(0);
         return($result);
     }
 
