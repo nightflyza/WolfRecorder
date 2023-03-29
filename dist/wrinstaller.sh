@@ -188,9 +188,12 @@ cp -R dist/landing/index.html ${APACHE_DATA_PATH}/index.html
 cp -R dist/landing/bg.gif ${APACHE_DATA_PATH}/
 
 # start reqired services
-${APACHE_INIT_SCRIPT} start
-${MYSQL_INIT_SCRIPT} start
-${CACHE_INIT_SCRIPT} start
+$DIALOG --infobox "Starting web server.." 4 60
+${APACHE_INIT_SCRIPT} start 2>> ${INSTALLER_LOG}
+$DIALOG --infobox "Starting database server.." 4 60
+${MYSQL_INIT_SCRIPT} start 2>> ${INSTALLER_LOG}
+$DIALOG --infobox "Starting caching server.." 4 60
+${CACHE_INIT_SCRIPT} start 2>> ${INSTALLER_LOG}
 
 #Setting MySQL root password
 mysqladmin -u root password ${MYSQL_PASSWD} 2>> ${INSTALLER_LOG}
