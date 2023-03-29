@@ -128,7 +128,7 @@ echo "=== Updating autoupdater ==="
 cp -R ./dist/presets/freebsd/autowrupdate.sh /bin/
 
 echo "=== Executing post-install API callback ==="
-/bin/wrapi "autoupdatehook"
+/bin/wrapi "autoupdatehook" >> ${LOG_FILE}
 
 echo "=== Deleting restore poing ==="
 rm -fr ${RESTORE_POINT}
