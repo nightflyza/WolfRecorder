@@ -224,25 +224,25 @@ echo "WOLFRECORDER         ALL = NOPASSWD: ALL" >> /usr/local/etc/sudoers
 if [ -f /usr/local/my.cnf ];
 then
 perl -e "s/,STRICT_TRANS_TABLES//g" -pi /usr/local/my.cnf
-echo "Disabling MySQL STRICT_TRANS_TABLES in /usr/local/my.cnf done"
+$DIALOG --infobox "Disabling MySQL STRICT_TRANS_TABLES in /usr/local/my.cnf done" 4 60
 else
-echo "Looks like no MySQL STRICT_TRANS_TABLES disable required in /usr/local/my.cnf"
+$DIALOG --infobox "Looks like no MySQL STRICT_TRANS_TABLES disable required in /usr/local/my.cnf" 4 60
 fi
 
 if [ -f /usr/local/etc/my.cnf ];
 then
 perl -e "s/,STRICT_TRANS_TABLES//g" -pi /usr/local/etc/my.cnf
-echo "Disabling MySQL STRICT_TRANS_TABLES in /usr/local/etc/my.cnf done"
+$DIALOG --infobox "Disabling MySQL STRICT_TRANS_TABLES in /usr/local/etc/my.cnf done" 4 60
 else
-echo "Looks like no MySQL STRICT_TRANS_TABLES disable required in /usr/local/etc/my.cnf"
+$DIALOG --infobox "Looks like no MySQL STRICT_TRANS_TABLES disable required in /usr/local/etc/my.cnf" 4 60
 fi
 
 if [ -f /usr/local/etc/mysql/my.cnf ];
 then
 perl -e "s/,STRICT_TRANS_TABLES//g" -pi /usr/local/etc/mysql/my.cnf
-echo "Disabling MySQL STRICT_TRANS_TABLES in /usr/local/etc/mysql/my.cnf done"
+$DIALOG --infobox "Disabling MySQL STRICT_TRANS_TABLES in /usr/local/etc/mysql/my.cnf done" 4 60
 else
-echo "Looks like no MySQL STRICT_TRANS_TABLES disable required in /usr/local/etc/mysql/my.cnf"
+$DIALOG --infobox "Looks like no MySQL STRICT_TRANS_TABLES disable required in /usr/local/etc/mysql/my.cnf" 4 60
 fi
 
 #initial crontab configuration

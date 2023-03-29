@@ -34,7 +34,7 @@ then
 #interactive mode
 $DIALOG --title "WolfRecorder update" --msgbox "This wizard help you to update your WolfRecorder installation to the the latest stable or current development release" 10 40
 clear
-$DIALOG --menu "Choose a WolfRecorder release branch to which you want to update." 12 65 6 \
+$DIALOG --menu "Choose a WolfRecorder release branch to which you want to update." 11 65 6 \
  	   	   STABLE "WolfRecorder latest stable release (recommended)"\
  	   	   CURRENT "WolfRecorder current development snapshot"\
             2> /tmp/auprelease
@@ -44,7 +44,7 @@ BRANCH=`cat /tmp/auprelease`
 rm -fr /tmp/auprelease
 
 #last chance to exit
-$DIALOG --title "Check settings"   --yesno "Are all of these settings correct? \n \n WolfRecorder release: ${BRANCH}\n Installation full path: ${APACHE_DATA_PATH}${WOLFRECORDER_PATH}\n" 9 60
+$DIALOG --title "Check settings"   --yesno "Are all of these settings correct? \n \n WolfRecorder release: ${BRANCH}\n Installation full path: ${APACHE_DATA_PATH}${WOLFRECORDER_PATH}\n" 9 70
 AGREE=$?
 clear
 
@@ -98,7 +98,6 @@ cp .htaccess ${RESTORE_POINT}/ 2> /dev/null
 cp favicon.ico ${RESTORE_POINT}/ 2> /dev/null
 
 cp ./config/alter.ini ${RESTORE_POINT}/config/
-cp ./config/billing.ini ${RESTORE_POINT}/config/
 cp ./config/mysql.ini ${RESTORE_POINT}/config/
 cp ./config/ymaps.ini ${RESTORE_POINT}/config/
 cp ./config/yalf.ini ${RESTORE_POINT}/config/
@@ -122,21 +121,23 @@ echo "=== Restoring configs ==="
 cp -R ${RESTORE_POINT}/* ./
 rm -fr ${WOLFRECORDER_RELEASE_NAME}
 
-echo "=== Setting permissions ==="
+echo "=== Setting FS permissions ==="
 chmod -R 777 content/ config/ exports/ howl/
 
+echo "=== Updating autoupdater ==="
+cp -R ./dist/presets/freebsd/autowrupdate.sh /bin/
+
 echo "=== Executing post-install API callback ==="
-NEW_RELEASE=`cat RELEASE`
-/bin/wrapi "autoupdate&param=${NEW_RELEASE}"
+/bin/wrapi "autoupdatehook"
 
 echo "=== Deleting restore poing ==="
 rm -fr ${RESTORE_POINT}
-
+NEW_RELEASE=`cat RELEASE`
 echo "SUCCESS: WolfRecorder update successfully completed. Now your installation release is: ${NEW_RELEASE}"
 
 #release file not dowloaded
 else
-echo "ERROR: No new WolfRecoderd release file found, update aborted"
+echo "ERROR: No new WolfRecoder release file found, update aborted"
 fi
 
 ;;
