@@ -272,8 +272,9 @@ else
 echo "Looks like this WolfRecorder release is not supporting automatic crontab configuration"
 fi
 
-# TODO:
-# setting autowrupdate.sh here
+# Setting up autoupdate sctipt
+cp -R ./dist/presets/freebsd/autowrupdate.sh /bin/
+chmod a+x /bin/autowrupdate.sh
 
 $DIALOG --title "WolfRecorder installation has been completed" --msgbox "Now you can access your web-interface by address http://server_ip/${WR_WEB_DIR} with login and password: admin/demo. Please reboot your server to check correct startup of all services" 15 50
 
