@@ -77,7 +77,7 @@ if (cfr('BACKUP')) {
                         $rows .= wf_TableRow($cells, 'row5');
                     }
                 }
-                $result = wf_TableBody($rows, '100%', '0', 'sortable');
+                $result = wf_TableBody($rows, '100%', '0', 'sortable resp-table');
             }
 
             return ($result);

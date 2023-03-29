@@ -315,7 +315,7 @@ class EventView {
                 $tablerows .= wf_TableRow($tablecells, 'row5');
             }
 
-            $result .= wf_TableBody($tablerows, '100%', 0, 'sortable');
+            $result .= wf_TableBody($tablerows, '100%', 0, 'sortable resp-table');
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing found'), 'info');
         }

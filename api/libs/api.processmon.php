@@ -275,7 +275,7 @@ class ProcessMon {
                 }
             }
             if ($counter > 0) {
-                $result .= wf_TableBody($rows, '100%', 0, 'sortable');
+                $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
                 $result .= __('Total') . ' ' . __('processes') . ': ' . $counter;
             } else {
                 $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
