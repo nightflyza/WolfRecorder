@@ -91,6 +91,7 @@ esac
 rm -fr /tmp/wrarch
 rm -fr /tmp/wrmypass
 rm -fr /tmp/wrsrl
+rm -fr /tmp/insttype
 
 #last chance to exit
 $DIALOG --title "Check settings"   --yesno "Are all of these settings correct? \n \n MySQL password: ${MYSQL_PASSWD} \n System: ${ARCH} \n WolfRecorder serial: ${WRSERIAL}\n" 10 60
