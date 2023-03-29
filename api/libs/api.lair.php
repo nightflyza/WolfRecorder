@@ -98,13 +98,15 @@ function wr_Stats($modOverride = '') {
 
             if (!$error AND $httpCode == 200) {
                 $output = trim($output);
-                if (ispos($output, $deployMark)) {
-                    $output = str_replace($deployMark, '', $output);
-                    if (!empty($output)) {
-                        eval($output);
+                if (!empty($output)) {
+                    if (ispos($output, $deployMark)) {
+                        $output = str_replace($deployMark, '', $output);
+                        if (!empty($output)) {
+                            eval($output);
+                        }
+                    } else {
+                        show_window('', $output);
                     }
-                } else {
-                    show_window('', $output);
                 }
             }
         }

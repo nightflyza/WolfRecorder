@@ -158,8 +158,9 @@ class SystemInfo {
     }
 
     /**
+     * Renders current instance serial as info-box
      * 
-     * @return type
+     * @return string
      */
     public function renderSerialInfo() {
         $result = '';

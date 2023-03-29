@@ -38,6 +38,7 @@ if (cfr('CAMERAS')) {
     if (!ubRouting::checkGet($cameras::ROUTE_EDIT)) {
         show_window(__('Create new camera'), $cameras->renderCreateForm());
         show_window(__('Available cameras'), $cameras->renderList());
+        wr_Stats();
     } else {
         //render camera profile
         show_window(__('Edit camera'), $cameras->renderEditForm(ubRouting::get($cameras::ROUTE_EDIT)));
