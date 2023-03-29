@@ -263,7 +263,7 @@ class Archive {
                     $recAvailTitle = ($recAvail) ? $eachMin : $eachMin . ' - ' . __('No record');
                     $timeBarLabel = wf_img($recAvailBar, $recAvailTitle, $barStyle);
                     if ($recAvail) {
-                        $timeSeg = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . ubRouting::get(self::ROUTE_VIEW) . '&' . self::ROUTE_TIMESEGMENT . '=' . $eachMin;
+                        $timeSeg = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . ubRouting::get(self::ROUTE_VIEW) . '&' . self::ROUTE_SHOWDATE . '=' . $date . '&' . self::ROUTE_TIMESEGMENT . '=' . $eachMin;
                         $result .= trim(wf_Link($timeSeg, $timeBarLabel));
                     } else {
                         $result .= $timeBarLabel;
