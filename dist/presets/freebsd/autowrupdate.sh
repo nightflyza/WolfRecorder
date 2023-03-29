@@ -105,6 +105,7 @@ cp ./config/binpaths.ini ${RESTORE_POINT}/config/
 cp -R ./content/users ${RESTORE_POINT}/content/
 cp -R ./content/backups ${RESTORE_POINT}/content/
 cp -R ./config/mymodeltemplates ${RESTORE_POINT}/config/
+cp -R ./howl/* ${RESTORE_POINT}/howl/
 
 
 echo "=== web directory cleanup ==="
