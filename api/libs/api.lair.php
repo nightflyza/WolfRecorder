@@ -41,6 +41,49 @@ function wr_SerialInstall() {
     return($randomid);
 }
 
+function wr_GetReleaseInfo($branch) {
+    $result = false;
+    $release_url = UpdateManager::URL_RELEASE_STABLE;
+    if ($branch == 'CURRENT') {
+        $release_url = UpdateManager::URL_RELEASE_CURRENT;
+    }
+    $remoteCallback = new OmaeUrl($release_url);
+    $releaseInfo = $remoteCallback->response();
+    if ($releaseInfo) {
+        $result = $releaseInfo;
+    }
+    return($result);
+}
+
+/**
+ * Ajax backend for checking WolfRecorder updates
+ * 
+ * @param bool $branch
+ * @param bool $return
+ * 
+ * @return string/bool
+ */
+function wr_CheckUpdates($return = false, $branch = 'STABLE') {
+    $result = '';
+    $latestRelease = wr_GetReleaseInfo($branch);
+
+    if ($latestRelease) {
+        if ($branch == 'CURRENT') {
+            $result = __('Latest nightly build is') . ': ' . $latestRelease;
+        } else {
+            $result = __('Latest stable release is') . ': ' . $latestRelease;
+        }
+    } else {
+        $result = __('Error checking updates');
+    }
+
+    if ($return) {
+        return($result);
+    } else {
+        die($result);
+    }
+}
+
 /**
  * Collects anonymous stats
  * 
