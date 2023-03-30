@@ -69,6 +69,13 @@ class Recorder {
     protected $messages = '';
 
     /**
+     * Debugging mode flag
+     *
+     * @var bool
+     */
+    protected $debugFlag = false;
+
+    /**
      * some creepy params here
      */
     protected $chunkTime = 60;
@@ -85,6 +92,7 @@ class Recorder {
     const WRAPPER = '/bin/wrapi';
     const CHUNKS_MASK = '%Y-%m-%d_%H-%M-%S';
     const CHUNKS_EXT = '.mp4';
+    const DEBUG_LOG = 'exports/recorder_debug.log';
 
     /**
      * Dinosaurs are my best friends
@@ -131,6 +139,11 @@ class Recorder {
         $this->recordOpts = '-strict -2 -vcodec copy -f segment -segment_time ' . $this->chunkTime . ' -strftime 1 -segment_atclocktime 1 -segment_clocktime_offset 30 -reset_timestamps 1 -segment_format mp4';
         $this->audioCapture = '-acodec copy' . ' ';
         $this->supressOutput = '';
+        if (isset($this->altCfg['RECORDER_DEBUG'])) {
+            if ($this->altCfg['RECORDER_DEBUG']) {
+                $this->debugFlag = true;
+            }
+        }
     }
 
     /**
@@ -202,8 +215,10 @@ class Recorder {
 
                                     $this->stardust->start();
                                     log_register('RECORDER STARTED [' . $cameraId . ']');
-                                    //TODO: remove following debug code
-                                    file_put_contents('exports/recorder_debug.log', $fullCommand . PHP_EOL, FILE_APPEND);
+                                    //optional logging there
+                                    if ($this->debugFlag) {
+                                        file_put_contents(self::DEBUG_LOG, curdatetime() . ' START: ' . $fullCommand . PHP_EOL, FILE_APPEND);
+                                    }
                                     shell_exec($fullCommand); //locks process till end
                                     $this->stardust->stop();
                                 }
@@ -295,6 +310,9 @@ class Recorder {
                 $count++;
                 $command = $this->binPaths['SUDO'] . ' ' . $this->binPaths['KILL'] . ' ' . $allRunningRecorders[$cameraId];
                 shell_exec($command);
+                if ($this->debugFlag) {
+                    file_put_contents(self::DEBUG_LOG, curdatetime() . ' STOP: ' . $command . PHP_EOL, FILE_APPEND);
+                }
                 $allRunningRecorders = $this->getRunningRecorders();
             }
             log_register('RECORDER STOPPED [' . $cameraId . '] ATTEMPT `' . $count . '`');
