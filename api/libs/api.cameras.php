@@ -452,7 +452,9 @@ class Cameras {
             } else {
                 $cameraControls .= wf_Link(self::URL_ME . '&' . self::ROUTE_ACTIVATE . '=' . $cameraData['id'], web_bool_led(1) . ' ' . __('Enable'), false, 'ubButton') . ' ';
             }
-            $cameraControls .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $cameraData['id'], wf_img('skins/icon_archive_small.png') . ' ' . __('Archive'), false, 'ubButton');
+            if (cfr('ARCHIVE')) {
+                $cameraControls .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $cameraData['id'], wf_img('skins/icon_archive_small.png') . ' ' . __('Archive'), false, 'ubButton');
+            }
         } else {
             $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
         }

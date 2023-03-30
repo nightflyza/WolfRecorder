@@ -418,7 +418,9 @@ class Archive {
         }
         $result .= wf_delimiter(1);
         $result .= wf_BackLink(self::URL_ME);
-        $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, wf_img('skins/icon_camera_small.png') . ' ' . __('Camera'), false, 'ubButton');
+        if (cfr('CAMERAS')) {
+            $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, wf_img('skins/icon_camera_small.png') . ' ' . __('Camera'), false, 'ubButton');
+        }
         return($result);
     }
 
