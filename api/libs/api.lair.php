@@ -73,16 +73,16 @@ function wr_GetReleaseInfo($branch) {
 }
 
 /**
- * Ajax backend for checking WolfRecorder updates
+ * Ajax backend for rendering WolfRecorder updates release info
  * 
+ * @param bool $version
  * @param bool $branch
- * @param bool $return
  * 
  * @return string/bool
  */
-function wr_CheckUpdates($return = false, $branch = 'STABLE') {
+function wr_RenderUpdateInfo($version = '', $branch = 'STABLE') {
     $result = '';
-    $latestRelease = wr_GetReleaseInfo($branch);
+    $latestRelease = $version;
     if ($latestRelease) {
         if ($branch == 'CURRENT') {
             $result = __('Latest nightly WolfRecorder build is') . ': ' . $latestRelease;
@@ -92,12 +92,7 @@ function wr_CheckUpdates($return = false, $branch = 'STABLE') {
     } else {
         $result = __('Error checking updates');
     }
-
-    if ($return) {
-        return($result);
-    } else {
-        die($result);
-    }
+    return($result);
 }
 
 /**

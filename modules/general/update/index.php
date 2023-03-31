@@ -3,17 +3,38 @@
 if (cfr('ROOT')) {
 
     set_time_limit(0);
-
+    $updateManager = new UpdateManager();
     $messages = new UbillingMessageHelper();
+
+
     if (ubRouting::checkGet('checkupdates')) {
-        $latestRelease = wr_CheckUpdates(true, 'STABLE');
-        $latestNightlyBuild = wr_CheckUpdates(true, 'CURRENT');
-        $remoteReleasesInfo = $messages->getStyledMessage($latestRelease, 'success');
-        $remoteReleasesInfo .= $messages->getStyledMessage($latestNightlyBuild, 'success');
+        $localSystemVersion = wr_getLocalSystemVersion();
+        $latestRelease = wr_GetReleaseInfo('STABLE');
+        $latestNightlyBuild = wr_GetReleaseInfo('CURRENT');
+        $latestReleaseLabel = wr_RenderUpdateInfo($latestRelease, 'STABLE');
+        $latestNightlyBuildLabel = wr_RenderUpdateInfo($latestNightlyBuild, 'CURRENT');
+        $styleStable = ($localSystemVersion == $latestRelease) ? 'success' : 'warning';
+        $styleNightly = ($localSystemVersion == $latestNightlyBuild) ? 'success' : 'warning';
+        $stableUpbradable = ($localSystemVersion == $latestRelease) ? false : true;
+        $nightlyUpgradable = ($localSystemVersion == $latestNightlyBuild) ? false : true;
+        $remoteReleasesInfo = $messages->getStyledMessage($latestReleaseLabel, $styleStable);
+        $remoteReleasesInfo .= $messages->getStyledMessage($latestNightlyBuildLabel, $styleNightly);
+        //upgrade controls here
+        $upgradeControls = '';
+        if ($stableUpbradable) {
+            $upgradeControls .= wf_Link($updateManager::URL_ME . '&' . $updateManager::ROUTE_AUTOSYSUPGRADE . '=STABLE', wf_img('skins/icon_ok.gif') . ' ' . __('Upgrade to stable release'), false, 'ubButton') . ' ';
+        }
+        if ($nightlyUpgradable) {
+            $upgradeControls .= wf_Link($updateManager::URL_ME . '&' . $updateManager::ROUTE_AUTOSYSUPGRADE . '=CURRENT', wf_img('skins/icon_cache.png') . ' ' . __('Upgrade to nightly build'), false, 'ubButton') . ' ';
+        }
+        $remoteReleasesInfo .= wf_delimiter(0);
+        $remoteReleasesInfo .= $upgradeControls;
+
+
         die($remoteReleasesInfo);
     }
 
-    $updateManager = new UpdateManager();
+
 
     //automatic upgrade
     if (ubRouting::checkGet($updateManager::ROUTE_AUTOSYSUPGRADE)) {
@@ -32,7 +53,11 @@ if (cfr('ROOT')) {
                     }
                 } else {
                     //confirmation form
-                    $confirmationInputs = wf_CheckInput($updateManager::PROUTE_UPGRADEAGREE, __('I`m ready'), false, false);
+                    $confirmationLabel = __('This will update your WolfRecorder') . ' ' . __('from') . ' ' . $currentSystemVersion . ' ' . __('to') . ' ' . $updateBranchVersion;
+                    $confirmationLabel .= wf_delimiter(0);
+
+                    $confirmationInputs = $confirmationLabel;
+                    $confirmationInputs .= wf_CheckInput($updateManager::PROUTE_UPGRADEAGREE, __('I`m ready'), true, false);
                     $confirmationInputs .= wf_Submit(__('System update'));
                     $confirmationForm = wf_Form('', 'POST', $confirmationInputs, 'glamour');
                     show_window(__('System update'), $confirmationForm);
