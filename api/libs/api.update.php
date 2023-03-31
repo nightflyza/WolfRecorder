@@ -78,6 +78,8 @@ class UpdateManager {
     const URL_ME = '?module=update';
     const URL_RELNOTES = 'wolfrecorder.com/wiki/doku.php?id=relnotes#section';
     const ROUTE_AUTOSYSUPGRADE = 'autosystemupgrade';
+    const PROUTE_UPGRADEAGREE = 'runsystemupgrade';
+    const PID_AUTOSYSUPGRADE = 'UPDMGRAUTOUPGRADE';
 
     /**
      * Creates new update manager instance
@@ -487,7 +489,7 @@ class UpdateManager {
         $currentRelease = wr_getLocalSystemVersion();
         $updatechecker = wf_tag('br') . wf_tag('div', false, '', 'style="margin-left: 3%;"');
         $updatechecker .= wf_AjaxLink('?module=update&checkupdates=true', wf_img('skins/question.png') . ' ' . __('Check updates'), 'lastrelease', false, 'ubButton') . ' ';
-        $updatechecker .= wf_Link(self::URL_ME . '&' . self::ROUTE_AUTOSYSUPGRADE . '=STABLE', wf_img('skins/icon_cache.png') . ' ' . __('Upgrade to stable release'), false, 'ubButton') . ' ';
+        $updatechecker .= wf_Link(self::URL_ME . '&' . self::ROUTE_AUTOSYSUPGRADE . '=STABLE', wf_img('skins/icon_ok.gif') . ' ' . __('Upgrade to stable release'), false, 'ubButton') . ' ';
         $updatechecker .= wf_Link(self::URL_ME . '&' . self::ROUTE_AUTOSYSUPGRADE . '=CURRENT', wf_img('skins/icon_cache.png') . ' ' . __('Upgrade to nightly build'), false, 'ubButton') . ' ';
         $updatechecker .= wf_tag('div', true);
         $updatechecker .= wf_CleanDiv();
@@ -499,6 +501,36 @@ class UpdateManager {
 
         $releaseInfo .= wf_AjaxLoader();
         return ($releaseInfo);
+    }
+
+    /**
+     * Performs automatic system upgrade 
+     * 
+     * @param string $branch
+     * 
+     * @return void/string on error
+     */
+    public function performAutoUpgrade($branch = 'STABLE') {
+        $result = '';
+        $updateProcess = new StarDust(self::PID_AUTOSYSUPGRADE);
+        if ($updateProcess->notRunning()) {
+            $updateProcess->start();
+            if ($this->sudoPath AND $this->atoupdaterPath) {
+                if (file_exists($this->atoupdaterPath)) {
+                    $command = $this->sudoPath . ' ' . $this->atoupdaterPath . ' ' . $branch;
+                    $autoUpdaterResult = shell_exec($command);
+                    if (!ispos($autoUpdaterResult, 'SUCCESS')) {
+                        $result .= __('Something went wrong').': '.$autoUpdaterResult;
+                    }
+                } else {
+                    $result .= $this->atoupdaterPath . ' ' . __('not exists');
+                }
+            }
+            $updateProcess->stop();
+        } else {
+            $result .= __('System update') . ' ' . __('already running');
+        }
+        return($result);
     }
 
 }

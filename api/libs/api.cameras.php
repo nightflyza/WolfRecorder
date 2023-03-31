@@ -156,13 +156,13 @@ class Cameras {
                 $storagesParams[$eachStorageId] = __($eachStorageName);
             }
             if (!empty($allModels)) {
-                $inputs = wf_Selector(self::PROUTE_NEWMODEL, $allModels, __('Model'), '', false) . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_NEWIP, __('IP'), '', false, 12, 'ip') . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_NEWLOGIN, __('Login'), '', false, 8, 'alphanumeric') . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_NEWPASS, __('Password'), '', false, 8, '') . ' ';
-                $inputs .= wf_CheckInput(self::PROUTE_NEWACT, __('Enabled'), false, true) . ' ';
-                $inputs .= wf_Selector(self::PROUTE_NEWSTORAGE, $storagesParams, __('Storage'), '', false) . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_NEWCOMMENT, __('Description'), '', false, 10, '') . ' ';
+                $inputs = wf_Selector(self::PROUTE_NEWMODEL, $allModels, __('Model'), '', true) . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_NEWIP, __('IP'), '', true, 12, 'ip') . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_NEWLOGIN, __('Login'), '', true, 14, 'alphanumeric') . ' ';
+                $inputs .= wf_PasswordInput(self::PROUTE_NEWPASS, __('Password'), '', true, 14) . ' ';
+                $inputs .= wf_CheckInput(self::PROUTE_NEWACT, __('Enabled'), true, true) . ' ';
+                $inputs .= wf_Selector(self::PROUTE_NEWSTORAGE, $storagesParams, __('Storage'), '', true) . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_NEWCOMMENT, __('Description'), '', true, 18, '') . ' ';
                 $inputs .= wf_Submit(__('Create'));
                 $result .= wf_Form('', 'POST', $inputs, 'glamour');
             } else {
@@ -266,12 +266,8 @@ class Cameras {
     public function renderList() {
         $result = '';
         if (!empty($this->allCameras)) {
-            $allModels = $this->models->getAllModelNames();
-
             $starDust = new StarDust();
-
             $cells = wf_TableCell(__('ID'));
-            $cells .= wf_TableCell(__('Model'));
             $cells .= wf_TableCell(__('IP'));
             $cells .= wf_TableCell(__('Enabled'));
             $cells .= wf_TableCell(__('Recording'));
@@ -280,7 +276,6 @@ class Cameras {
             $rows = wf_TableRow($cells, 'row1');
             foreach ($this->allCameras as $io => $each) {
                 $cells = wf_TableCell($each['id']);
-                $cells .= wf_TableCell($allModels[$each['modelid']]);
                 $cells .= wf_TableCell($each['ip']);
                 $cells .= wf_TableCell(web_bool_led($each['active']));
                 $starDust->setProcess(Recorder::PID_PREFIX . $each['id']);
