@@ -508,7 +508,7 @@ class UpdateManager {
      * 
      * @return void/string on error
      */
-    public function performAutoUpgrade($branch = 'STABLE') {
+    public function performAutoUpgrade($branch) {
         $result = '';
         $updateProcess = new StarDust(self::PID_AUTOSYSUPGRADE);
         if ($updateProcess->notRunning()) {

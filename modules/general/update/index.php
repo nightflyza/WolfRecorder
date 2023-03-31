@@ -45,7 +45,7 @@ if (cfr('ROOT')) {
             if ($currentSystemVersion != $updateBranchVersion) {
                 //running upgrade process
                 if (ubRouting::checkPost($updateManager::PROUTE_UPGRADEAGREE)) {
-                    $upgradeResult = $updateManager->performAutoUpgrade();
+                    $upgradeResult = $updateManager->performAutoUpgrade($updateBranch);
                     if ($upgradeResult) {
                         show_error($upgradeResult);
                     } else {
