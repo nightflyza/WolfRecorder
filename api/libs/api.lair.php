@@ -41,6 +41,23 @@ function wr_SerialInstall() {
     return($randomid);
 }
 
+/**
+ * Returns current system version
+ * 
+ * @return string
+ */
+function wr_getLocalSystemVersion() {
+    $result = file_get_contents('RELEASE');
+    return($result);
+}
+
+/**
+ * Returns remote release version
+ * 
+ * @param string $branch
+ * 
+ * @return string/bool
+ */
 function wr_GetReleaseInfo($branch) {
     $result = false;
     $release_url = UpdateManager::URL_RELEASE_STABLE;
@@ -66,12 +83,11 @@ function wr_GetReleaseInfo($branch) {
 function wr_CheckUpdates($return = false, $branch = 'STABLE') {
     $result = '';
     $latestRelease = wr_GetReleaseInfo($branch);
-
     if ($latestRelease) {
         if ($branch == 'CURRENT') {
-            $result = __('Latest nightly build is') . ': ' . $latestRelease;
+            $result = __('Latest nightly WolfRecorder build is') . ': ' . $latestRelease;
         } else {
-            $result = __('Latest stable release is') . ': ' . $latestRelease;
+            $result = __('Latest stable WolfRecorder release is') . ': ' . $latestRelease;
         }
     } else {
         $result = __('Error checking updates');

@@ -71,13 +71,13 @@ class UpdateManager {
     /**
      * predefined stuff here
      */
-    const URL_RELEASE_STABLE='http://wolfrecorder.com/RELEASE';
-    const URL_RELEASE_CURRENT='http://snaps.wolfrecorder.com/RELEASE';
+    const URL_RELEASE_STABLE = 'http://wolfrecorder.com/RELEASE';
+    const URL_RELEASE_CURRENT = 'http://snaps.wolfrecorder.com/RELEASE';
     const DUMPS_PATH = 'content/updates/sql/';
     const CONFIGS_PATH = 'content/updates/configs/';
     const URL_ME = '?module=update';
     const URL_RELNOTES = 'wolfrecorder.com/wiki/doku.php?id=relnotes#section';
-    
+    const ROUTE_AUTOSYSUPGRADE = 'autosystemupgrade';
 
     /**
      * Creates new update manager instance
@@ -484,15 +484,17 @@ class UpdateManager {
      * @return string
      */
     public function renderVersionInfo() {
-        $currentRelease = file_get_contents("RELEASE");
+        $currentRelease = wr_getLocalSystemVersion();
         $updatechecker = wf_tag('br') . wf_tag('div', false, '', 'style="margin-left: 3%;"');
-        $updatechecker .= wf_AjaxLink('?module=update&checkupdates=true', wf_img('skins/question.png') . ' ' . __('Check updates'), 'lastrelease', false, 'ubButton');
+        $updatechecker .= wf_AjaxLink('?module=update&checkupdates=true', wf_img('skins/question.png') . ' ' . __('Check updates'), 'lastrelease', false, 'ubButton') . ' ';
+        $updatechecker .= wf_Link(self::URL_ME . '&' . self::ROUTE_AUTOSYSUPGRADE . '=STABLE', wf_img('skins/icon_cache.png') . ' ' . __('Upgrade to stable release'), false, 'ubButton') . ' ';
+        $updatechecker .= wf_Link(self::URL_ME . '&' . self::ROUTE_AUTOSYSUPGRADE . '=CURRENT', wf_img('skins/icon_cache.png') . ' ' . __('Upgrade to nightly build'), false, 'ubButton') . ' ';
         $updatechecker .= wf_tag('div', true);
         $updatechecker .= wf_CleanDiv();
 
         $releaseInfo = wf_tag('style') . '#ubajaxloaderanim { margin-left: 3%; margin-top: 10px; }' . wf_tag('style', true);
         $releaseInfo .= $updatechecker;
-        $releaseInfo .= $this->messages->getStyledMessage(__('Current WolfRecorder version') . ': ' . $currentRelease, 'info');
+        $releaseInfo .= $this->messages->getStyledMessage(__('Current system version') . ': ' . $currentRelease, 'info');
         $releaseInfo .= wf_AjaxContainer('lastrelease', '', '');
 
         $releaseInfo .= wf_AjaxLoader();
