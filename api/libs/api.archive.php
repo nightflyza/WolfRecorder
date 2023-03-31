@@ -250,26 +250,29 @@ class Archive {
 
             //any records here?
             if ($chunksByDay) {
-                $barWidth = 0.064;
-                $barStyle = 'width:' . $barWidth . '%;';
-                $result = wf_tag('div', false, '', 'style = "width:' . $this->playerWidth . ';"');
-                foreach ($dayMinAlloc as $eachMin => $recAvail) {
-                    $recAvailBar = ($recAvail) ? 'skins/rec_avail.png' : 'skins/rec_unavail.png';
-                    if ($curDate == $date) {
-                        if (zb_isTimeBetween($fewMinAgo, $fewMinLater, $eachMin)) {
-                            $recAvailBar = 'skins/rec_now.png';
+                if ($chunksByDay > 3) {
+                    $barWidth = 0.064;
+                    $barStyle = 'width:' . $barWidth . '%;';
+                    $result = wf_tag('div', false, '', 'style = "width:' . $this->playerWidth . ';"');
+                    foreach ($dayMinAlloc as $eachMin => $recAvail) {
+                        $recAvailBar = ($recAvail) ? 'skins/rec_avail.png' : 'skins/rec_unavail.png';
+                        if ($curDate == $date) {
+                            if (zb_isTimeBetween($fewMinAgo, $fewMinLater, $eachMin)) {
+                                $recAvailBar = 'skins/rec_now.png';
+                            }
+                        }
+                        $recAvailTitle = ($recAvail) ? $eachMin : $eachMin . ' - ' . __('No record');
+                        $timeBarLabel = wf_img($recAvailBar, $recAvailTitle, $barStyle);
+                        if ($recAvail) {
+                            $timeSeg = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . ubRouting::get(self::ROUTE_VIEW) . '&' . self::ROUTE_SHOWDATE . '=' . $date . '&' . self::ROUTE_TIMESEGMENT . '=' . $eachMin;
+                            $result .= trim(wf_Link($timeSeg, $timeBarLabel));
+                        } else {
+                            $result .= $timeBarLabel;
                         }
                     }
-                    $recAvailTitle = ($recAvail) ? $eachMin : $eachMin . ' - ' . __('No record');
-                    $timeBarLabel = wf_img($recAvailBar, $recAvailTitle, $barStyle);
-                    if ($recAvail) {
-                        $timeSeg = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . ubRouting::get(self::ROUTE_VIEW) . '&' . self::ROUTE_SHOWDATE . '=' . $date . '&' . self::ROUTE_TIMESEGMENT . '=' . $eachMin;
-                        $result .= trim(wf_Link($timeSeg, $timeBarLabel));
-                    } else {
-                        $result .= $timeBarLabel;
-                    }
+                    $result .= wf_tag('div', true);
                 }
-                $result .= wf_tag('div', true);
+                $result .= wf_delimiter(0);
             }
         }
 
@@ -301,7 +304,7 @@ class Archive {
 
             if (!empty($datesTmp)) {
                 $result .= $this->renderDayRecordsAvailTimeline($chunksList, $dayPointer);
-                $result .= wf_delimiter(0);
+
                 $chunkTime = $this->altCfg['RECORDER_CHUNK_TIME'];
                 foreach ($datesTmp as $eachDate => $chunksCount) {
                     $justDay = date("d", strtotime($eachDate));
