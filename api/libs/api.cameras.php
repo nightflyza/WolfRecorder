@@ -282,13 +282,7 @@ class Cameras {
                 $recordingFlag = $starDust->isRunning();
                 $cells .= wf_TableCell(web_bool_led($recordingFlag));
                 $cells .= wf_TableCell($each['comment']);
-                $deletionUrl = self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'];
-                $cancelUrl = self::URL_ME;
-                $deletionAlert = $this->messages->getDeleteAlert() . '. ' . wf_tag('br');
-                $deletionAlert .= __('Also all archive data for this camera will be destroyed permanently') . '.';
-                $deletionTitle = __('Delete') . ' ' . __('Camera') . ' ' . $each['ip'] . '?';
-                $actLinks = wf_ConfirmDialog($deletionUrl, web_delete_icon(), $deletionAlert, '', $cancelUrl, $deletionTitle) . ' ';
-                $actLinks .= wf_Link(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $each['id'], web_edit_icon(), false);
+                $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $each['id'], web_edit_icon(), false);
                 $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
             }
@@ -441,14 +435,26 @@ class Cameras {
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
 
             //some controls here
+
+
             if ($cameraData['active']) {
                 $deactUrl = self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $cameraData['id'] . '&' . self::ROUTE_DEACTIVATE . '=' . $cameraData['id'];
                 $cameraControls .= wf_Link($deactUrl, web_bool_led(0) . ' ' . __('Disable'), false, 'ubButton') . ' ';
             } else {
                 $cameraControls .= wf_Link(self::URL_ME . '&' . self::ROUTE_ACTIVATE . '=' . $cameraData['id'], web_bool_led(1) . ' ' . __('Enable'), false, 'ubButton') . ' ';
             }
+
             if (cfr('ARCHIVE')) {
                 $cameraControls .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $cameraData['id'], wf_img('skins/icon_archive_small.png') . ' ' . __('Archive'), false, 'ubButton');
+            }
+
+            if (!$cameraData['active']) {
+                $deletionUrl = self::URL_ME . '&' . self::ROUTE_DEL . '=' . $cameraId;
+                $cancelUrl = self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $cameraId;
+                $deletionAlert = $this->messages->getDeleteAlert() . '. ' . wf_tag('br');
+                $deletionAlert .= __('Also all archive data for this camera will be destroyed permanently') . '.';
+                $deletionTitle = __('Delete') . ' ' . __('Camera') . ' ' . $cameraData['ip'] . '?';
+                $cameraControls .= wf_ConfirmDialog($deletionUrl, web_delete_icon() . ' ' . __('Delete'), $deletionAlert, 'ubButton', $cancelUrl, $deletionTitle) . ' ';
             }
         } else {
             $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
