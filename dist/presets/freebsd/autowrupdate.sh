@@ -113,6 +113,7 @@ rm -fr ${APACHE_DATA_PATH}${WOLFRECORDER_PATH}/*
 
 echo "=== Unpacking new release ==="
 cp  -R ${RESTORE_POINT}/${WOLFRECORDER_RELEASE_NAME} ${APACHE_DATA_PATH}${WOLFRECORDER_PATH}/
+echo ${BRANCH} >> ${LOG_FILE}
 echo `date` >> ${LOG_FILE}
 echo "====================" >> ${LOG_FILE}
 $TAR zxvf ${WOLFRECORDER_RELEASE_NAME} 2>> ${LOG_FILE}
