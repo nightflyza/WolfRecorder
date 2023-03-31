@@ -283,6 +283,10 @@ fi
 cp -R ./dist/presets/freebsd/autowrupdate.sh /bin/
 chmod a+x /bin/autowrupdate.sh
 
+#cleaning up installer work directory
+cd /
+rm -fr ${INSTALLER_WORK_DIR}
+
 $DIALOG --title "WolfRecorder installation has been completed" --msgbox "Now you can access your web-interface by address http://server_ip/${WR_WEB_DIR} with login and password: admin/demo. Please reboot your server to check correct startup of all services" 15 50
 
 # Finishing installation
