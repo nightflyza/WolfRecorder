@@ -513,17 +513,20 @@ class UpdateManager {
         $updateProcess = new StarDust(self::PID_AUTOSYSUPGRADE);
         if ($updateProcess->notRunning()) {
             $updateProcess->start();
+            log_register('UPDMGR AUTOUPGRADE `' . $branch . '` STARTED');
             if ($this->sudoPath AND $this->atoupdaterPath) {
                 if (file_exists($this->atoupdaterPath)) {
                     $command = $this->sudoPath . ' ' . $this->atoupdaterPath . ' ' . $branch;
                     $autoUpdaterResult = shell_exec($command);
                     if (!ispos($autoUpdaterResult, 'SUCCESS')) {
                         $result .= __('Something went wrong') . ': ' . $autoUpdaterResult;
+                        log_register('UPDMGR AUTOUPGRADE `' . $branch . '` FAILED');
                     }
                 } else {
                     $result .= $this->atoupdaterPath . ' ' . __('not exists');
                 }
             }
+            log_register('UPDMGR AUTOUPGRADE `' . $branch . '` FINISHED');
             $updateProcess->stop();
         } else {
             $result .= __('System update') . ' ' . __('already running');

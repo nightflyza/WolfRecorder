@@ -87,7 +87,7 @@ if (cfr('ROOT')) {
         } else {
             //mysql dumps applying interface
             if (ubRouting::checkGet('applysql')) {
-                show_window(__('MySQL database schema update'), $updateManager->applyMysqlDump(ubRouting::get('applysql')));
+                show_window(__('Database schema updates'), $updateManager->applyMysqlDump(ubRouting::get('applysql')));
             }
 
             if (ubRouting::checkGet('showconfigs')) {
