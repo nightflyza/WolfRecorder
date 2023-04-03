@@ -410,6 +410,7 @@ class Archive {
                     $result .= $this->renderArchivePlayer($archivePlayList, $this->playerWidth, true, $cameraData['channel']);
                 } else {
                     $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
+                    $result .= wf_delimiter(0);
                 }
 //some timeline here
                 $result .= $this->renderDaysTimeline($cameraId, $chunksList);
