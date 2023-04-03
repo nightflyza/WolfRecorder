@@ -54,7 +54,18 @@ class Rotator {
      */
     protected $allStoragesData = array();
 
+    /**
+     * Debugging mode flag
+     *
+     * @var bool
+     */
+    protected $debugFlag = false;
+
+    /**
+     * Other predefined stuff
+     */
     const ROTATOR_PID = 'ROTATOR';
+    const DEBUG_LOG = 'exports/rotator_debug.log';
 
     public function __construct() {
         $this->loadConfigs();
@@ -74,6 +85,11 @@ class Rotator {
         $this->altCfg = $ubillingConfig->getAlter();
         $this->binPaths = $ubillingConfig->getBinpaths();
         $this->reservedSpacePercent = $this->altCfg['STORAGE_RESERVED_SPACE'];
+        if (isset($this->altCfg['ROTATOR_DEBUG'])) {
+            if ($this->altCfg['ROTATOR_DEBUG']) {
+                $this->debugFlag = true;
+            }
+        }
     }
 
     /**
@@ -162,47 +178,50 @@ class Rotator {
                 foreach ($this->allStoragesData as $io => $eachStorage) {
                     $storageTotalSpace = disk_total_space($eachStorage['path']);
                     $storageFreeSpace = disk_free_space($eachStorage['path']);
-                    $usedStorageSpace=$storageTotalSpace-$storageFreeSpace;
-                    $maxUsagePercent=100-($this->reservedSpacePercent);
-                    $maxUsageSpace=zb_Percent($storageTotalSpace,$maxUsagePercent);
-                    $mustBeFree=$storageTotalSpace-$maxUsageSpace;
-                    $allChannelsSpace=0;
+                    $usedStorageSpace = $storageTotalSpace - $storageFreeSpace;
+                    $maxUsagePercent = 100 - ($this->reservedSpacePercent);
+                    $maxUsageSpace = zb_Percent($storageTotalSpace, $maxUsagePercent);
+                    $mustBeFree = $storageTotalSpace - $maxUsageSpace;
+                    $allChannelsSpace = 0;
 
-                    
+
                     //storage cleanup required?
                     if ($storageFreeSpace < $mustBeFree) {
                         $eachStorageChannels = $this->getStorageChannels($eachStorage['id']);
                         //this storage must be cleaned
                         if (!empty($eachStorageChannels)) {
                             //count of channels
-                            $storageChannelsCount=sizeof($eachStorageChannels);
+                            $storageChannelsCount = sizeof($eachStorageChannels);
                             foreach ($eachStorageChannels as $eachChannel => $chanPath) {
-                                $allChannelsSpace+=$this->storages->getChannelSize($eachStorage['id'],$eachChannel);
+                                $allChannelsSpace += $this->storages->getChannelSize($eachStorage['id'], $eachChannel);
                             }
-                          
-                            $avgChanSize=$allChannelsSpace/$storageChannelsCount;
-                            $usedBySystem=$usedStorageSpace-$allChannelsSpace;
+
+                            $avgChanSize = $allChannelsSpace / $storageChannelsCount;
+                            $usedBySystem = $usedStorageSpace - $allChannelsSpace;
                             //fair?
-                            $maxChannelAllocSize=round((($storageFreeSpace-$mustBeFree)+$allChannelsSpace)/$storageChannelsCount);
-                           
-                                foreach ($eachStorageChannels as $eachChannel => $chanPath) {
-                                    $eachChannelSize=$this->storages->getChannelSize($eachStorage['id'],$eachChannel);
-                                    //this channel is exhausted his reserved size?
-                                    if ($eachChannelSize>$maxChannelAllocSize) {
-                                        while ($eachChannelSize>$maxChannelAllocSize) {
-                                                $this->flushChannelOldestChunk($eachStorage['id'],$eachChannel);
-                                                $eachChannelSize=$this->storages->getChannelSize($eachStorage['id'],$eachChannel);
-                                                //TODO: remove following debug code
-                                                //file_put_contents('exports/rotator_debug.log', curdatetime() . ' '.wr_convertSize($eachChannelSize).' > OF '. wr_convertSize($maxChannelAllocSize).' '. $eachChannel . PHP_EOL, FILE_APPEND);
+                            $maxChannelAllocSize = round((($storageFreeSpace - $mustBeFree) + $allChannelsSpace) / $storageChannelsCount);
+
+                            foreach ($eachStorageChannels as $eachChannel => $chanPath) {
+                                $eachChannelSize = $this->storages->getChannelSize($eachStorage['id'], $eachChannel);
+                                //this channel is exhausted his reserved size?
+                                if ($eachChannelSize > $maxChannelAllocSize) {
+                                    while ($eachChannelSize > $maxChannelAllocSize) {
+                                        $this->flushChannelOldestChunk($eachStorage['id'], $eachChannel);
+                                        $eachChannelSize = $this->storages->getChannelSize($eachStorage['id'], $eachChannel);
+                                        //some debug logging here
+                                        if ($this->debugFlag) {
+                                            file_put_contents(self::DEBUG_LOG, curdatetime() . ' ' . wr_convertSize($eachChannelSize) . ' > OF ' . wr_convertSize($maxChannelAllocSize) . ' ' . $eachChannel . PHP_EOL, FILE_APPEND);
                                         }
-                                        
-                                  } else {
-                                        //TODO: remove following debug code
-                                        //file_put_contents('exports/rotator_debug.log', curdatetime() . ' '.wr_convertSize($eachChannelSize).' < OF '. wr_convertSize($maxChannelAllocSize).' '. $eachChannel . PHP_EOL, FILE_APPEND);
-                                  }
+                                    }
+                                } else {
+                                    //and there some rotation skips logging
+                                    if ($this->debugFlag) {
+                                        file_put_contents('exports/rotator_debug.log', curdatetime() . ' ' . wr_convertSize($eachChannelSize) . ' < OF ' . wr_convertSize($maxChannelAllocSize) . ' ' . $eachChannel . PHP_EOL, FILE_APPEND);
+                                    }
+                                }
                             }
                         }
-                    }                     
+                    }
                 }
             }
             $rotatorProcess->stop();
