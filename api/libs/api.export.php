@@ -64,7 +64,7 @@ class Export {
     const PROUTE_DATE_EXPORT = 'dateexport';
     const PROUTE_TIME_FROM = 'timefrom';
     const PROUTE_TIME_TO = 'timeto';
-    const PATH_EXPORTS='exports/';
+    const PATH_EXPORTS='howl/';
 
     public function __construct() {
         $this->initMessages();
