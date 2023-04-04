@@ -24,6 +24,9 @@
         </style>
         <script type="text/javascript" src="modules/jsc/dt3/datatables.min.js"></script>
         <script src="modules/jsc/sorttable.js" language="javascript"></script>
+        <!-- timepicker -->
+        <script type="text/javascript" src="modules/jsc/timepick/jquery.timepicker.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="modules/jsc/timepick/jquery.timepicker.css" />
     </head>
 
     <body class="">
@@ -38,12 +41,12 @@
                 <div class="sidebar-wrapper">
                     <ul class="nav">
                         <?=$system->renderMenu(); ?> 
-                        
+
                         <?php 
                         if ($system->getAuthEnabled()) {
-                         if ($system->getLoggedInState()) {
-                            print(wf_tag('li').wf_link('?forceLogout=true',wf_img('skins/poweroff.png').' '.__('Log out'))).wf_tag('li',true);
-                           }
+                        if ($system->getLoggedInState()) {
+                        print(wf_tag('li').wf_link('?forceLogout=true',wf_img('skins/poweroff.png').' '.__('Log out'))).wf_tag('li',true);
+                        }
                         }
                         ?>
                     </ul>
@@ -91,7 +94,7 @@
                             <nav class="footer-nav">
                                 <?php
                                 if ($system->isLocaleSwitchable()) {
-                                 print(YalfLangSwitch::render());
+                                print(YalfLangSwitch::render());
                                 }
                                 ?>
                                 <div style="float:left;"> </div>
