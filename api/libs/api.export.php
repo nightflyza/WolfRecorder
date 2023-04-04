@@ -41,6 +41,13 @@ class Export {
     protected $storages = '';
 
     /**
+     * Archive instance placeholder.
+     *
+     * @var object
+     */
+    protected $archive = '';
+
+    /**
      * Contains ffmpeg binary path
      *
      * @var string
@@ -55,6 +62,13 @@ class Export {
     protected $messages = '';
 
     /**
+     * Contains current instance user login
+     *
+     * @var string
+     */
+    protected $myLogin = '';
+
+    /**
      * other predefined stuff like routes
      */
     const EXPORTLIST_MASK = '_exportlist.txt';
@@ -64,14 +78,27 @@ class Export {
     const PROUTE_DATE_EXPORT = 'dateexport';
     const PROUTE_TIME_FROM = 'timefrom';
     const PROUTE_TIME_TO = 'timeto';
-    const PATH_EXPORTS='howl/';
+    const PATH_RECORDS = 'howl/recdl/';
+    const PID_EXPORT = 'EXPORT_';
+    const RECORDS_EXT = '.mp4';
 
     public function __construct() {
+        $this->setLogin();
         $this->initMessages();
         $this->loadConfigs();
         $this->setOptions();
         $this->initStorages();
         $this->initCameras();
+        $this->initArchive();
+    }
+
+    /**
+     * Sets current instance login
+     * 
+     * @return void
+     */
+    protected function setLogin() {
+        $this->myLogin = whoami();
     }
 
     /**
@@ -184,7 +211,7 @@ class Export {
     protected function renderDayRecordsAvailability($chunksList, $date) {
         $result = '';
         if (!empty($chunksList)) {
-            $dayMinAlloc = $this->allocDayTimeline();
+            $dayMinAlloc = $this->archive->allocDayTimeline();
             $chunksByDay = 0;
             $curDate = curdate();
             $fewMinAgo = date("H:i", strtotime("-5 minute", time()));
@@ -227,24 +254,6 @@ class Export {
     }
 
     /**
-     * Allocates array with full timeline as hh:mm=>0
-     * 
-     * @return array
-     */
-    protected function allocDayTimeline() {
-        $result = array();
-        for ($h = 0; $h <= 23; $h++) {
-            for ($m = 0; $m < 60; $m++) {
-                $hLabel = ($h > 9) ? $h : '0' . $h;
-                $mLabel = ($m > 9) ? $m : '0' . $m;
-                $timeLabel = $hLabel . ':' . $mLabel;
-                $result[$timeLabel] = 0;
-            }
-        }
-        return($result);
-    }
-
-    /**
      * Renders export form with timeline for some chunks list
      * 
      * @param string $channelId
@@ -263,11 +272,11 @@ class Export {
                 $datesTmp[$chunkDate] = $chunkDate;
             }
             if (!empty($datesTmp)) {
-                $inputs = wf_Selector(self::PROUTE_DATE_EXPORT, $datesTmp, __('Date'), $dayPointer, false).' ';
-                $inputs.= wf_TimePickerPreset(self::PROUTE_TIME_FROM, '', __('from'),false).' ';
-                $inputs.= wf_TimePickerPreset(self::PROUTE_TIME_TO, '', __('to'),false).' ';
+                $inputs = wf_Selector(self::PROUTE_DATE_EXPORT, $datesTmp, __('Date'), $dayPointer, false) . ' ';
+                $inputs .= wf_TimePickerPreset(self::PROUTE_TIME_FROM, ubRouting::post(self::PROUTE_TIME_FROM), __('from'), false) . ' ';
+                $inputs .= wf_TimePickerPreset(self::PROUTE_TIME_TO, ubRouting::post(self::PROUTE_TIME_TO), __('to'), false) . ' ';
                 $inputs .= wf_Submit(__('Export'));
-                $result.= wf_Form('', 'POST', $inputs, 'glamour');
+                $result .= wf_Form('', 'POST', $inputs, 'glamour');
                 //here some timeline for selected day
                 $result .= $this->renderDayRecordsAvailability($chunksList, $dayPointer);
                 $result .= wf_CleanDiv();
@@ -315,6 +324,226 @@ class Export {
             if ($cameraId) {
                 $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, wf_img('skins/icon_camera_small.png') . ' ' . __('Camera'), false, 'ubButton');
             }
+        }
+        return($result);
+    }
+
+    /**
+     * Prepares per-user recordings space
+     * 
+     * @return string
+     */
+    protected function prepareRecodringsDir() {
+        $result = '';
+        if (!empty($this->myLogin)) {
+            $fullUserPath = self::PATH_RECORDS . $this->myLogin;
+            //base recordings path
+            if (!file_exists(self::PATH_RECORDS)) {
+                //creating base path
+                mkdir(self::PATH_RECORDS, 0777);
+                chmod(self::PATH_RECORDS, 0777);
+            }
+
+            if (!file_exists($fullUserPath)) {
+                //and per-user path
+                mkdir($fullUserPath, 0777);
+                chmod($fullUserPath, 0777);
+            }
+
+            if (file_exists($fullUserPath)) {
+                $result = $fullUserPath . '/'; //with ending slash
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Returns space used by user recordings
+     * 
+     * @param string $recordsDir
+     * 
+     * @return int
+     */
+    protected function getUserUsedSpace($recordsDir) {
+        $result = 0;
+        if (!empty($recordsDir)) {
+            $allRecords = rcms_scandir($recordsDir);
+            if (!empty($allRecords)) {
+                foreach ($allRecords as $io => $eachRecord) {
+                    $result += filesize($recordsDir . $eachRecord);
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Returns count of users registered in system
+     * 
+     * @return int
+     */
+    protected function getUserCount() {
+        $result = 0;
+        $allUsers = rcms_scandir(USERS_PATH);
+        if (!empty($allUsers)) {
+            $result = sizeof($allUsers);
+        }
+        return($result);
+    }
+
+    /**
+     * Returns count bytes count allowed to each user to store his records
+     * 
+     * @return int
+     */
+    protected function getUserMaxSpace() {
+        $result = 0;
+        $storageTotalSpace = disk_total_space('/');
+        $storageFreeSpace = disk_free_space('/');
+        $usedStorageSpace = $storageTotalSpace - $storageFreeSpace;
+        $maxUsagePercent = 100 - ($this->altCfg['STORAGE_RESERVED_SPACE'] / 2); // half of reserved space
+        $maxUsageSpace = zb_Percent($storageTotalSpace, $maxUsagePercent);
+        $mustBeFree = $storageTotalSpace - $maxUsageSpace;
+        $usersCount = $this->getUserCount();
+        if ($usersCount > 0) {
+            $result = $mustBeFree / $usersCount;
+        }
+        return($result);
+    }
+
+    /**
+     * Performs export of some chunks list of some channel into selected directory
+     * 
+     * @param array $chunksList
+     * @param string $channelId
+     * @param string $directory
+     * @param string $userLogin
+     * 
+     * @return void/string
+     */
+    protected function exportChunksList($chunksList, $channelId, $directory, $userLogin) {
+        $result = '';
+        $exportProcess = new StarDust(self::PID_EXPORT . $userLogin);
+        if ($exportProcess->notRunning()) {
+            $exportProcess->start();
+            $allChannels = $this->cameras->getAllCamerasChannels();
+            $cameraId = $allChannels[$channelId];
+            log_register('EXPORT STARTED CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '`');
+            if (!empty($chunksList)) {
+                $firstTs = 0;
+                $lastTs = 0;
+                $exportListData = '';
+                $exportListPath = Storages::PATH_HOWL . $channelId . self::EXPORTLIST_MASK;
+                //building concat list here
+                foreach ($chunksList as $eachTimeStamp => $eachChunk) {
+                    if (file_exists($eachChunk)) {
+                        if (!$firstTs) {
+                            $firstTs = $eachTimeStamp;
+                        }
+                        $lastTs = $eachTimeStamp;
+                        $exportListData .= "file '" . $eachChunk . "'" . PHP_EOL;
+                    }
+                }
+
+                //saving export list
+                file_put_contents($exportListPath, $exportListData);
+                //record file name
+                $dateFmt = "Y-m-d-H-i-s";
+                $recordFileName = date($dateFmt, $firstTs) . '_' . date($dateFmt, $lastTs) . '_' . $channelId . self::RECORDS_EXT;
+                $fullRecordFilePath = $directory . $recordFileName;
+                if (!file_exists($fullRecordFilePath)) {
+                    $command = $this->ffmpgPath . ' -loglevel error -f concat -safe 0 -i ' . $exportListPath . ' -c copy ' . $fullRecordFilePath;
+                    shell_exec($command);
+                } else {
+                    log_register('EXPORT SKIPPED CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '` ALREADY EXISTS');
+                }
+                //cleanup export list
+                unlink($exportListPath);
+            } else {
+                $result .= __('Something went wrong');
+            }
+            $exportProcess->stop();
+            log_register('EXPORT FINISHED CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '`');
+        } else {
+            $result .= __('Export process already running');
+        }
+        return($result);
+    }
+
+    /**
+     * Performs export of some channels records into single file
+     * 
+     * @param string $channelId
+     * @param string $date
+     * @param string $timeFrom
+     * @param string $timeTo
+     * 
+     * @return void/string on error
+     */
+    public function runExport($channelId, $date, $timeFrom, $timeTo) {
+        $result = '';
+        $userRecordingsDir = $this->prepareRecodringsDir(); //anyway we need this
+        $channelId = ubRouting::filters($channelId, 'mres');
+        $date = ubRouting::filters($date, 'mres');
+        $timeFrom = ubRouting::filters($timeFrom, 'mres');
+        $timeTo = ubRouting::filters($timeTo, 'mres');
+
+        $fullDateFrom = strtotime($date . $timeFrom . ':00');
+        $fullDateTo = strtotime($date . $timeTo . ':59');
+
+        $allCameraChannels = $this->cameras->getAllCamerasChannels();
+        //TODO: here must be some per user ACL checks
+        if (isset($allCameraChannels[$channelId])) {
+            $cameraId = $allCameraChannels[$channelId];
+            if (isset($this->allCamerasData[$cameraId])) {
+                $cameraData = $this->allCamerasData[$cameraId];
+                $storageId = $cameraData['STORAGE']['id'];
+                $allChannelChunks = $this->storages->getChannelChunks($storageId, $channelId);
+                if (!empty($allCameraChannels)) {
+                    $chunksInRange = $this->storages->filterChunksTimeRange($allChannelChunks, $fullDateFrom, $fullDateTo);
+                    if (!empty($chunksInRange)) {
+                        $chunksSize = $this->storages->getChunksSize($chunksInRange); //total chunks size
+                        $usedSpace = $this->getUserUsedSpace($userRecordingsDir); //space used by user
+                        $maxSpace = $this->getUserMaxSpace(); //max of reserved space for each user
+                        $usageForecast = $usedSpace + $chunksSize; //how much space will be with current export?
+                        //checking is some of user space left?
+                        if ($usageForecast <= $maxSpace) {
+                            $result .= $this->exportChunksList($chunksInRange, $channelId, $userRecordingsDir, $this->myLogin);
+                        } else {
+                            $result .= __('There is not enough space reserved for exporting your records');
+                        }
+                    } else {
+                        $result .= __('No records in archive for this time range');
+                    }
+                } else {
+                    $result .= __('Nothing to export');
+                }
+            } else {
+                $result .= __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
+            }
+        } else {
+            $result .= __('Camera') . ' ' . __('with channel') . ' `' . $channelId . '` ' . __('not exists');
+        }
+
+        return($result);
+    }
+
+    /**
+     * Returns list of available records
+     * 
+     * @param string $channelId
+     * 
+     * @return string
+     */
+    public function renderAvailableRecords($channelId = '') {
+        $result = '';
+        $userRecordingsDir = $this->prepareRecodringsDir();
+        $recordsExtFilter = '*' . self::RECORDS_EXT;
+        $allRecords = rcms_scandir($userRecordingsDir, $recordsExtFilter);
+        if (!empty($allRecords)) {
+            
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
         }
         return($result);
     }

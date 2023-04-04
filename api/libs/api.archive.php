@@ -218,7 +218,7 @@ class Archive {
      * 
      * @return array
      */
-    protected function allocDayTimeline() {
+    public function allocDayTimeline() {
         $result = array();
         for ($h = 0; $h <= 23; $h++) {
             for ($m = 0; $m < 60; $m++) {

@@ -372,6 +372,46 @@ class Storages {
     }
 
     /**
+     * Filters some chanks array and lefts only chunks between some timestamps in range
+     * 
+     * @param array $chunksList
+     * @param int $timeFrom
+     * @param int $timeTo
+     * 
+     * @return array
+     */
+    public function filterChunksTimeRange($chunksList, $timeFrom, $timeTo) {
+        $result = array();
+        if (!empty($chunksList)) {
+            foreach ($chunksList as $eachTimestamp => $eachChunkPath) {
+                if (($eachTimestamp > $timeFrom) AND ( $eachTimestamp < $timeTo)) {
+                    $result[$eachTimestamp] = $eachChunkPath;
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Returns size in bytes of all chunks in list
+     * 
+     * @param array $chunksList
+     * 
+     * @return int
+     */
+    public function getChunksSize($chunksList) {
+        $result = 0;
+        if (!empty($chunksList)) {
+            foreach ($chunksList as $timeStamp => $eachChunk) {
+                if (file_exists($eachChunk)) {
+                    $result += filesize($eachChunk);
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Allocates path in storage for channel recording if required
      * 
      * @param string $storagePath
