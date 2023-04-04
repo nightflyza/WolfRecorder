@@ -144,7 +144,10 @@ class Archive {
         $allStotagesData = $this->storages->getAllStoragesData();
         if (!empty($allStotagesData)) {
             if (!empty($this->allCamerasData)) {
-                $cells = wf_TableCell(__('ID'));
+                $cells = '';
+                if (cfr('CAMERAS')) {
+                    $cells .= wf_TableCell(__('ID'));
+                }
                 $cells .= wf_TableCell(__('IP'));
                 $cells .= wf_TableCell(__('Description'));
                 $cells .= wf_TableCell(__('Actions'));
@@ -154,7 +157,10 @@ class Archive {
                     $eachCamIp = $each['CAMERA']['ip'];
                     $eachCamDesc = $each['CAMERA']['comment'];
                     $eachCamChannel = $each['CAMERA']['channel'];
-                    $cells = wf_TableCell($eachCamId);
+                    $cells = '';
+                    if (cfr('CAMERAS')) {
+                        $cells .= wf_TableCell($eachCamId);
+                    }
                     $cells .= wf_TableCell($eachCamIp);
                     $cells .= wf_TableCell($eachCamDesc);
                     $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel, web_icon_search(__('View')));
