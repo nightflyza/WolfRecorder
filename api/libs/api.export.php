@@ -541,7 +541,17 @@ class Export {
         $recordsExtFilter = '*' . self::RECORDS_EXT;
         $allRecords = rcms_scandir($userRecordingsDir, $recordsExtFilter);
         if (!empty($allRecords)) {
-            
+            $cells = wf_TableCell(__('File'));
+            $cells .= wf_TableCell(__('Actions'));
+            $rows = wf_TableRow($cells, 'row1');
+            foreach ($allRecords as $io => $eachFile) {
+                $fileUrl = $userRecordingsDir . $eachFile;
+                $fileLink= wf_Link($fileUrl, $eachFile);
+                $cells = wf_TableCell($fileLink);
+                $cells .= wf_TableCell('TODO:');
+                $rows .= wf_TableRow($cells, 'row5');
+            }
+            $result .= wf_TableBody($rows, '100%', 0, 'resp-table sortable');
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
         }
