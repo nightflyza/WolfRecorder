@@ -3,7 +3,7 @@
 if (cfr('ARCHIVE')) {
     $archive = new Archive();
 
-    //archive lookup
+    //archive lookup by channel ID
     if (ubRouting::checkGet($archive::ROUTE_VIEW)) {
         show_window(__('Archive'), $archive->renderLookup(ubRouting::get($archive::ROUTE_VIEW)));
     }

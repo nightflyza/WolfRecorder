@@ -1,7 +1,8 @@
 <?php
 
 if (cfr('EXPORT')) {
-    //TODO: something here
+   $export=new Export();
+   debarr($export);
 } else {
     show_error(__('Access denied'));
 }

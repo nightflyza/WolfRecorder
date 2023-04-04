@@ -342,6 +342,21 @@ class Cameras {
     }
 
     /**
+     * Returns all cameras channels as struct channelId=>cameraId
+     * 
+     * @return array
+     */
+    public function getAllCamerasChannels() {
+        $result = array();
+        if (!empty($this->allCameras)) {
+            foreach ($this->allCameras as $io => $each) {
+                $result[$each['channel']] = $each['id'];
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Renders camera editing interface
      * 
      * @param int $cameraId
@@ -445,7 +460,7 @@ class Cameras {
             }
 
             if (cfr('ARCHIVE')) {
-                $cameraControls .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $cameraData['id'], wf_img('skins/icon_archive_small.png') . ' ' . __('Archive'), false, 'ubButton');
+                $cameraControls .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $cameraData['channel'], wf_img('skins/icon_archive_small.png') . ' ' . __('Archive'), false, 'ubButton');
             }
 
             if (!$cameraData['active']) {

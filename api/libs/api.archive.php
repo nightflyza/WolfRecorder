@@ -71,7 +71,7 @@ class Archive {
      */
     const PLAYLIST_MASK = '_playlist.txt';
     const URL_ME = '?module=archive';
-    const ROUTE_VIEW = 'viewcameraarchive';
+    const ROUTE_VIEW = 'viewchannel';
     const ROUTE_SHOWDATE = 'renderdatearchive';
     const ROUTE_TIMESEGMENT = 'tseg';
 
@@ -153,10 +153,11 @@ class Archive {
                     $eachCamId = $each['CAMERA']['id'];
                     $eachCamIp = $each['CAMERA']['ip'];
                     $eachCamDesc = $each['CAMERA']['comment'];
+                    $eachCamChannel = $each['CAMERA']['channel'];
                     $cells = wf_TableCell($eachCamId);
                     $cells .= wf_TableCell($eachCamIp);
                     $cells .= wf_TableCell($eachCamDesc);
-                    $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamId, web_icon_search(__('View')));
+                    $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel, web_icon_search(__('View')));
                     $cells .= wf_TableCell($actLinks);
                     $rows .= wf_TableRow($cells, 'row5');
                 }
@@ -282,14 +283,14 @@ class Archive {
     /**
      * Renders basic timeline for some chunks list
      * 
-     * @param array $cameraId
+     * @param string $channelId
      * @param array $chunksList
      * 
      * @return string
      */
-    protected function renderDaysTimeline($cameraId, $chunksList) {
+    protected function renderDaysTimeline($channelId, $chunksList) {
         $result = '';
-        $cameraId = ubRouting::filters($cameraId, 'int');
+        $channelId = ubRouting::filters($channelId, 'mres');
         $dayPointer = ubRouting::checkGet(self::ROUTE_SHOWDATE) ? ubRouting::get(self::ROUTE_SHOWDATE) : curdate();
         if (!empty($chunksList)) {
             $datesTmp = array();
@@ -308,7 +309,7 @@ class Archive {
                 $chunkTime = $this->altCfg['RECORDER_CHUNK_TIME'];
                 foreach ($datesTmp as $eachDate => $chunksCount) {
                     $justDay = date("d", strtotime($eachDate));
-                    $baseUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $cameraId . '&' . self::ROUTE_SHOWDATE . '=' . $eachDate;
+                    $baseUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $channelId . '&' . self::ROUTE_SHOWDATE . '=' . $eachDate;
                     $recordsTime = wr_formatTimeArchive($chunksCount * $chunkTime);
                     $buttonIcon = ($eachDate == $dayPointer) ? 'skins/icon_play_small.png' : 'skins/icon_calendar.gif';
                     $result .= wf_Link($baseUrl, wf_img($buttonIcon, $eachDate . ' - ' . $recordsTime) . ' ' . $justDay, false, 'ubButton') . ' ';
@@ -393,37 +394,47 @@ class Archive {
     /**
      * Renders basic archive lookup interface
      * 
-     * @param int $cameraId
+     * @param string $channelId
      * 
      * @return string
      */
-    public function renderLookup($cameraId) {
+    public function renderLookup($channelId) {
         $result = '';
-        $cameraId = ubRouting::filters($cameraId, 'int');
-        if (isset($this->allCamerasData[$cameraId])) {
-            $cameraData = $this->allCamerasData[$cameraId]['CAMERA'];
-            $showDate = (ubRouting::checkGet(self::ROUTE_SHOWDATE)) ? ubRouting::get(self::ROUTE_SHOWDATE, 'mres') : curdate();
-            $chunksList = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
-            if (!empty($chunksList)) {
-                $archivePlayList = $this->generateArchivePlaylist($cameraId, $showDate, $showDate);
-                if ($archivePlayList) {
-                    $result .= $this->renderArchivePlayer($archivePlayList, $this->playerWidth, true, $cameraData['channel']);
+        $channelId = ubRouting::filters($channelId, 'mres');
+        //camera ID lookup by channel
+        $allCamerasChannels = $this->cameras->getAllCamerasChannels();
+        $cameraId = (isset($allCamerasChannels[$channelId])) ? $allCamerasChannels[$channelId] : 0;
+
+        if ($cameraId) {
+            if (isset($this->allCamerasData[$cameraId])) {
+                $cameraData = $this->allCamerasData[$cameraId]['CAMERA'];
+                $showDate = (ubRouting::checkGet(self::ROUTE_SHOWDATE)) ? ubRouting::get(self::ROUTE_SHOWDATE, 'mres') : curdate();
+                $chunksList = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
+                if (!empty($chunksList)) {
+                    $archivePlayList = $this->generateArchivePlaylist($cameraId, $showDate, $showDate);
+                    if ($archivePlayList) {
+                        $result .= $this->renderArchivePlayer($archivePlayList, $this->playerWidth, true, $cameraData['channel']);
+                    } else {
+                        $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
+                        $result .= wf_delimiter(0);
+                    }
+//some timeline here
+                    $result .= $this->renderDaysTimeline($channelId, $chunksList);
                 } else {
                     $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
-                    $result .= wf_delimiter(0);
                 }
-//some timeline here
-                $result .= $this->renderDaysTimeline($cameraId, $chunksList);
             } else {
-                $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
+                $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
             }
         } else {
-            $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
+            $result .= $this->messages->getStyledMessage(__('Camera') . ' ' . __('with channel') . ' `' . $channelId . '` ' . __('not exists'), 'error');
         }
         $result .= wf_delimiter(1);
         $result .= wf_BackLink(self::URL_ME);
         if (cfr('CAMERAS')) {
-            $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, wf_img('skins/icon_camera_small.png') . ' ' . __('Camera'), false, 'ubButton');
+            if ($cameraId) {
+                $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, wf_img('skins/icon_camera_small.png') . ' ' . __('Camera'), false, 'ubButton');
+            }
         }
         return($result);
     }
