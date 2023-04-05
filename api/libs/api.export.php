@@ -325,6 +325,9 @@ class Export {
                 $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, wf_img('skins/icon_camera_small.png') . ' ' . __('Camera'), false, 'ubButton');
             }
         }
+        if (cfr('ARCHIVE')) {
+            $result .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $channelId, wf_img('skins/icon_archive_small.png') . ' ' . __('Archive'), false, 'ubButton');
+        }
         return($result);
     }
 
@@ -529,6 +532,29 @@ class Export {
     }
 
     /**
+     * Parses exported file name
+     * 
+     * @param string $fileName
+     * 
+     * @return array
+     */
+    public function parseRecordFileName($fileName) {
+        $result = array();
+        $cleanName = str_replace(self::RECORDS_EXT, '', $fileName);
+        $explodedName = explode('_', $cleanName);
+        if (sizeof($explodedName) == 3) {
+            $rawFrom = explode('-', $explodedName[0]);
+            $from = $rawFrom[0] . '-' . $rawFrom[1] . '-' . $rawFrom[2] . ' ' . $rawFrom[3] . ':' . $rawFrom[4] . ':' . $rawFrom[5];
+            $rawTo = explode('-', $explodedName[1]);
+            $to = $rawTo[0] . '-' . $rawTo[1] . '-' . $rawTo[2] . ' ' . $rawTo[3] . ':' . $rawTo[4] . ':' . $rawTo[5];
+            $result['from'] = $from;
+            $result['to'] = $to;
+            $result['channel'] = $explodedName[2];
+        }
+        return($result);
+    }
+
+    /**
      * Returns list of available records
      * 
      * @param string $channelId
@@ -540,15 +566,30 @@ class Export {
         $userRecordingsDir = $this->prepareRecodringsDir();
         $recordsExtFilter = '*' . self::RECORDS_EXT;
         $allRecords = rcms_scandir($userRecordingsDir, $recordsExtFilter);
+        //channel filter applied?
+        if ($channelId) {
+            if (!empty($allRecords)) {
+                foreach ($allRecords as $io => $each) {
+                    if (!ispos($each, $channelId)) {
+                        unset($allRecords[$io]);
+                    }
+                }
+            }
+        }
         if (!empty($allRecords)) {
-            $cells = wf_TableCell(__('File'));
+            $cells = wf_TableCell(__('Time') . ' ' . __('from'));
+            $cells .= wf_TableCell(__('Time') . ' ' . __('to'));
+            $cells .= wf_TableCell(__('Camera'));
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
             foreach ($allRecords as $io => $eachFile) {
+                $fileNameParts = $this->parseRecordFileName($eachFile);
+                $cells = wf_TableCell($fileNameParts['from']);
+                $cells .= wf_TableCell($fileNameParts['to']);
+                $cells .= wf_TableCell($this->cameras->getCameraComment($fileNameParts['channel']));
                 $fileUrl = $userRecordingsDir . $eachFile;
-                $fileLink = wf_Link($fileUrl, $eachFile);
-                $cells = wf_TableCell($fileLink);
-                $cells .= wf_TableCell('TODO:');
+                $actLinks = wf_Link($fileUrl, web_icon_download());
+                $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
             }
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table sortable');

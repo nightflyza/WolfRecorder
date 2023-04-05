@@ -188,9 +188,9 @@ class Cameras {
             }
         }
 
-        $result = zb_rand_string(8);
+        $result = zb_rand_string(11);
         while (isset($busyCnannelIds[$result])) {
-            $result = zb_rand_string(8);
+            $result = zb_rand_string(11);
         }
 
         return($result);
@@ -463,6 +463,10 @@ class Cameras {
                 $cameraControls .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $cameraData['channel'], wf_img('skins/icon_archive_small.png') . ' ' . __('Archive'), false, 'ubButton');
             }
 
+            if (cfr('EXPORT')) {
+                $cameraControls .= wf_Link(Export::URL_ME . '&' . Export::ROUTE_CHANNEL . '=' . $cameraData['channel'], wf_img('skins/icon_download.png') . ' ' . __('Export'), false, 'ubButton');
+            }
+
             if (!$cameraData['active']) {
                 $deletionUrl = self::URL_ME . '&' . self::ROUTE_DEL . '=' . $cameraId;
                 $cancelUrl = self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $cameraId;
@@ -526,6 +530,29 @@ class Cameras {
                 $recorder->runRecordBackground($cameraId);
             }
         }
+    }
+
+    /**
+     * Returns camera comment or IP by its channelId
+     * 
+     * @param string $channelId
+     * 
+     * @return string
+     */
+    public function getCameraComment($channelId) {
+        $result = '';
+        if (!empty($this->allCameras)) {
+            foreach ($this->allCameras as $io => $each) {
+                if ($each['channel'] == $channelId) {
+                    if (!empty($each['comment'])) {
+                        $result = $each['comment'];
+                    } else {
+                        $result = $each['ip'];
+                    }
+                }
+            }
+        }
+        return($result);
     }
 
 }

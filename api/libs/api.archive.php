@@ -442,6 +442,9 @@ class Archive {
                 $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, wf_img('skins/icon_camera_small.png') . ' ' . __('Camera'), false, 'ubButton');
             }
         }
+        if (cfr('EXPORT')) {
+            $result .= wf_Link(Export::URL_ME . '&' . Export::ROUTE_CHANNEL . '=' . $channelId, wf_img('skins/icon_download.png') . ' ' . __('Export'), false, 'ubButton');
+        }
         return($result);
     }
 

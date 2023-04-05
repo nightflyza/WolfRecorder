@@ -17,9 +17,12 @@ if (cfr('EXPORT')) {
             }
         }
 
+
         //export interface here
         $exportDate = (ubRouting::checkPost($export::PROUTE_DATE_EXPORT)) ? ubRouting::post($export::PROUTE_DATE_EXPORT) : curdate();
         show_window(__('Export records') . ': ' . $exportDate, $export->renderExportLookup(ubRouting::get($export::ROUTE_CHANNEL)));
+
+        //already saved records here
         show_window(__('Your saved records'), $export->renderAvailableRecords(ubRouting::get($export::ROUTE_CHANNEL)));
     }
 
