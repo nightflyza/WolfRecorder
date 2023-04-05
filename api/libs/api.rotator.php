@@ -166,6 +166,22 @@ class Rotator {
     }
 
     /**
+     * Checks, is channel locked by another background process or not?
+     * 
+     * @param string $channelId
+     * 
+     * @return bool
+     */
+    protected function channelNotLocked($channelId) {
+        $result = true;
+        $channelPid = new StarDust(Export::PID_EXPORT . $channelId);
+        if ($channelPid->isRunning()) {
+            $result = false;
+        }
+        return($result);
+    }
+
+    /**
      * Performs old chunks rotation for all cameras
      * 
      * @return void
@@ -202,21 +218,28 @@ class Rotator {
                             $maxChannelAllocSize = round((($storageFreeSpace - $mustBeFree) + $allChannelsSpace) / $storageChannelsCount);
 
                             foreach ($eachStorageChannels as $eachChannel => $chanPath) {
-                                $eachChannelSize = $this->storages->getChannelSize($eachStorage['id'], $eachChannel);
-                                //this channel is exhausted his reserved size?
-                                if ($eachChannelSize > $maxChannelAllocSize) {
-                                    while ($eachChannelSize > $maxChannelAllocSize) {
-                                        $this->flushChannelOldestChunk($eachStorage['id'], $eachChannel);
-                                        $eachChannelSize = $this->storages->getChannelSize($eachStorage['id'], $eachChannel);
-                                        //some debug logging here
+                                if ($this->channelNotLocked($eachChannel)) {
+                                    $eachChannelSize = $this->storages->getChannelSize($eachStorage['id'], $eachChannel);
+                                    //this channel is exhausted his reserved size?
+                                    if ($eachChannelSize > $maxChannelAllocSize) {
+                                        while ($eachChannelSize > $maxChannelAllocSize) {
+                                            $this->flushChannelOldestChunk($eachStorage['id'], $eachChannel);
+                                            $eachChannelSize = $this->storages->getChannelSize($eachStorage['id'], $eachChannel);
+                                            //some debug logging here
+                                            if ($this->debugFlag) {
+                                                file_put_contents(self::DEBUG_LOG, curdatetime() . ' ' . wr_convertSize($eachChannelSize) . ' > OF ' . wr_convertSize($maxChannelAllocSize) . ' ' . $eachChannel . PHP_EOL, FILE_APPEND);
+                                            }
+                                        }
+                                    } else {
+                                        //and there some rotation skips logging
                                         if ($this->debugFlag) {
-                                            file_put_contents(self::DEBUG_LOG, curdatetime() . ' ' . wr_convertSize($eachChannelSize) . ' > OF ' . wr_convertSize($maxChannelAllocSize) . ' ' . $eachChannel . PHP_EOL, FILE_APPEND);
+                                            file_put_contents('exports/rotator_debug.log', curdatetime() . ' ' . wr_convertSize($eachChannelSize) . ' < OF ' . wr_convertSize($maxChannelAllocSize) . ' ' . $eachChannel . PHP_EOL, FILE_APPEND);
                                         }
                                     }
                                 } else {
-                                    //and there some rotation skips logging
+                                    //and there some rotation skips on export logging
                                     if ($this->debugFlag) {
-                                        file_put_contents('exports/rotator_debug.log', curdatetime() . ' ' . wr_convertSize($eachChannelSize) . ' < OF ' . wr_convertSize($maxChannelAllocSize) . ' ' . $eachChannel . PHP_EOL, FILE_APPEND);
+                                        file_put_contents('exports/rotator_debug.log', curdatetime() . ' SKIPPED LOCKED BY EXPORT ' . $eachChannel . PHP_EOL, FILE_APPEND);
                                     }
                                 }
                             }

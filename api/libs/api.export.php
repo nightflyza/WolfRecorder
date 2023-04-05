@@ -423,7 +423,7 @@ class Export {
      */
     protected function exportChunksList($chunksList, $channelId, $directory, $userLogin) {
         $result = '';
-        $exportProcess = new StarDust(self::PID_EXPORT . $userLogin);
+        $exportProcess = new StarDust(self::PID_EXPORT . $channelId);
         if ($exportProcess->notRunning()) {
             $exportProcess->start();
             $allChannels = $this->cameras->getAllCamerasChannels();
@@ -546,7 +546,7 @@ class Export {
             $rows = wf_TableRow($cells, 'row1');
             foreach ($allRecords as $io => $eachFile) {
                 $fileUrl = $userRecordingsDir . $eachFile;
-                $fileLink= wf_Link($fileUrl, $eachFile);
+                $fileLink = wf_Link($fileUrl, $eachFile);
                 $cells = wf_TableCell($fileLink);
                 $cells .= wf_TableCell('TODO:');
                 $rows .= wf_TableRow($cells, 'row5');
@@ -555,6 +555,10 @@ class Export {
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
         }
+        $maxUserSpace = $this->getUserMaxSpace();
+        $usedSpaceByMe = $this->getUserUsedSpace($userRecordingsDir);
+        $spaceFree = $maxUserSpace - $usedSpaceByMe;
+        $result .= $this->messages->getStyledMessage(__('Free space for exporting your records') . ': ' . wr_convertSize($spaceFree), 'info');
         return($result);
     }
 
