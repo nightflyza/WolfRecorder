@@ -47,3 +47,15 @@ CREATE TABLE `lair` (
  `value` VARCHAR ( 255 ) NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE = MYISAM CHARSET=utf8 AUTO_INCREMENT=1;
+
+CREATE TABLE IF NOT EXISTS `schedule` (
+  `id` int(11) NOT NULL auto_increment,
+  `date` datetime NOT NULL,
+  `user` varchar(128) NOT NULL,
+  `channel` varchar(64) NOT NULL,
+  `storageid` INT(11) NOT NULL,
+  `channel`  varchar(64) NOT NULL,
+  `comment`  varchar(255) DEFAULT NULL,
+  `done` tinyint(2) NOT NULL DEFAULT 0,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;

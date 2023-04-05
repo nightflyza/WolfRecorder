@@ -181,6 +181,6 @@ $lang['def']['File'] = 'Файл';
 $lang['def']['Free space for exporting your records'] = 'Простору вільно для експорту ваших записів';
 $lang['def']['Time'] = 'Час';
 $lang['def']['Records'] = 'Записи';
-$lang['def'][''] = '';
+$lang['def']['Exhausted'] = 'Вичерпано';
 $lang['def'][''] = '';
 $lang['def'][''] = '';

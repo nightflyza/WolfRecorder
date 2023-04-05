@@ -511,6 +511,7 @@ class Export {
                         $usageForecast = $usedSpace + $chunksSize; //how much space will be with current export?
                         //checking is some of user space left?
                         if ($usageForecast <= $maxSpace) {
+                            //TODO: replace this with just schedule creation
                             $result .= $this->exportChunksList($chunksInRange, $channelId, $userRecordingsDir, $this->myLogin);
                         } else {
                             $result .= __('There is not enough space reserved for exporting your records');
@@ -599,7 +600,8 @@ class Export {
         $maxUserSpace = $this->getUserMaxSpace();
         $usedSpaceByMe = $this->getUserUsedSpace($userRecordingsDir);
         $spaceFree = $maxUserSpace - $usedSpaceByMe;
-        $result .= $this->messages->getStyledMessage(__('Free space for exporting your records') . ': ' . wr_convertSize($spaceFree), 'info');
+        $spaceLabel = ($spaceFree > 0) ? wr_convertSize($spaceFree) : __('Exhausted') . ' :(';
+        $result .= $this->messages->getStyledMessage(__('Free space for exporting your records') . ': ' . $spaceLabel, 'info');
         return($result);
     }
 
