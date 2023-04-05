@@ -276,11 +276,11 @@ class Cameras {
             $rows = wf_TableRow($cells, 'row1');
             foreach ($this->allCameras as $io => $each) {
                 $cells = wf_TableCell($each['id']);
-                $cells .= wf_TableCell($each['ip']);
-                $cells .= wf_TableCell(web_bool_led($each['active']));
+                $cells .= wf_TableCell($each['ip'], '', '', 'sorttable_customkey="' . ip2int($each['ip']) . '"');
+                $cells .= wf_TableCell(web_bool_led($each['active']), '', '', 'sorttable_customkey="' . $each['active'] . '"');
                 $starDust->setProcess(Recorder::PID_PREFIX . $each['id']);
                 $recordingFlag = $starDust->isRunning();
-                $cells .= wf_TableCell(web_bool_led($recordingFlag));
+                $cells .= wf_TableCell(web_bool_led($recordingFlag), '', '', 'sorttable_customkey="' . $recordingFlag . '"');
                 $cells .= wf_TableCell($each['comment']);
                 $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $each['id'], web_edit_icon(), false);
                 $cells .= wf_TableCell($actLinks);
@@ -464,7 +464,7 @@ class Cameras {
             }
 
             if (cfr('EXPORT')) {
-                $cameraControls .= wf_Link(Export::URL_ME . '&' . Export::ROUTE_CHANNEL . '=' . $cameraData['channel'], wf_img('skins/icon_download.png') . ' ' . __('Export'), false, 'ubButton');
+                $cameraControls .= wf_Link(Export::URL_ME . '&' . Export::ROUTE_CHANNEL . '=' . $cameraData['channel'], wf_img('skins/icon_export.png') . ' ' . __('Export'), false, 'ubButton');
             }
 
             if (!$cameraData['active']) {

@@ -191,7 +191,7 @@ class Export {
                     }
                     $cells .= wf_TableCell($eachCamIp);
                     $cells .= wf_TableCell($eachCamDesc);
-                    $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $eachCamChannel, web_icon_download());
+                    $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $eachCamChannel, wf_img('skins/icon_export.png', __('Export')));
                     $cells .= wf_TableCell($actLinks);
                     $rows .= wf_TableRow($cells, 'row5');
                 }
@@ -626,7 +626,7 @@ class Export {
                 $cells .= wf_TableCell($this->cameras->getCameraComment($fileNameParts['channel']));
                 $recordSize = filesize($userRecordingsDir . $eachFile);
                 $recordSizeLabel = wr_convertSize($recordSize);
-                $cells .= wf_TableCell($recordSizeLabel);
+                $cells .= wf_TableCell($recordSizeLabel, '', '', 'sorttable_customkey="' . $recordSize . '"');
                 $fileUrl = $userRecordingsDir . $eachFile;
                 $actLinks = $this->renderRecDelDialog($eachFile);
                 $actLinks .= wf_Link($fileUrl, web_icon_download());

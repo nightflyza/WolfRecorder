@@ -161,7 +161,7 @@ class Archive {
                     if (cfr('CAMERAS')) {
                         $cells .= wf_TableCell($eachCamId);
                     }
-                    $cells .= wf_TableCell($eachCamIp);
+                    $cells .= wf_TableCell($eachCamIp, '', '', 'sorttable_customkey="' . ip2int($eachCamIp) . '"');
                     $cells .= wf_TableCell($eachCamDesc);
                     $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel, web_icon_search(__('View')));
                     $cells .= wf_TableCell($actLinks);
@@ -443,7 +443,7 @@ class Archive {
             }
         }
         if (cfr('EXPORT')) {
-            $result .= wf_Link(Export::URL_ME . '&' . Export::ROUTE_CHANNEL . '=' . $channelId, wf_img('skins/icon_download.png') . ' ' . __('Export'), false, 'ubButton');
+            $result .= wf_Link(Export::URL_ME . '&' . Export::ROUTE_CHANNEL . '=' . $channelId, wf_img('skins/icon_export.png') . ' ' . __('Export'), false, 'ubButton');
         }
         return($result);
     }
