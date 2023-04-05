@@ -105,7 +105,7 @@ cp ./config/binpaths.ini ${RESTORE_POINT}/config/
 cp -R ./content/users ${RESTORE_POINT}/content/
 cp -R ./content/backups ${RESTORE_POINT}/content/
 cp -R ./config/mymodeltemplates ${RESTORE_POINT}/config/
-cp -R ./howl/* ${RESTORE_POINT}/howl/
+mv ./howl/* ${RESTORE_POINT}/howl/
 
 
 echo "=== web directory cleanup ==="
@@ -121,6 +121,7 @@ $TAR zxvf ${WOLFRECORDER_RELEASE_NAME} 2>> ${LOG_FILE}
 rm -fr ${WOLFRECORDER_RELEASE_NAME}
 
 echo "=== Restoring configs ==="
+mv ${RESTORE_POINT}/howl/* ./howl/
 cp -R ${RESTORE_POINT}/* ./
 rm -fr ${WOLFRECORDER_RELEASE_NAME}
 
