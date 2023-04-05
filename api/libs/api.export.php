@@ -71,10 +71,12 @@ class Export {
     /**
      * other predefined stuff like routes
      */
-    const EXPORTLIST_MASK = '_exportlist.txt';
+    const EXPORTLIST_MASK = '_el.txt';
     const URL_ME = '?module=export';
+    const URL_RECORDS = '?module=records';
     const ROUTE_CHANNEL = 'exportchannel';
     const ROUTE_SHOWDATE = 'exportdatearchive';
+    const ROUTE_DELETE = 'delrec';
     const PROUTE_DATE_EXPORT = 'dateexport';
     const PROUTE_TIME_FROM = 'timefrom';
     const PROUTE_TIME_TO = 'timeto';
@@ -334,12 +336,18 @@ class Export {
     /**
      * Prepares per-user recordings space
      * 
+     * @param string $userLogin
+     * 
      * @return string
      */
-    protected function prepareRecodringsDir() {
+    protected function prepareRecordingsDir($userLogin = '') {
         $result = '';
-        if (!empty($this->myLogin)) {
-            $fullUserPath = self::PATH_RECORDS . $this->myLogin;
+        if (empty($userLogin)) {
+            //using current user`s instance
+            $userLogin = $this->myLogin;
+        }
+        if (!empty($userLogin)) {
+            $fullUserPath = self::PATH_RECORDS . $userLogin;
             //base recordings path
             if (!file_exists(self::PATH_RECORDS)) {
                 //creating base path
@@ -436,7 +444,7 @@ class Export {
                 $firstTs = 0;
                 $lastTs = 0;
                 $exportListData = '';
-                $exportListPath = Storages::PATH_HOWL . $channelId . self::EXPORTLIST_MASK;
+                $exportListPath = Storages::PATH_HOWL . $channelId . '_' . zb_rand_string(8) . self::EXPORTLIST_MASK;
                 //building concat list here
                 foreach ($chunksList as $eachTimeStamp => $eachChunk) {
                     if (file_exists($eachChunk)) {
@@ -456,12 +464,13 @@ class Export {
                 $fullRecordFilePath = $directory . $recordFileName;
                 if (!file_exists($fullRecordFilePath)) {
                     $command = $this->ffmpgPath . ' -loglevel error -f concat -safe 0 -i ' . $exportListPath . ' -c copy ' . $fullRecordFilePath;
+                    die($command);
                     shell_exec($command);
                 } else {
                     log_register('EXPORT SKIPPED CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '` ALREADY EXISTS');
                 }
                 //cleanup export list
-                unlink($exportListPath);
+                // unlink($exportListPath);
             } else {
                 $result .= __('Something went wrong');
             }
@@ -485,7 +494,7 @@ class Export {
      */
     public function runExport($channelId, $date, $timeFrom, $timeTo) {
         $result = '';
-        $userRecordingsDir = $this->prepareRecodringsDir(); //anyway we need this
+        $userRecordingsDir = $this->prepareRecordingsDir(); //anyway we need this
         $channelId = ubRouting::filters($channelId, 'mres');
         $date = ubRouting::filters($date, 'mres');
         $timeFrom = ubRouting::filters($timeFrom, 'mres');
@@ -556,6 +565,33 @@ class Export {
     }
 
     /**
+     * Renders recording file deletion dialog
+     * 
+     * @param string $fileName
+     * 
+     * @return string
+     */
+    protected function renderRecDelDialog($fileName) {
+        $result = '';
+        $currentModule = ubRouting::get('module');
+        if (!empty($currentModule)) {
+            if ($currentModule == 'export') {
+                $channelId = ubRouting::get(self::ROUTE_CHANNEL);
+                $deleteUrl = self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $channelId . '&' . self::ROUTE_DELETE . '=' . $fileName;
+                $cancelUrl = self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $channelId;
+                $result .= wf_ConfirmDialog($deleteUrl, web_delete_icon(), $this->messages->getDeleteAlert(), '', $cancelUrl, __('Delete') . ' ' . __('Recording') . '?');
+            }
+
+            if ($currentModule == 'records') {
+                $deleteUrl = self::URL_RECORDS . '&' . self::ROUTE_DELETE . '=' . $fileName;
+                $cancelUrl = self::URL_RECORDS;
+                $result .= wf_ConfirmDialog($deleteUrl, web_delete_icon(), $this->messages->getDeleteAlert(), '', $cancelUrl, __('Delete') . ' ' . __('Recording') . '?');
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Returns list of available records
      * 
      * @param string $channelId
@@ -564,7 +600,7 @@ class Export {
      */
     public function renderAvailableRecords($channelId = '') {
         $result = '';
-        $userRecordingsDir = $this->prepareRecodringsDir();
+        $userRecordingsDir = $this->prepareRecordingsDir();
         $recordsExtFilter = '*' . self::RECORDS_EXT;
         $allRecords = rcms_scandir($userRecordingsDir, $recordsExtFilter);
         //channel filter applied?
@@ -593,7 +629,8 @@ class Export {
                 $recordSizeLabel = wr_convertSize($recordSize);
                 $cells .= wf_TableCell($recordSizeLabel);
                 $fileUrl = $userRecordingsDir . $eachFile;
-                $actLinks = wf_Link($fileUrl, web_icon_download());
+                $actLinks = $this->renderRecDelDialog($eachFile);
+                $actLinks .= wf_Link($fileUrl, web_icon_download());
                 $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
             }
@@ -606,6 +643,43 @@ class Export {
         $spaceFree = $maxUserSpace - $usedSpaceByMe;
         $spaceLabel = ($spaceFree > 0) ? wr_convertSize($spaceFree) : __('Exhausted') . ' :(';
         $result .= $this->messages->getStyledMessage(__('Free space for exporting your records') . ': ' . $spaceLabel, 'info');
+        return($result);
+    }
+
+    /**
+     * Deletes existing recording file
+     * 
+     * @param string $fileName
+     * @param string $userLogin
+     * 
+     * @return void/string
+     */
+    public function deleteRecording($fileName, $userLogin = '') {
+        $result = '';
+        $fileName = ubRouting::filters($fileName, 'mres');
+        if (empty($userLogin)) {
+            $userLogin = $this->myLogin;
+        }
+        if (!empty($fileName)) {
+            $userRecordingsDir = $this->prepareRecordingsDir($userLogin);
+            if (!empty($userRecordingsDir)) {
+                if (file_exists($userRecordingsDir . $fileName)) {
+                    if (is_writable($userRecordingsDir . $fileName)) {
+                        unlink($userRecordingsDir . $fileName);
+                        log_register('EXPORT DELETE `' . $fileName . '`');
+                    } else {
+                        $result .= __('Recording') . ' ' . __('is not writable');
+                        log_register('EXPORT DELETE FAIL `' . $fileName . '` NOT WRITABLE');
+                    }
+                } else {
+                    $result .= __('Recording') . ' ' . __('not exists');
+                    log_register('EXPORT DELETE FAIL `' . $fileName . '` NOT EXISTS');
+                }
+            }
+        } else {
+            $result .= __('Recording') . ' ' . __('is empty');
+            log_register('EXPORT DELETE FAIL FILENAME EMPTY');
+        }
         return($result);
     }
 

@@ -182,5 +182,9 @@ $lang['def']['Free space for exporting your records'] = 'Простору віл
 $lang['def']['Time'] = 'Час';
 $lang['def']['Records'] = 'Записи';
 $lang['def']['Exhausted'] = 'Вичерпано';
+$lang['def']['is not writable'] = 'не доступний для запису';
+$lang['def']['Lost'] = 'Загублений';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
+$lang['def'][''] = '';
+

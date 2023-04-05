@@ -5,6 +5,16 @@ if (cfr('EXPORT')) {
 
     //viewing channel export interface
     if (ubRouting::checkGet($export::ROUTE_CHANNEL)) {
+        //deleting record
+        if (ubRouting::checkGet($export::ROUTE_DELETE)) {
+            $deletionResult = $export->deleteRecording(ubRouting::get($export::ROUTE_DELETE));
+            if (empty($deletionResult)) {
+                ubRouting::nav($export::URL_ME . '&' . $export::ROUTE_CHANNEL . '=' . ubRouting::get($export::ROUTE_CHANNEL));
+            } else {
+                show_error($deletionResult);
+            }
+        }
+
         //run export if required
         if (ubRouting::checkPost(array($export::PROUTE_DATE_EXPORT, $export::PROUTE_TIME_FROM, $export::PROUTE_TIME_TO))) {
             $exportChannel = ubRouting::get($export::ROUTE_CHANNEL);

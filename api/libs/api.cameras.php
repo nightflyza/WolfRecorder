@@ -552,6 +552,9 @@ class Cameras {
                 }
             }
         }
+        if (empty($result)) {
+            $result = __('Lost');
+        }
         return($result);
     }
 
