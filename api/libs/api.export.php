@@ -464,13 +464,12 @@ class Export {
                 $fullRecordFilePath = $directory . $recordFileName;
                 if (!file_exists($fullRecordFilePath)) {
                     $command = $this->ffmpgPath . ' -loglevel error -f concat -safe 0 -i ' . $exportListPath . ' -c copy ' . $fullRecordFilePath;
-                    die($command);
                     shell_exec($command);
                 } else {
                     log_register('EXPORT SKIPPED CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '` ALREADY EXISTS');
                 }
                 //cleanup export list
-                // unlink($exportListPath);
+                unlink($exportListPath);
             } else {
                 $result .= __('Something went wrong');
             }

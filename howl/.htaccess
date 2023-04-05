@@ -1,1 +1,6 @@
 Options -Indexes
+
+<FilesMatch "\.(mp4|avi|mkv)$">
+   ForceType application/octet-stream
+   Header set Content-Disposition attachment
+</FilesMatch>
