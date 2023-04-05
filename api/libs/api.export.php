@@ -581,6 +581,7 @@ class Export {
             $cells = wf_TableCell(__('Time') . ' ' . __('from'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('to'));
             $cells .= wf_TableCell(__('Camera'));
+            $cells .= wf_TableCell(__('Size'));
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
             foreach ($allRecords as $io => $eachFile) {
@@ -588,6 +589,9 @@ class Export {
                 $cells = wf_TableCell($fileNameParts['from']);
                 $cells .= wf_TableCell($fileNameParts['to']);
                 $cells .= wf_TableCell($this->cameras->getCameraComment($fileNameParts['channel']));
+                $recordSize = filesize($userRecordingsDir . $eachFile);
+                $recordSizeLabel = wr_convertSize($recordSize);
+                $cells .= wf_TableCell($recordSizeLabel);
                 $fileUrl = $userRecordingsDir . $eachFile;
                 $actLinks = wf_Link($fileUrl, web_icon_download());
                 $cells .= wf_TableCell($actLinks);

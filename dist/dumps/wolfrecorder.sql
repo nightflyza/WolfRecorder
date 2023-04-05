@@ -53,9 +53,10 @@ CREATE TABLE IF NOT EXISTS `schedule` (
   `date` datetime NOT NULL,
   `user` varchar(128) NOT NULL,
   `channel` varchar(64) NOT NULL,
-  `storageid` INT(11) NOT NULL,
-  `channel`  varchar(64) NOT NULL,
-  `comment`  varchar(255) DEFAULT NULL,
+  `datetimefrom` datetime NOT NULL,
+  `datetimeto` datetime NOT NULL,
+  `sizeforecast` INT(11) NOT NULL,
   `done` tinyint(2) NOT NULL DEFAULT 0,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY  (`id`),
+  KEY `user` (`user`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
