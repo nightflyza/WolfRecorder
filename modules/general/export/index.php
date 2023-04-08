@@ -21,7 +21,7 @@ if (cfr('EXPORT')) {
             $exportDate = ubRouting::post($export::PROUTE_DATE_EXPORT);
             $exportTimeFrom = ubRouting::post($export::PROUTE_TIME_FROM);
             $exportTimeTo = ubRouting::post($export::PROUTE_TIME_TO);
-            $exportResult = $export->runExport($exportChannel, $exportDate, $exportTimeFrom, $exportTimeTo);
+            $exportResult = $export->requestExport($exportChannel, $exportDate, $exportTimeFrom, $exportTimeTo);
             if (!empty($exportResult)) {
                 show_error($exportResult);
             }

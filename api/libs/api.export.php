@@ -69,6 +69,13 @@ class Export {
     protected $myLogin = '';
 
     /**
+     * Contains scheduler database abstraction layer
+     *
+     * @var object
+     */
+    protected $scheduleDb = '';
+
+    /**
      * other predefined stuff like routes
      */
     const EXPORTLIST_MASK = '_el.txt';
@@ -83,6 +90,7 @@ class Export {
     const PATH_RECORDS = 'howl/recdl/';
     const PID_EXPORT = 'EXPORT_';
     const RECORDS_EXT = '.mp4';
+    const TABLE_SCHED = 'schedule';
 
     public function __construct() {
         $this->setLogin();
@@ -92,6 +100,7 @@ class Export {
         $this->initStorages();
         $this->initCameras();
         $this->initArchive();
+        $this->initScheduleDb();
     }
 
     /**
@@ -160,6 +169,15 @@ class Export {
      */
     protected function initArchive() {
         $this->archive = new Archive();
+    }
+
+    /**
+     * Inits schedule database abstraction laye
+     * 
+     * @return void
+     */
+    protected function initScheduleDb() {
+        $this->scheduleDb = new NyanORM(self::TABLE_SCHED);
     }
 
     /**
@@ -482,6 +500,44 @@ class Export {
     }
 
     /**
+     * Schedules future export operation
+     * 
+     * @param string $userLogin
+     * @param string $channelId
+     * @param string $dateFrom
+     * @param string $dateTo
+     * @param int $sizeForecast
+     * 
+     * @return void/string
+     */
+    public function scheduleExportTask($userLogin, $channelId, $dateFrom, $dateTo, $sizeForecast) {
+        $result = '';
+        $userLoginF = ubRouting::filters($userLogin, 'mres');
+        $dateF = curdatetime();
+        $channelIdF = ubRouting::filters($channelId, 'mres');
+        $dateFromF = ubRouting::filters($dateFrom, 'mres');
+        $dateToF = ubRouting::filters($dateTo, 'mres');
+        $sizeForecastF = ubRouting::filters($sizeForecast, 'int');
+        if ($userLoginF AND $channelId AND $dateFrom AND $dateTo) {
+            $this->scheduleDb->data('date', $dateF);
+            $this->scheduleDb->data('user', $userLogin);
+            $this->scheduleDb->data('channel', $channelIdF);
+            $this->scheduleDb->data('datetimefrom', $dateFromF);
+            $this->scheduleDb->data('datetimeto', $dateToF);
+            $this->scheduleDb->data('sizeforecast', $sizeForecastF);
+            $this->scheduleDb->data('done', 0);
+            $this->scheduleDb->create();
+        } else {
+            $result .= __('Something went wrong');
+        }
+        return($result);
+    }
+    
+    protected function scheduleRun() {
+        
+    }
+
+    /**
      * Performs export of some channels records into single file
      * 
      * @param string $channelId
@@ -491,7 +547,7 @@ class Export {
      * 
      * @return void/string on error
      */
-    public function runExport($channelId, $date, $timeFrom, $timeTo) {
+    public function requestExport($channelId, $date, $timeFrom, $timeTo) {
         $result = '';
         $userRecordingsDir = $this->prepareRecordingsDir(); //anyway we need this
         $channelId = ubRouting::filters($channelId, 'mres');
@@ -519,8 +575,14 @@ class Export {
                         $usageForecast = $usedSpace + $chunksSize; //how much space will be with current export?
                         //checking is some of user space left?
                         if ($usageForecast <= $maxSpace) {
-                            //TODO: replace this with just schedule creation
-                            $result .= $this->exportChunksList($chunksInRange, $channelId, $userRecordingsDir, $this->myLogin);
+                            if ($fullDateFrom < $fullDateTo) {
+                                $schedDateFrom = date("Y-m-d H:i:s", $fullDateFrom);
+                                $schedDateTo = date("Y-m-d H:i:s", $fullDateTo);
+                                //creating export schedule
+                                $result .= $this->scheduleExportTask($this->myLogin, $channelId, $schedDateFrom, $schedDateTo, $usageForecast);
+                            } else {
+                                $result .= __('Wrong time range');
+                            }
                         } else {
                             $result .= __('There is not enough space reserved for exporting your records');
                         }
@@ -635,7 +697,7 @@ class Export {
             }
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table sortable');
         } else {
-            $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
+            $result .= $this->messages->getStyledMessage(__('You have no exported records yet'), 'info');
         }
         $maxUserSpace = $this->getUserMaxSpace();
         $usedSpaceByMe = $this->getUserUsedSpace($userRecordingsDir);

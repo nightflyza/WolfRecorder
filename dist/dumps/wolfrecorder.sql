@@ -57,6 +57,8 @@ CREATE TABLE IF NOT EXISTS `schedule` (
   `datetimeto` datetime NOT NULL,
   `sizeforecast` INT(11) NOT NULL,
   `done` tinyint(2) NOT NULL DEFAULT 0,
+  `finishdate` datetime DEFAULT NULL,
   PRIMARY KEY  (`id`),
-  KEY `user` (`user`)
+  KEY `user` (`user`),
+  KEY `done` (`done`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
