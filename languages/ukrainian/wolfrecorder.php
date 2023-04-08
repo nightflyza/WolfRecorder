@@ -186,7 +186,10 @@ $lang['def']['is not writable'] = 'не доступний для запису';
 $lang['def']['Lost'] = 'Загублений';
 $lang['def']['You have no exported records yet'] = 'Наразі у вас немає експортованих записів';
 $lang['def']['Wrong time range'] = 'Невірний відрізок часу';
+$lang['def']['Your scheduled export records'] = 'Ваші заплановані експорти записів';
+$lang['def']['Size forecast'] = 'Очікуваний розмір';
+$lang['def']['Created'] = 'Створено';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
-
+$lang['def'][''] = '';

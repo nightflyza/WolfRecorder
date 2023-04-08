@@ -21,9 +21,11 @@ if (cfr('EXPORT')) {
             $exportDate = ubRouting::post($export::PROUTE_DATE_EXPORT);
             $exportTimeFrom = ubRouting::post($export::PROUTE_TIME_FROM);
             $exportTimeTo = ubRouting::post($export::PROUTE_TIME_TO);
-            $exportResult = $export->requestExport($exportChannel, $exportDate, $exportTimeFrom, $exportTimeTo);
-            if (!empty($exportResult)) {
-                show_error($exportResult);
+            $exportRequestResult = $export->requestExport($exportChannel, $exportDate, $exportTimeFrom, $exportTimeTo);
+            if (!empty($exportRequestResult)) {
+                show_error($exportRequestResult);
+            } else {
+                ubRouting::nav($export::URL_ME . '&' . $export::ROUTE_CHANNEL . '=' . $exportChannel);
             }
         }
 
@@ -31,6 +33,12 @@ if (cfr('EXPORT')) {
         //export interface here
         $exportDate = (ubRouting::checkPost($export::PROUTE_DATE_EXPORT)) ? ubRouting::post($export::PROUTE_DATE_EXPORT) : curdate();
         show_window(__('Export records') . ': ' . $exportDate, $export->renderExportLookup(ubRouting::get($export::ROUTE_CHANNEL)));
+
+        //rendering schedule if not empty
+        $exportSchedule = $export->renderScheduledExports();
+        if ($exportSchedule) {
+            show_window(__('Your scheduled export records'), $exportSchedule);
+        }
 
         //already saved records here
         show_window(__('Your saved records'), $export->renderAvailableRecords(ubRouting::get($export::ROUTE_CHANNEL)));

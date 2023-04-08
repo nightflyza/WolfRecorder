@@ -519,7 +519,9 @@ class Export {
         $dateFromF = ubRouting::filters($dateFrom, 'mres');
         $dateToF = ubRouting::filters($dateTo, 'mres');
         $sizeForecastF = ubRouting::filters($sizeForecast, 'int');
-        if ($userLoginF AND $channelId AND $dateFrom AND $dateTo) {
+        $allChannels = $this->cameras->getAllCamerasChannels();
+        $cameraId = $allChannels[$channelId];
+        if ($userLoginF AND $channelId AND $dateFrom AND $dateTo AND $cameraId) {
             $this->scheduleDb->data('date', $dateF);
             $this->scheduleDb->data('user', $userLogin);
             $this->scheduleDb->data('channel', $channelIdF);
@@ -528,6 +530,7 @@ class Export {
             $this->scheduleDb->data('sizeforecast', $sizeForecastF);
             $this->scheduleDb->data('done', 0);
             $this->scheduleDb->create();
+            log_register('EXPORT SCHEDULED CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '`');
         } else {
             $result .= __('Something went wrong');
         }
@@ -555,7 +558,7 @@ class Export {
                 $dateTimeFromTs = strtotime($each['datetimefrom']);
                 $dateTimeToTs = strtotime($each['datetimeto']);
                 $chunksInRange = $this->storages->filterChunksTimeRange($allChannelChunks, $dateTimeFromTs, $dateTimeToTs);
-                if ($chunksInRange) {
+                if ($chunksInRange AND $userRecordingsDir) {
                     $this->exportChunksList($chunksInRange, $channelId, $userRecordingsDir, $userLogin);
                 }
                 //mark task as done
@@ -629,11 +632,10 @@ class Export {
                             $usageForecast = $usedSpace + $chunksSize + $scheduleForecast; //how much space will be with current export?
                             //checking is some of user space left?
                             if ($usageForecast <= $maxSpace) {
-
                                 $schedDateFrom = date("Y-m-d H:i:s", $fullDateFrom);
                                 $schedDateTo = date("Y-m-d H:i:s", $fullDateTo);
                                 //creating export schedule
-                                $result .= $this->scheduleExportTask($this->myLogin, $channelId, $schedDateFrom, $schedDateTo, $usageForecast);
+                                $result .= $this->scheduleExportTask($this->myLogin, $channelId, $schedDateFrom, $schedDateTo, $chunksSize);
                             } else {
                                 $result .= __('There is not enough space reserved for exporting your records');
                             }
@@ -702,6 +704,56 @@ class Export {
                 $cancelUrl = self::URL_RECORDS;
                 $result .= wf_ConfirmDialog($deleteUrl, web_delete_icon(), $this->messages->getDeleteAlert(), '', $cancelUrl, __('Delete') . ' ' . __('Recording') . '?');
             }
+        }
+        return($result);
+    }
+
+    /**
+     * Returns all current user scheduler tasks done, undone or all
+     * 
+     * @param string $state - all/done/undone
+     * 
+     * @return array
+     */
+    protected function scheduleGetMyTasks($state = 'all') {
+        $result = array();
+        $this->scheduleDb->where('user', '=', $this->myLogin);
+        switch ($state) {
+            case 'done':
+                $this->scheduleDb->where('done', '=', 1);
+                break;
+            case 'undone':
+                $this->scheduleDb->where('done', '=', 0);
+                break;
+        }
+        $result = $this->scheduleDb->getAll();
+        return($result);
+    }
+
+    /**
+     * Renders scheduled recording exports tasks for current user
+     * 
+     * @return string
+     */
+    public function renderScheduledExports() {
+        $result = '';
+        $allUndoneTasks = $this->scheduleGetMyTasks('undone');
+        if (!empty($allUndoneTasks)) {
+            $cells = wf_TableCell(__('Created'));
+            $cells .= wf_TableCell(__('Time') . ' ' . __('from'));
+            $cells .= wf_TableCell(__('Time') . ' ' . __('to'));
+            $cells .= wf_TableCell(__('Camera'));
+            $cells .= wf_TableCell(__('Size forecast'));
+            $rows = wf_TableRowStyled($cells, 'row1');
+            foreach ($allUndoneTasks as $io => $each) {
+                $cells = wf_TableCell($each['date']);
+                $cells .= wf_TableCell($each['datetimefrom']);
+                $cells .= wf_TableCell($each['datetimeto']);
+                $cells .= wf_TableCell($this->cameras->getCameraComment($each['channel']));
+                $cells .= wf_TableCell(wr_convertSize($each['sizeforecast']), '', '', 'sorttable_customkey="' . $each['sizeforecast'] . '"');
+                $rows .= wf_TableRowStyled($cells, 'row5');
+            }
+            $result .= wf_TableBody($rows, '100%', 0, 'resp-table sortable');
         }
         return($result);
     }
