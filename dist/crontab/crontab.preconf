@@ -1,4 +1,5 @@
 1 1 * * *       /bin/wrapi "backupdb"
 */2 * * * *     /bin/wrapi "capture"
 */1 * * * *     /bin/wrapi "rotator"
+*/2 * * * *     /bin/wrapi "exportsched"
 

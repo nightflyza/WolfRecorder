@@ -89,6 +89,7 @@ class Export {
     const PROUTE_TIME_TO = 'timeto';
     const PATH_RECORDS = 'howl/recdl/';
     const PID_EXPORT = 'EXPORT_';
+    const PID_SCHEDULE = 'EXPORTSCHEDULE';
     const RECORDS_EXT = '.mp4';
     const TABLE_SCHED = 'schedule';
 
@@ -532,9 +533,60 @@ class Export {
         }
         return($result);
     }
-    
-    protected function scheduleRun() {
-        
+
+    /**
+     * Performs processin of all scheduled exports tasks
+     * 
+     * @return void
+     */
+    public function scheduleRun() {
+        $this->scheduleDb->where('done', '=', 0);
+        $allScheduledTasks = $this->scheduleDb->getAll();
+        if (!empty($allScheduledTasks)) {
+            $allCameraChannels = $this->cameras->getAllCamerasChannels();
+            foreach ($allScheduledTasks as $io => $each) {
+                $userLogin = $each['user'];
+                $userRecordingsDir = $this->prepareRecordingsDir($userLogin);
+                $channelId = $each['channel'];
+                $cameraId = $allCameraChannels[$channelId];
+                $cameraData = $this->allCamerasData[$cameraId];
+                $storageId = $cameraData['STORAGE']['id'];
+                $allChannelChunks = $this->storages->getChannelChunks($storageId, $channelId);
+                $dateTimeFromTs = strtotime($each['datetimefrom']);
+                $dateTimeToTs = strtotime($each['datetimeto']);
+                $chunksInRange = $this->storages->filterChunksTimeRange($allChannelChunks, $dateTimeFromTs, $dateTimeToTs);
+                if ($chunksInRange) {
+                    $this->exportChunksList($chunksInRange, $channelId, $userRecordingsDir, $userLogin);
+                }
+                //mark task as done
+                $this->scheduleDb->where('id', '=', $each['id']);
+                $this->scheduleDb->data('done', 1);
+                $this->scheduleDb->data('finishdate', curdatetime());
+                $this->scheduleDb->save();
+            }
+        }
+    }
+
+    /**
+     * Returns expected scheduled records export size
+     * 
+     * @param string $userLogin
+     * 
+     * @return int
+     */
+    protected function scheduleGetForecastSize($userLogin) {
+        $result = 0;
+        $userLogin = ubRouting::filters($userLogin, 'mres');
+        $this->scheduleDb->where('user', '=', $userLogin);
+        $this->scheduleDb->where('done', '=', 0);
+        $rawResult = $this->scheduleDb->getAll();
+        if (!empty($rawResult)) {
+            foreach ($rawResult as $io => $each) {
+                $result += $each['sizeforecast'];
+            }
+        }
+
+        return($result);
     }
 
     /**
@@ -567,27 +619,29 @@ class Export {
                 $storageId = $cameraData['STORAGE']['id'];
                 $allChannelChunks = $this->storages->getChannelChunks($storageId, $channelId);
                 if (!empty($allCameraChannels)) {
-                    $chunksInRange = $this->storages->filterChunksTimeRange($allChannelChunks, $fullDateFrom, $fullDateTo);
-                    if (!empty($chunksInRange)) {
-                        $chunksSize = $this->storages->getChunksSize($chunksInRange); //total chunks size
-                        $usedSpace = $this->getUserUsedSpace($userRecordingsDir); //space used by user
-                        $maxSpace = $this->getUserMaxSpace(); //max of reserved space for each user
-                        $usageForecast = $usedSpace + $chunksSize; //how much space will be with current export?
-                        //checking is some of user space left?
-                        if ($usageForecast <= $maxSpace) {
-                            if ($fullDateFrom < $fullDateTo) {
+                    if ($fullDateFrom < $fullDateTo) {
+                        $chunksInRange = $this->storages->filterChunksTimeRange($allChannelChunks, $fullDateFrom, $fullDateTo);
+                        if (!empty($chunksInRange)) {
+                            $chunksSize = $this->storages->getChunksSize($chunksInRange); //total chunks size
+                            $usedSpace = $this->getUserUsedSpace($userRecordingsDir); //space used by user
+                            $maxSpace = $this->getUserMaxSpace(); //max of reserved space for each user
+                            $scheduleForecast = $this->scheduleGetForecastSize($this->myLogin); //already scheduled tasks forecast
+                            $usageForecast = $usedSpace + $chunksSize + $scheduleForecast; //how much space will be with current export?
+                            //checking is some of user space left?
+                            if ($usageForecast <= $maxSpace) {
+
                                 $schedDateFrom = date("Y-m-d H:i:s", $fullDateFrom);
                                 $schedDateTo = date("Y-m-d H:i:s", $fullDateTo);
                                 //creating export schedule
                                 $result .= $this->scheduleExportTask($this->myLogin, $channelId, $schedDateFrom, $schedDateTo, $usageForecast);
                             } else {
-                                $result .= __('Wrong time range');
+                                $result .= __('There is not enough space reserved for exporting your records');
                             }
                         } else {
-                            $result .= __('There is not enough space reserved for exporting your records');
+                            $result .= __('No records in archive for this time range');
                         }
                     } else {
-                        $result .= __('No records in archive for this time range');
+                        $result .= __('Wrong time range');
                     }
                 } else {
                     $result .= __('Nothing to export');
@@ -701,7 +755,8 @@ class Export {
         }
         $maxUserSpace = $this->getUserMaxSpace();
         $usedSpaceByMe = $this->getUserUsedSpace($userRecordingsDir);
-        $spaceFree = $maxUserSpace - $usedSpaceByMe;
+        $scheduledExportsForecast = $this->scheduleGetForecastSize($this->myLogin);
+        $spaceFree = $maxUserSpace - $usedSpaceByMe - $scheduledExportsForecast;
         $spaceLabel = ($spaceFree > 0) ? wr_convertSize($spaceFree) : __('Exhausted') . ' :(';
         $result .= $this->messages->getStyledMessage(__('Free space for exporting your records') . ': ' . $spaceLabel, 'info');
         return($result);
