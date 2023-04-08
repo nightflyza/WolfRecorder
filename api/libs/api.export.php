@@ -809,8 +809,18 @@ class Export {
         $usedSpaceByMe = $this->getUserUsedSpace($userRecordingsDir);
         $scheduledExportsForecast = $this->scheduleGetForecastSize($this->myLogin);
         $spaceFree = $maxUserSpace - $usedSpaceByMe - $scheduledExportsForecast;
-        $spaceLabel = ($spaceFree > 0) ? wr_convertSize($spaceFree) : __('Exhausted') . ' :(';
-        $result .= $this->messages->getStyledMessage(__('Free space for exporting your records') . ': ' . $spaceLabel, 'info');
+        if ($spaceFree > 0) {
+            $spaceLabel = wr_convertSize($spaceFree);
+            $notificationType = 'info';
+            if ($usedSpaceByMe == 0) {
+                $notificationType = 'success';
+            }
+        } else {
+            $spaceLabel = __('Exhausted') . ' :(';
+            $notificationType = 'warning';
+        }
+
+        $result .= $this->messages->getStyledMessage(__('Free space for exporting your records') . ': ' . $spaceLabel, $notificationType);
         return($result);
     }
 
