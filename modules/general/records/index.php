@@ -3,7 +3,6 @@
 if (cfr('EXPORT')) {
     $export = new Export();
     //some record deletion?
-    //deleting record
     if (ubRouting::checkGet($export::ROUTE_DELETE)) {
         $deletionResult = $export->deleteRecording(ubRouting::get($export::ROUTE_DELETE));
         if (empty($deletionResult)) {
@@ -11,6 +10,12 @@ if (cfr('EXPORT')) {
         } else {
             show_error($deletionResult);
         }
+    }
+
+    //rendering schedule if not empty
+    $exportSchedule = $export->renderScheduledExports();
+    if ($exportSchedule) {
+        show_window(__('Your scheduled export records'), $exportSchedule);
     }
 
     //already saved records here
