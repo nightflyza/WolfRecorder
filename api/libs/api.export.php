@@ -739,6 +739,8 @@ class Export {
         $result = '';
         $allUndoneTasks = $this->scheduleGetMyTasks('undone');
         if (!empty($allUndoneTasks)) {
+            $starDust = new StarDust();
+            $allExportProcesses = $starDust->getAllStates();
             $cells = wf_TableCell(__('Created'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('from'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('to'));
@@ -746,10 +748,17 @@ class Export {
             $cells .= wf_TableCell(__('Size forecast'));
             $rows = wf_TableRowStyled($cells, 'row1');
             foreach ($allUndoneTasks as $io => $each) {
+                $channelPid = self::PID_EXPORT . $each['channel'];
+                $runningLabel = '';
+                if (isset($allExportProcesses[$channelPid])) {
+                    if (!$allExportProcesses[$channelPid]['finished']) {
+                        $runningLabel = ' 🏁 ';
+                    }
+                }
                 $cells = wf_TableCell($each['date']);
                 $cells .= wf_TableCell($each['datetimefrom']);
                 $cells .= wf_TableCell($each['datetimeto']);
-                $cells .= wf_TableCell($this->cameras->getCameraComment($each['channel']));
+                $cells .= wf_TableCell($this->cameras->getCameraComment($each['channel']) . $runningLabel);
                 $cells .= wf_TableCell(wr_convertSize($each['sizeforecast']), '', '', 'sorttable_customkey="' . $each['sizeforecast'] . '"');
                 $rows .= wf_TableRowStyled($cells, 'row5');
             }
