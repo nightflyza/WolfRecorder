@@ -195,44 +195,49 @@ class Recorder {
         if (isset($this->allCamerasData[$cameraId])) {
             $cameraData = $this->allCamerasData[$cameraId];
             if ($cameraData['CAMERA']['active']) {
-                $pid = self::PID_PREFIX . $cameraId;
-                $this->stardust->setProcess($pid);
-                if ($this->stardust->notRunning()) {
-                    if (zb_PingICMP($cameraData['CAMERA']['ip'])) {
-                        $storageId = $cameraData['CAMERA']['storageid'];
-                        $channel = $cameraData['CAMERA']['channel'];
-                        $channelPath = $this->storages->initChannel($storageId, $channel);
-                        if ($channelPath) {
-                            if ($cameraData['TEMPLATE']['MAIN_STREAM']) {
-                                //rtsp proto capture
-                                if ($cameraData['TEMPLATE']['PROTO'] == 'rtsp') {
-                                    $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
-                                    $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $cameraData['TEMPLATE']['MAIN_STREAM'];
-                                    $audioOpts = ($cameraData['TEMPLATE']['SOUND']) ? $this->audioCapture : '';
-                                    $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "' " . $audioOpts . $this->recordOpts . ' ' . self::CHUNKS_MASK . self::CHUNKS_EXT;
-                                    $captureCommand = $this->ffmpgPath . ' ' . $this->transportTemplate . ' ' . $captureFullUrl . ' ' . $this->supressOutput;
-                                    $fullCommand = 'cd ' . $channelPath . ' && ' . $captureCommand;
+                $allRunningRecorders = $this->getRunningRecorders();
+                if (!isset($allRunningRecorders[$cameraId])) {
+                    $pid = self::PID_PREFIX . $cameraId;
+                    $this->stardust->setProcess($pid);
+                    if ($this->stardust->notRunning()) {
+                        if (zb_PingICMP($cameraData['CAMERA']['ip'])) {
+                            $storageId = $cameraData['CAMERA']['storageid'];
+                            $channel = $cameraData['CAMERA']['channel'];
+                            $channelPath = $this->storages->initChannel($storageId, $channel);
+                            if ($channelPath) {
+                                if ($cameraData['TEMPLATE']['MAIN_STREAM']) {
+                                    //rtsp proto capture
+                                    if ($cameraData['TEMPLATE']['PROTO'] == 'rtsp') {
+                                        $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
+                                        $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $cameraData['TEMPLATE']['MAIN_STREAM'];
+                                        $audioOpts = ($cameraData['TEMPLATE']['SOUND']) ? $this->audioCapture : '';
+                                        $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "' " . $audioOpts . $this->recordOpts . ' ' . self::CHUNKS_MASK . self::CHUNKS_EXT;
+                                        $captureCommand = $this->ffmpgPath . ' ' . $this->transportTemplate . ' ' . $captureFullUrl . ' ' . $this->supressOutput;
+                                        $fullCommand = 'cd ' . $channelPath . ' && ' . $captureCommand;
 
-                                    $this->stardust->start();
-                                    log_register('RECORDER STARTED [' . $cameraId . ']');
-                                    //optional logging there
-                                    if ($this->debugFlag) {
-                                        file_put_contents(self::DEBUG_LOG, curdatetime() . ' START: ' . $fullCommand . PHP_EOL, FILE_APPEND);
+                                        $this->stardust->start();
+                                        log_register('RECORDER STARTED [' . $cameraId . ']');
+                                        //optional logging there
+                                        if ($this->debugFlag) {
+                                            file_put_contents(self::DEBUG_LOG, curdatetime() . ' START: ' . $fullCommand . PHP_EOL, FILE_APPEND);
+                                        }
+                                        shell_exec($fullCommand); //locks process till end
+                                        $this->stardust->stop();
                                     }
-                                    shell_exec($fullCommand); //locks process till end
-                                    $this->stardust->stop();
+                                } else {
+                                    log_register('RECORDER FAILED [' . $cameraId . '] NO MAINSTREAM');
                                 }
                             } else {
-                                log_register('RECORDER FAILED [' . $cameraId . '] NO MAINSTREAM');
+                                log_register('RECORDER FAILED [' . $cameraId . '] CHANNEL NOT EXISTS');
                             }
                         } else {
-                            log_register('RECORDER FAILED [' . $cameraId . '] CHANNEL NOT EXISTS');
+                            log_register('RECORDER NOTSTARTED [' . $cameraId . '] CAMERA NOT ACCESSIBLE');
                         }
                     } else {
-                        log_register('RECORDER NOTSTARTED [' . $cameraId . '] CAMERA NOT ACCESSIBLE');
+                        log_register('RECORDER NOTSTARTED [' . $cameraId . '] ALREADY RUNNING STARDUST');
                     }
                 } else {
-                    log_register('RECORDER NOTSTARTED [' . $cameraId . '] ALREADY RUNNING');
+                    log_register('RECORDER NOTSTARTED [' . $cameraId . '] ALREADY RUNNING REALPROCESS');
                 }
             } else {
                 log_register('RECORDER NOTSTARTED [' . $cameraId . '] CAMERA DISABLED');
