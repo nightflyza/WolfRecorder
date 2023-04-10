@@ -45,6 +45,9 @@ class Models {
     const URL_ME = '?module=models';
     const PROUTE_NEWMODELNAME = 'newmodelname';
     const PROUTE_NEWMODELTPL = 'newmodeltemplate';
+    const PROUTE_ED_MODELID = 'editmodelid';
+    const PROUTE_ED_MODELNAME = 'editmodelname';
+    const PROUTE_ED_MODELTPL = 'editmodeltemplate';
     const ROUTE_DELMODEL = 'deletemodelid';
     const DATA_TABLE = 'models';
 
@@ -200,6 +203,71 @@ class Models {
     }
 
     /**
+     * Changes model in database if model not in usage
+     * 
+     * @param int $modelId
+     * @param string $modelName
+     * @param string $template
+     * 
+     * @return void/string on error
+     */
+    public function save($modelId, $modelName, $template) {
+        $result = '';
+        $modelId = ubRouting::filters($modelId, 'int');
+        $modelNameF = ubRouting::filters($modelName, 'mres');
+        $templateF = ubRouting::filters($template, 'mres');
+
+        if (isset($this->allModels[$modelId])) {
+            $camerasDb = new NyanORM(Cameras::DATA_TABLE);
+            $camerasDb->where('modelid', '=', $modelId);
+            $camerasDb->where('active', '=', '1');
+            $camerasDb->selectable('id');
+            $usedByActiveCameras = $camerasDb->getAll();
+            if (!$usedByActiveCameras) {
+                if ($modelId AND $modelNameF AND $templateF) {
+                    if (isset($this->allTemplatesData[$templateF])) {
+                        $this->modelsDb->where('id', '=', $modelId);
+                        $this->modelsDb->data('modelname', $modelNameF);
+                        $this->modelsDb->data('template', $templateF);
+                        $this->modelsDb->save();
+                        log_register('MODEL EDIT [' . $modelId . '] NAME `' . $modelName . '` TEMPLATE `' . $template . '`');
+                    } else {
+                        $result .= __('Template') . ' `' . $templateF . '` ' . __('not exists');
+                    }
+                } else {
+                    $result .= __('Something went wrong');
+                }
+            } else {
+                $result .= __('Model now is used by active cameras');
+            }
+        } else {
+            $result .= __('Model') . ' [' . $modelId . '] ' . __('not exists');
+        }
+        return($result);
+    }
+
+    /**
+     * Renders camera model editing form
+     * 
+     * @param int $modelId
+     * 
+     * @return string
+     */
+    protected function renderEditForm($modelId) {
+        $result = '';
+        $modelId = ubRouting::filters($modelId, 'int');
+        if (isset($this->allModels[$modelId])) {
+            $modelData = $this->allModels[$modelId];
+            $inputs = wf_HiddenInput(self::PROUTE_ED_MODELID, $modelId);
+            $inputs .= wf_TextInput(self::PROUTE_ED_MODELNAME, __('Name'), $modelData['modelname'], true, 20) . ' ';
+            $inputs .= wf_Selector(self::PROUTE_ED_MODELTPL, $this->allTemplateNames, __('Template'), $modelData['template'], true) . ' ';
+            $inputs .= wf_Submit(__('Save'));
+            $result .= wf_Form('', 'POST', $inputs, 'glamour');
+        }
+        return($result);
+    }
+
+    /**
      * Renders available models list
      * 
      * @return string
@@ -217,6 +285,7 @@ class Models {
                 $cells .= wf_TableCell($each['modelname']);
                 $cells .= wf_TableCell($this->allTemplateNames[$each['template']]);
                 $actLinks = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DELMODEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert());
+                $actLinks .= wf_modalAuto(web_edit_icon(), __('Edit') . ' `' . $each['modelname'] . '`', $this->renderEditForm($each['id']));
                 $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
             }

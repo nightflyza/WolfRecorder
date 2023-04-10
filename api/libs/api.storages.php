@@ -270,7 +270,7 @@ class Storages {
      * 
      * @return void
      */
-    public function saveStorageName($storageId, $storageName) {
+    public function saveName($storageId, $storageName) {
         $storageId = ubRouting::filters($storageId, 'int');
         $storageNameF = ubRouting::filters($storageName, 'mres');
         if ($storageId AND $storageNameF) {
@@ -317,7 +317,7 @@ class Storages {
                 $cells .= wf_TableCell($storageSizeLabel);
                 $cells .= wf_TableCell($storageFreeLabel);
                 $actControls = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert());
-                $actControls .= wf_modalAuto(web_edit_icon(), __('Edit'), $this->renderEditForm($each['id']));
+                $actControls .= wf_modalAuto(web_edit_icon(), __('Edit') . ' `' . __($each['name']) . '`', $this->renderEditForm($each['id']));
                 $cells .= wf_TableCell($actControls);
                 $rows .= wf_TableRow($cells, 'row5');
             }

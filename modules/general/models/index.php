@@ -23,6 +23,19 @@ if (cfr('MODELS')) {
         }
     }
 
+    //model editing
+    if (ubRouting::checkPost(array($models::PROUTE_ED_MODELID, $models::PROUTE_ED_MODELNAME, $models::PROUTE_ED_MODELTPL))) {
+        $edModelId = ubRouting::post($models::PROUTE_ED_MODELID);
+        $edName = ubRouting::post($models::PROUTE_ED_MODELNAME);
+        $edTemplate = ubRouting::post($models::PROUTE_ED_MODELTPL);
+        $editingResult = $models->save($edModelId, $edName, $edTemplate);
+        if ($editingResult) {
+            show_error($editingResult);
+        } else {
+            ubRouting::nav($models::URL_ME);
+        }
+    }
+
     show_window(__('Create new model'), $models->renderCreationForm());
     show_window(__('Available models'), $models->renderList());
 } else {

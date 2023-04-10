@@ -190,6 +190,6 @@ $lang['def']['Your scheduled export records'] = 'Ваші заплановані
 $lang['def']['Size forecast'] = 'Очікуваний розмір';
 $lang['def']['Created'] = 'Створено';
 $lang['def']['Another storage with such path is already exists'] = 'Інше сховище з цим шляхом вже існує';
-$lang['def'][''] = '';
+$lang['def']['Model now is used by active cameras'] = 'Модель зараз використовується активними камерами';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
