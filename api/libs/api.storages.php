@@ -33,6 +33,8 @@ class Storages {
     const PROUTE_PATH = 'newstoragepath';
     const PROUTE_NAME = 'newstoragename';
     const ROUTE_DEL = 'deletestorageid';
+    const PROUTE_ED_STORAGE = 'editstorageid';
+    const PROUTE_ED_NAME = 'editstoragename';
     const URL_ME = '?module=storages';
     const DATA_TABLE = 'storages';
 
@@ -242,6 +244,47 @@ class Storages {
     }
 
     /**
+     * Renders storage editing form
+     * 
+     * @param int $storageId
+     * 
+     * @return string
+     */
+    protected function renderEditForm($storageId) {
+        $result = '';
+        $storageId = ubRouting::filters($storageId, 'int');
+        if (isset($this->allStorages[$storageId])) {
+            $inputs = wf_HiddenInput(self::PROUTE_ED_STORAGE, $storageId);
+            $inputs .= wf_TextInput(self::PROUTE_ED_NAME, __('Name'), $this->allStorages[$storageId]['name'], false, 20) . ' ';
+            $inputs .= wf_Submit(__('Save'));
+            $result .= wf_Form('', 'POST', $inputs, 'glamour');
+        }
+        return($result);
+    }
+
+    /**
+     * Changes storage name in database
+     * 
+     * @param int $storageId
+     * @param string $storageName
+     * 
+     * @return void
+     */
+    public function saveStorageName($storageId, $storageName) {
+        $storageId = ubRouting::filters($storageId, 'int');
+        $storageNameF = ubRouting::filters($storageName, 'mres');
+        if ($storageId AND $storageNameF) {
+            if (isset($this->allStorages[$storageId])) {
+                $storagePath = $this->allStorages[$storageId]['path'];
+                $this->storagesDb->where('id', '=', $storageId);
+                $this->storagesDb->data('name', $storageNameF);
+                $this->storagesDb->save();
+                log_register('STORAGE EDIT [' . $storageId . '] PATH `' . $storagePath . '` NAME `' . $storageName . '`');
+            }
+        }
+    }
+
+    /**
      * Renders available storages list
      * 
      * @return string
@@ -271,6 +314,7 @@ class Storages {
                 $cells .= wf_TableCell($storageSizeLabel);
                 $cells .= wf_TableCell($storageFreeLabel);
                 $actControls = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert());
+                $actControls .= wf_modalAuto(web_edit_icon(), __('Edit'), $this->renderEditForm($each['id']));
                 $cells .= wf_TableCell($actControls);
                 $rows .= wf_TableRow($cells, 'row5');
             }

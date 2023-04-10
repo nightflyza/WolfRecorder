@@ -23,6 +23,12 @@ if (cfr('STORAGES')) {
         }
     }
 
+    //storage edit
+    if (ubRouting::checkPost(array($storages::PROUTE_ED_STORAGE, $storages::PROUTE_ED_NAME))) {
+        $storages->saveStorageName(ubRouting::post($storages::PROUTE_ED_STORAGE), ubRouting::post($storages::PROUTE_ED_NAME));
+        ubRouting::nav($storages::URL_ME);
+    }
+
     show_window(__('Create new storage'), $storages->renderCreationForm());
     show_window(__('Available storages'), $storages->renderList());
 } else {
