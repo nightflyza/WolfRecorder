@@ -13,6 +13,13 @@ class Cameras {
     protected $altCfg = array();
 
     /**
+     * Contains binpaths config as key=>value
+     *
+     * @var array
+     */
+    protected $binPaths = array();
+
+    /**
      * Cameras database abstraction layer placeholder
      *
      * @var object
@@ -102,6 +109,7 @@ class Cameras {
     protected function loadConfigs() {
         global $ubillingConfig;
         $this->altCfg = $ubillingConfig->getAlter();
+        $this->binPaths = $ubillingConfig->getBinPaths();
     }
 
     /**
@@ -259,6 +267,59 @@ class Cameras {
     }
 
     /**
+     * Returns all running recorders real process PID-s array as pid=>processString
+     * 
+     * @return array
+     */
+    protected function getRecordersPids() {
+        $result = array();
+        $command = $this->binPaths['PS'] . ' ax | ' . $this->binPaths['GREP'] . ' ' . $this->binPaths['FFMPG_PATH'] . ' | ' . $this->binPaths['GREP'] . ' -v grep';
+        $rawResult = shell_exec($command);
+        if (!empty($rawResult)) {
+            $rawResult = explodeRows($rawResult);
+            foreach ($rawResult as $io => $eachLine) {
+                $eachLine = trim($eachLine);
+                $rawLine = $eachLine;
+                $eachLine = explode(' ', $eachLine);
+                if (isset($eachLine[0])) {
+                    $eachPid = $eachLine[0];
+                    if (is_numeric($eachPid)) {
+                        //is this really capture process?
+                        if (ispos($rawLine, $this->binPaths['FFMPG_PATH'])) {
+                            $result[$eachPid] = $rawLine;
+                        }
+                    }
+                }
+            }
+        }
+
+        return($result);
+    }
+
+    /**
+     * Returns running cameras recording processes as cameraId=>realPid
+     * 
+     * @return array
+     */
+    protected function getRunningRecorders() {
+        $result = array();
+        if (!empty($this->allCameras)) {
+            $recorderPids = $this->getRecordersPids();
+            if (!empty($recorderPids)) {
+                foreach ($this->allCameras as $eachCameraId => $eachCameraData) {
+                    foreach ($recorderPids as $eachPid => $eachProcess) {
+                        //looks familiar?
+                        if (ispos($eachProcess, $eachCameraData['ip']) AND ispos($eachProcess, $eachCameraData['login'])) {
+                            $result[$eachCameraId] = $eachPid;
+                        }
+                    }
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Renders available cameras list
      * 
      * @return string
@@ -266,7 +327,7 @@ class Cameras {
     public function renderList() {
         $result = '';
         if (!empty($this->allCameras)) {
-            $starDust = new StarDust();
+            $allRunningRecorders = $this->getRunningRecorders();
             $cells = wf_TableCell(__('ID'));
             $cells .= wf_TableCell(__('IP'));
             $cells .= wf_TableCell(__('Enabled'));
@@ -278,8 +339,7 @@ class Cameras {
                 $cells = wf_TableCell($each['id']);
                 $cells .= wf_TableCell($each['ip'], '', '', 'sorttable_customkey="' . ip2int($each['ip']) . '"');
                 $cells .= wf_TableCell(web_bool_led($each['active']), '', '', 'sorttable_customkey="' . $each['active'] . '"');
-                $starDust->setProcess(Recorder::PID_PREFIX . $each['id']);
-                $recordingFlag = $starDust->isRunning();
+                $recordingFlag = isset($allRunningRecorders[$each['id']]) ? 1 : 0;
                 $cells .= wf_TableCell(web_bool_led($recordingFlag), '', '', 'sorttable_customkey="' . $recordingFlag . '"');
                 $cells .= wf_TableCell($each['comment']);
                 $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $each['id'], web_edit_icon(), false);
@@ -373,9 +433,8 @@ class Cameras {
             $cameraData = $this->allCameras[$cameraId];
 
             //recorder process now is running?
-            $starDust = new StarDust();
-            $starDust->setProcess(Recorder::PID_PREFIX . $cameraData['id']);
-            $recordingFlag = $starDust->isRunning();
+            $allRunningRecorders = $this->getRunningRecorders();
+            $recordingFlag = (isset($allRunningRecorders[$cameraId])) ? 1 : 0;
 
             //some channel data collecting
             $channelChunks = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);

@@ -332,7 +332,8 @@ class Recorder {
             $cameraData = $this->allCamerasData[$cameraId];
             if ($cameraData['CAMERA']['active']) {
                 $recordingProcess = new StarDust(self::PID_PREFIX . $cameraId);
-                if ($recordingProcess->notRunning()) {
+                $allRunningRecorders = $this->getRunningRecorders();
+                if (!isset($allRunningRecorders[$cameraId])) {
                     $recordingProcess->runBackgroundProcess(self::WRAPPER . ' "recherd&cameraid=' . $cameraId . '"', 1);
                 }
             }
