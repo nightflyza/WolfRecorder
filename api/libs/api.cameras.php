@@ -327,6 +327,7 @@ class Cameras {
     public function renderList() {
         $result = '';
         if (!empty($this->allCameras)) {
+            $totalCount = 0;
             $allRunningRecorders = $this->getRunningRecorders();
             $cells = wf_TableCell(__('ID'));
             $cells .= wf_TableCell(__('IP'));
@@ -345,8 +346,10 @@ class Cameras {
                 $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $each['id'], web_edit_icon(), false);
                 $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
+                $totalCount++;
             }
             $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
+            $result .= wf_tag('b') . __('Total') . ': ' . $totalCount . wf_tag('b', true);
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
         }

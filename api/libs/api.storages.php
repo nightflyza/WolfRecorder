@@ -292,10 +292,12 @@ class Storages {
     public function renderList() {
         $result = '';
         if (!empty($this->allStorages)) {
+            $allStoragesCams = $this->getAllStoragesCamerasCount();
             $cells = wf_TableCell(__('ID'));
             $cells .= wf_TableCell(__('Path'));
             $cells .= wf_TableCell(__('Name'));
             $cells .= wf_TableCell(__('State'));
+            $cells .= wf_TableCell(__('Cameras'));
             $cells .= wf_TableCell(__('Capacity'));
             $cells .= wf_TableCell(__('Free'));
             $cells .= wf_TableCell(__('Actions'));
@@ -307,6 +309,7 @@ class Storages {
                 $storageState = ($this->checkPath($each['path'])) ? true : false;
                 $stateIcon = web_bool_led($storageState);
                 $cells .= wf_TableCell($stateIcon);
+                $cells .= wf_TableCell($allStoragesCams[$each['id']]);
                 $storageSize = @disk_total_space($each['path']);
                 $storageFree = @disk_free_space($each['path']);
                 $storageSizeLabel = ($storageState) ? wr_convertSize($storageSize) : '-';
@@ -322,6 +325,29 @@ class Storages {
             $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
+        }
+        return($result);
+    }
+
+    /**
+     * Returns all storages cameras counters as storeageId=>camerasCount
+     * 
+     * @return array
+     */
+    protected function getAllStoragesCamerasCount() {
+        $result = array();
+        if (!empty($this->allStorages)) {
+            foreach ($this->allStorages as $io => $each) {
+                $result[$each['id']] = 0;
+            }
+            $camerasDb = new NyanORM(Cameras::DATA_TABLE);
+            $camerasDb->selectable('id,storageid');
+            $allCamerasStorages = $camerasDb->getAll();
+            if (!empty($allCamerasStorages)) {
+                foreach ($allCamerasStorages as $io => $eachCam) {
+                    $result[$eachCam['storageid']] ++;
+                }
+            }
         }
         return($result);
     }
