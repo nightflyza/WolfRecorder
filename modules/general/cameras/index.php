@@ -35,6 +35,17 @@ if (cfr('CAMERAS')) {
         ubRouting::nav($cameras::URL_ME . '&' . $cameras::ROUTE_EDIT . '=' . ubRouting::get($cameras::ROUTE_ACTIVATE));
     }
 
+    //camera comment editing
+    if (ubRouting::checkPost($cameras::PROUTE_ED_CAMERAID_ACT)) {
+        $renameResult = $cameras->saveComment(ubRouting::post($cameras::PROUTE_ED_CAMERAID_ACT), ubRouting::post($cameras::PROUTE_ED_COMMENT_ACT));
+        if ($renameResult) {
+            show_error($renameResult);
+        } else {
+            ubRouting::nav($cameras::URL_ME . '&' . $cameras::ROUTE_EDIT . '=' . ubRouting::post($cameras::PROUTE_ED_CAMERAID_ACT));
+        }
+    }
+
+
     if (!ubRouting::checkGet($cameras::ROUTE_EDIT)) {
         show_window(__('Available cameras'), $cameras->renderList());
         $cameraCreationDialog = wf_modalAuto(wf_img('skins/add_icon.png') . ' ' . __('Create new camera'), __('Create new camera'), $cameras->renderCreateForm(), 'ubButton');
