@@ -234,6 +234,48 @@ class Cameras {
     }
 
     /**
+     * Returns camera comments editing form
+     * 
+     * @param int $cameraId
+     * 
+     * @return string
+     */
+    public function renderRenameForm($cameraId) {
+        $result = '';
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        $allStorages = $this->storages->getAllStorageNames();
+        $allModels = $this->models->getAllModelNames();
+
+        if (isset($this->allCameras[$cameraId])) {
+            $cameraData = $this->allCameras[$cameraId];
+            if (!empty($allStorages)) {
+                $storagesParams = array();
+                foreach ($allStorages as $eachStorageId => $eachStorageName) {
+                    $storagesParams[$eachStorageId] = __($eachStorageName);
+                }
+                if (!empty($allModels)) {
+                    $inputs = wf_HiddenInput(self::PROUTE_ED_CAMERAID, $cameraId);
+                    $inputs .= wf_Selector(self::PROUTE_ED_MODEL, $allModels, __('Model'), $cameraData['modelid'], true) . ' ';
+                    $inputs .= wf_TextInput(self::PROUTE_ED_IP, __('IP'), $cameraData['ip'], true, 12, 'ip') . ' ';
+                    $inputs .= wf_TextInput(self::PROUTE_ED_LOGIN, __('Login'), $cameraData['login'], true, 14, 'alphanumeric') . ' ';
+                    $inputs .= wf_PasswordInput(self::PROUTE_ED_PASS, __('Password'), $cameraData['password'], true, 14) . ' ';
+                    $inputs .= wf_Selector(self::PROUTE_ED_STORAGE, $storagesParams, __('Storage'), $cameraData['storageid'], true) . ' ';
+                    $inputs .= wf_TextInput(self::PROUTE_ED_COMMENT, __('Description'), $cameraData['comment'], true, 18, '') . ' ';
+                    $inputs .= wf_Submit(__('Save'));
+                    $result .= wf_Form('', 'POST', $inputs, 'glamour');
+                } else {
+                    $result .= $this->messages->getStyledMessage(__('Any device models exists'), 'error');
+                }
+            } else {
+                $result .= $this->messages->getStyledMessage(__('Any storages exists'), 'error');
+            }
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
+        }
+        return($result);
+    }
+
+    /**
      * Returns unique channelId
      * 
      * @return string
