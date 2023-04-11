@@ -451,7 +451,7 @@ class Cameras {
                 $archiveDepth = wr_formatTimeArchive($archiveSeconds);
             }
 
-            $chanSizeRaw = $this->storages->getChannelSize($cameraData['storageid'], $cameraData['channel']);
+            $chanSizeRaw = $this->storages->getChannelChunksSize($channelChunks);
             $chanSizeLabel = wr_convertSize($chanSizeRaw);
 
             $chanBitrateLabel = '-';

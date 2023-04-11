@@ -398,9 +398,10 @@ class Storages {
                         $allChunksNames = scandir($storagePath . $channel);
                         if (!empty($allChunksNames)) {
                             foreach ($allChunksNames as $io => $eachFileName) {
-                                if ($eachFileName != '.' AND $eachFileName != '..' AND ispos($eachFileName, $chunksExt)) {
-                                    $cleanChunkName = str_replace($chunksExt, '', $eachFileName);
-                                    $cleanChunkName = str_replace('_', ' ', $cleanChunkName);
+                                if ($eachFileName != '.' AND $eachFileName != '..') {
+                                    $nameSkips = array($chunksExt, '_');
+                                    $nameReplaces = array('', ' ');
+                                    $cleanChunkName = str_replace($nameSkips, $nameReplaces, $eachFileName);
                                     $explodedName = explode(' ', $cleanChunkName);
                                     $chunkDate = $explodedName[0];
                                     $chunkTime = $explodedName[1];
@@ -436,6 +437,23 @@ class Storages {
                 foreach ($channelChunks as $io => $eachChunk) {
                     $result += filesize($eachChunk);
                 }
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Returns bytes count that some channel chunks list contains
+     * 
+     * @param array $chunksList
+     * 
+     * @return string
+     */
+    public function getChannelChunksSize($chunksList) {
+        $result = 0;
+        if (!empty($chunksList)) {
+            foreach ($chunksList as $io => $eachChunk) {
+                $result += filesize($eachChunk);
             }
         }
         return($result);
