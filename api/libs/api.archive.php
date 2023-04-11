@@ -448,4 +448,19 @@ class Archive {
         return($result);
     }
 
+    /**
+     * Returns some channel human-readable comment
+     * 
+     * @param string $channelId
+     * 
+     * @return string
+     */
+    public function getCameraComment($channelId) {
+        $result = '';
+        if ($channelId) {
+            $result .= $this->cameras->getCameraComment($channelId);
+        }
+        return($result);
+    }
+
 }
