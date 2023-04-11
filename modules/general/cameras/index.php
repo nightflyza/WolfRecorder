@@ -42,7 +42,7 @@ if (cfr('CAMERAS')) {
         wr_Stats();
     } else {
         //render camera profile
-        show_window(__('Edit camera'), $cameras->renderEditForm(ubRouting::get($cameras::ROUTE_EDIT)));
+        show_window(__('Edit camera'), $cameras->renderCameraProfile(ubRouting::get($cameras::ROUTE_EDIT)));
     }
 } else {
     show_error(__('Access denied'));
