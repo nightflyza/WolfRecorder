@@ -161,107 +161,6 @@ class Cameras {
     }
 
     /**
-     * Returns camera creation form
-     * 
-     * @return string
-     */
-    public function renderCreateForm() {
-        $result = '';
-        $allStorages = $this->storages->getAllStorageNames();
-        $allModels = $this->models->getAllModelNames();
-        if (!empty($allStorages)) {
-            $storagesParams = array();
-            foreach ($allStorages as $eachStorageId => $eachStorageName) {
-                $storagesParams[$eachStorageId] = __($eachStorageName);
-            }
-            if (!empty($allModels)) {
-                $inputs = wf_Selector(self::PROUTE_NEWMODEL, $allModels, __('Model'), '', true) . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_NEWIP, __('IP'), '', true, 12, 'ip') . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_NEWLOGIN, __('Login'), '', true, 14, 'alphanumeric') . ' ';
-                $inputs .= wf_PasswordInput(self::PROUTE_NEWPASS, __('Password'), '', true, 14) . ' ';
-                $inputs .= wf_CheckInput(self::PROUTE_NEWACT, __('Enabled'), true, true) . ' ';
-                $inputs .= wf_Selector(self::PROUTE_NEWSTORAGE, $storagesParams, __('Storage'), '', true) . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_NEWCOMMENT, __('Description'), '', true, 18, '') . ' ';
-                $inputs .= wf_Submit(__('Create'));
-                $result .= wf_Form('', 'POST', $inputs, 'glamour');
-            } else {
-                $result .= $this->messages->getStyledMessage(__('Any device models exists'), 'error');
-            }
-        } else {
-            $result .= $this->messages->getStyledMessage(__('Any storages exists'), 'error');
-        }
-        return($result);
-    }
-
-    /**
-     * Returns camera editing form
-     * 
-     * @param int $cameraId
-     * 
-     * @return string
-     */
-    public function renderEditForm($cameraId) {
-        $result = '';
-        $cameraId = ubRouting::filters($cameraId, 'int');
-        $allStorages = $this->storages->getAllStorageNames();
-        $allModels = $this->models->getAllModelNames();
-
-        if (isset($this->allCameras[$cameraId])) {
-            $cameraData = $this->allCameras[$cameraId];
-            if (!empty($allStorages)) {
-                $storagesParams = array();
-                foreach ($allStorages as $eachStorageId => $eachStorageName) {
-                    $storagesParams[$eachStorageId] = __($eachStorageName);
-                }
-                if (!empty($allModels)) {
-                    $inputs = wf_HiddenInput(self::PROUTE_ED_CAMERAID, $cameraId);
-                    $inputs .= wf_Selector(self::PROUTE_ED_MODEL, $allModels, __('Model'), $cameraData['modelid'], true) . ' ';
-                    $inputs .= wf_TextInput(self::PROUTE_ED_IP, __('IP'), $cameraData['ip'], true, 12, 'ip') . ' ';
-                    $inputs .= wf_TextInput(self::PROUTE_ED_LOGIN, __('Login'), $cameraData['login'], true, 14, 'alphanumeric') . ' ';
-                    $inputs .= wf_PasswordInput(self::PROUTE_ED_PASS, __('Password'), $cameraData['password'], true, 14) . ' ';
-                    $inputs .= wf_Selector(self::PROUTE_ED_STORAGE, $storagesParams, __('Storage'), $cameraData['storageid'], true) . ' ';
-                    $inputs .= wf_TextInput(self::PROUTE_ED_COMMENT, __('Description'), $cameraData['comment'], true, 18, '') . ' ';
-                    $inputs .= wf_Submit(__('Save'));
-                    $result .= wf_Form('', 'POST', $inputs, 'glamour');
-                } else {
-                    $result .= $this->messages->getStyledMessage(__('Any device models exists'), 'error');
-                }
-            } else {
-                $result .= $this->messages->getStyledMessage(__('Any storages exists'), 'error');
-            }
-        } else {
-            $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
-        }
-        return($result);
-    }
-
-    /**
-     * Returns camera comments editing form
-     * 
-     * @param int $cameraId
-     * 
-     * @return string
-     */
-    public function renderRenameForm($cameraId) {
-        $result = '';
-        $cameraId = ubRouting::filters($cameraId, 'int');
-
-        if (isset($this->allCameras[$cameraId])) {
-            $cameraData = $this->allCameras[$cameraId];
-            $inputs = wf_HiddenInput(self::PROUTE_ED_CAMERAID_ACT, $cameraId);
-            $inputs .= wf_TextInput(self::PROUTE_ED_COMMENT_ACT, __('Description'), $cameraData['comment'], true, 20, '') . ' ';
-            $inputs .= wf_Submit(__('Save'));
-            $result .= wf_Form('', 'POST', $inputs, 'glamour');
-
-            $actNotice = $this->messages->getStyledMessage(__('You can only change the description of cameras that are active at this moment'), 'warning');
-            $result .= wf_tag('div', false, '', 'style="width: auto;"') . $actNotice . wf_tag('div', true);
-        } else {
-            $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
-        }
-        return($result);
-    }
-
-    /**
      * Changes comment for existing camera in database
      * 
      * @param int $cameraId
@@ -278,6 +177,73 @@ class Cameras {
             $this->camerasDb->data('comment', $commentF);
             $this->camerasDb->save();
             log_register('CAMERA EDIT [' . $cameraId . '] COMMENT `' . $comment . '`');
+        } else {
+            $result .= __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
+        }
+        return($result);
+    }
+
+    /**
+     * Saves changes in existing camera database record
+     * 
+     * @param int $cameraId
+     * @param int $modelId
+     * @param string $ip
+     * @param string $login
+     * @param string $password
+     * @param int $storageId
+     * @param comment $comment
+     * 
+     * @return void/string on error
+     */
+    public function save($cameraId, $modelId, $ip, $login, $password, $storageId, $comment = '') {
+        $result = '';
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        $modelId = ubRouting::filters($modelId, 'int');
+        $ipF = ubRouting::filters($ip, 'mres');
+        $loginF = ubRouting::filters($login, 'mres');
+        $passwordF = ubRouting::filters($password, 'mres');
+        $storageId = ubRouting::filters($storageId, 'int');
+        $commentF = ubRouting::filters($comment, 'mres');
+        if (isset($this->allCameras[$cameraId])) {
+            $cameraData = $this->allCameras[$cameraId];
+            if ($cameraData['active'] == 0) {
+                $allStorages = $this->storages->getAllStorageNames();
+                $allModels = $this->models->getAllModelNames();
+                if (isset($allStorages[$storageId])) {
+                    $storageData = $this->storages->getStorageData($storageId);
+                    $storagePathValid = $this->storages->checkPath($storageData['path']);
+                    if ($storagePathValid) {
+                        if (isset($allModels[$modelId])) {
+                            if (zb_isIPValid($ipF)) {
+                                if (!empty($loginF) AND ! empty($passwordF)) {
+                                    $this->camerasDb->where('id', '=', $cameraId);
+                                    $this->camerasDb->data('modelid', $modelId);
+                                    $this->camerasDb->data('ip', $ipF);
+                                    $this->camerasDb->data('login', $loginF);
+                                    $this->camerasDb->data('password', $passwordF);
+                                    $this->camerasDb->data('storageid', $storageId);
+                                    $this->camerasDb->data('comment', $commentF);
+                                    $this->camerasDb->save();
+                                    log_register('CAMERA EDIT [' . $cameraId . ']  MODEL [' . $modelId . '] IP `' . $ip . '` STORAGE [' . $storageId . '] COMMENT `' . $comment . '`');
+                                } else {
+                                    $result .= __('Login or password is empty');
+                                }
+                            } else {
+                                $result .= __('Wrong IP format') . ': `' . $ip . '`';
+                            }
+                        } else {
+                            $result .= __('Model') . ' [' . $modelId . '] ' . __('not exists');
+                        }
+                    } else {
+                        $result .= __('Storage path is not writable');
+                    }
+                } else {
+                    $result .= __('Storage') . ' [' . $storageId . '] ' . __('not exists');
+                }
+            } else {
+                $result .= __('Camera') . ' ' . __('Active') . '!';
+            }
         } else {
             $result .= __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
         }
@@ -303,6 +269,21 @@ class Cameras {
             $result = zb_rand_string(self::CHANNEL_ID_LEN);
         }
 
+        return($result);
+    }
+
+    /**
+     * Returns all cameras channels as struct channelId=>cameraId
+     * 
+     * @return array
+     */
+    public function getAllCamerasChannels() {
+        $result = array();
+        if (!empty($this->allCameras)) {
+            foreach ($this->allCameras as $io => $each) {
+                $result[$each['channel']] = $each['id'];
+            }
+        }
         return($result);
     }
 
@@ -422,43 +403,6 @@ class Cameras {
     }
 
     /**
-     * Renders available cameras list
-     * 
-     * @return string
-     */
-    public function renderList() {
-        $result = '';
-        if (!empty($this->allCameras)) {
-            $totalCount = 0;
-            $allRunningRecorders = $this->getRunningRecorders();
-            $cells = wf_TableCell(__('ID'));
-            $cells .= wf_TableCell(__('IP'));
-            $cells .= wf_TableCell(__('Enabled'));
-            $cells .= wf_TableCell(__('Recording'));
-            $cells .= wf_TableCell(__('Description'));
-            $cells .= wf_TableCell(__('Actions'));
-            $rows = wf_TableRow($cells, 'row1');
-            foreach ($this->allCameras as $io => $each) {
-                $cells = wf_TableCell($each['id']);
-                $cells .= wf_TableCell($each['ip'], '', '', 'sorttable_customkey="' . ip2int($each['ip']) . '"');
-                $cells .= wf_TableCell(web_bool_led($each['active']), '', '', 'sorttable_customkey="' . $each['active'] . '"');
-                $recordingFlag = isset($allRunningRecorders[$each['id']]) ? 1 : 0;
-                $cells .= wf_TableCell(web_bool_led($recordingFlag), '', '', 'sorttable_customkey="' . $recordingFlag . '"');
-                $cells .= wf_TableCell($each['comment']);
-                $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $each['id'], web_edit_icon(), false);
-                $cells .= wf_TableCell($actLinks);
-                $rows .= wf_TableRow($cells, 'row5');
-                $totalCount++;
-            }
-            $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
-            $result .= wf_tag('b') . __('Total') . ': ' . $totalCount . wf_tag('b', true);
-        } else {
-            $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
-        }
-        return($result);
-    }
-
-    /**
      * Deletes existing camera from database
      * 
      * @param int $cameraId
@@ -507,16 +451,209 @@ class Cameras {
     }
 
     /**
-     * Returns all cameras channels as struct channelId=>cameraId
+     * Shutdown camera to unlock its settings
      * 
-     * @return array
+     * @param int $cameraId
+     * 
+     * @return void
      */
-    public function getAllCamerasChannels() {
-        $result = array();
+    public function deactivate($cameraId) {
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        if (isset($this->allCameras[$cameraId])) {
+            $recorder = new Recorder();
+            //shutdown recording process
+            $recorder->stopRecord($cameraId); //this method locks execution until capture process will be really killed
+            //disabling camera activity flag
+            $this->camerasDb->where('id', '=', $cameraId);
+            $this->camerasDb->data('active', 0);
+            $this->camerasDb->save();
+            log_register('CAMERA DEACTIVATE [' . $cameraId . ']');
+        }
+    }
+
+    /**
+     * Enables camera to lock its settings
+     * 
+     * @param int $cameraId
+     * 
+     * @return void
+     */
+    public function activate($cameraId) {
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        if (isset($this->allCameras[$cameraId])) {
+            //enabling camera activity flag
+            $this->camerasDb->where('id', '=', $cameraId);
+            $this->camerasDb->data('active', 1);
+            $this->camerasDb->save();
+            $this->allCameras[$cameraId]['active'] = 1;
+            log_register('CAMERA ACTIVATE [' . $cameraId . ']');
+
+            //starting capture now if enabled
+            if ($this->altCfg['RECORDER_ON_CAMERA_ACTIVATION']) {
+                $recorder = new Recorder();
+                $recorder->runRecordBackground($cameraId);
+            }
+        }
+    }
+
+    /**
+     * Returns camera comment or IP by its channelId
+     * 
+     * @param string $channelId
+     * 
+     * @return string
+     */
+    public function getCameraComment($channelId) {
+        $result = '';
         if (!empty($this->allCameras)) {
             foreach ($this->allCameras as $io => $each) {
-                $result[$each['channel']] = $each['id'];
+                if ($each['channel'] == $channelId) {
+                    if (!empty($each['comment'])) {
+                        $result = $each['comment'];
+                    } else {
+                        $result = $each['ip'];
+                    }
+                }
             }
+        }
+        if (empty($result)) {
+            $result = __('Lost');
+        }
+        return($result);
+    }
+
+    /**
+     * Returns camera creation form
+     * 
+     * @return string
+     */
+    public function renderCreateForm() {
+        $result = '';
+        $allStorages = $this->storages->getAllStorageNames();
+        $allModels = $this->models->getAllModelNames();
+        if (!empty($allStorages)) {
+            $storagesParams = array();
+            foreach ($allStorages as $eachStorageId => $eachStorageName) {
+                $storagesParams[$eachStorageId] = __($eachStorageName);
+            }
+            if (!empty($allModels)) {
+                $inputs = wf_Selector(self::PROUTE_NEWMODEL, $allModels, __('Model'), '', true) . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_NEWIP, __('IP'), '', true, 12, 'ip') . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_NEWLOGIN, __('Login'), '', true, 14, 'alphanumeric') . ' ';
+                $inputs .= wf_PasswordInput(self::PROUTE_NEWPASS, __('Password'), '', true, 14) . ' ';
+                $inputs .= wf_CheckInput(self::PROUTE_NEWACT, __('Enabled'), true, true) . ' ';
+                $inputs .= wf_Selector(self::PROUTE_NEWSTORAGE, $storagesParams, __('Storage'), '', true) . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_NEWCOMMENT, __('Description'), '', true, 18, '') . ' ';
+                $inputs .= wf_Submit(__('Create'));
+                $result .= wf_Form('', 'POST', $inputs, 'glamour');
+            } else {
+                $result .= $this->messages->getStyledMessage(__('Any device models exists'), 'error');
+            }
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Any storages exists'), 'error');
+        }
+        return($result);
+    }
+
+    /**
+     * Returns camera editing form
+     * 
+     * @param int $cameraId
+     * 
+     * @return string
+     */
+    public function renderEditForm($cameraId) {
+        $result = '';
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        $allStorages = $this->storages->getAllStorageNames();
+        $allModels = $this->models->getAllModelNames();
+
+        if (isset($this->allCameras[$cameraId])) {
+            $cameraData = $this->allCameras[$cameraId];
+            if (!empty($allStorages)) {
+                $storagesParams = array();
+                foreach ($allStorages as $eachStorageId => $eachStorageName) {
+                    $storagesParams[$eachStorageId] = __($eachStorageName);
+                }
+                if (!empty($allModels)) {
+                    $inputs = wf_HiddenInput(self::PROUTE_ED_CAMERAID, $cameraId);
+                    $inputs .= wf_Selector(self::PROUTE_ED_MODEL, $allModels, __('Model'), $cameraData['modelid'], true) . ' ';
+                    $inputs .= wf_TextInput(self::PROUTE_ED_IP, __('IP'), $cameraData['ip'], true, 12, 'ip') . ' ';
+                    $inputs .= wf_TextInput(self::PROUTE_ED_LOGIN, __('Login'), $cameraData['login'], true, 14, 'alphanumeric') . ' ';
+                    $inputs .= wf_PasswordInput(self::PROUTE_ED_PASS, __('Password'), $cameraData['password'], true, 14) . ' ';
+                    $inputs .= wf_Selector(self::PROUTE_ED_STORAGE, $storagesParams, __('Storage'), $cameraData['storageid'], true) . ' ';
+                    $inputs .= wf_TextInput(self::PROUTE_ED_COMMENT, __('Description'), $cameraData['comment'], true, 18, '') . ' ';
+                    $inputs .= wf_Submit(__('Save'));
+                    $result .= wf_Form('', 'POST', $inputs, 'glamour');
+                } else {
+                    $result .= $this->messages->getStyledMessage(__('Any device models exists'), 'error');
+                }
+            } else {
+                $result .= $this->messages->getStyledMessage(__('Any storages exists'), 'error');
+            }
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
+        }
+        return($result);
+    }
+
+    /**
+     * Returns camera comments editing form
+     * 
+     * @param int $cameraId
+     * 
+     * @return string
+     */
+    public function renderRenameForm($cameraId) {
+        $result = '';
+        $cameraId = ubRouting::filters($cameraId, 'int');
+
+        if (isset($this->allCameras[$cameraId])) {
+            $cameraData = $this->allCameras[$cameraId];
+            $inputs = wf_HiddenInput(self::PROUTE_ED_CAMERAID_ACT, $cameraId);
+            $inputs .= wf_TextInput(self::PROUTE_ED_COMMENT_ACT, __('Description'), $cameraData['comment'], true, 20, '') . ' ';
+            $inputs .= wf_Submit(__('Save'));
+            $result .= wf_Form('', 'POST', $inputs, 'glamour');
+            $result .= __('You can only change the description of cameras that are active at this moment');
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
+        }
+        return($result);
+    }
+
+    /**
+     * Renders available cameras list
+     * 
+     * @return string
+     */
+    public function renderList() {
+        $result = '';
+        if (!empty($this->allCameras)) {
+            $totalCount = 0;
+            $allRunningRecorders = $this->getRunningRecorders();
+            $cells = wf_TableCell(__('ID'));
+            $cells .= wf_TableCell(__('IP'));
+            $cells .= wf_TableCell(__('Enabled'));
+            $cells .= wf_TableCell(__('Recording'));
+            $cells .= wf_TableCell(__('Description'));
+            $cells .= wf_TableCell(__('Actions'));
+            $rows = wf_TableRow($cells, 'row1');
+            foreach ($this->allCameras as $io => $each) {
+                $cells = wf_TableCell($each['id']);
+                $cells .= wf_TableCell($each['ip'], '', '', 'sorttable_customkey="' . ip2int($each['ip']) . '"');
+                $cells .= wf_TableCell(web_bool_led($each['active']), '', '', 'sorttable_customkey="' . $each['active'] . '"');
+                $recordingFlag = isset($allRunningRecorders[$each['id']]) ? 1 : 0;
+                $cells .= wf_TableCell(web_bool_led($recordingFlag), '', '', 'sorttable_customkey="' . $recordingFlag . '"');
+                $cells .= wf_TableCell($each['comment']);
+                $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $each['id'], web_edit_icon(), false);
+                $cells .= wf_TableCell($actLinks);
+                $rows .= wf_TableRow($cells, 'row5');
+                $totalCount++;
+            }
+            $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
+            $result .= wf_tag('b') . __('Total') . ': ' . $totalCount . wf_tag('b', true);
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
         }
         return($result);
     }
@@ -656,78 +793,6 @@ class Cameras {
         $result .= wf_delimiter(0);
         $result .= wf_BackLink(self::URL_ME) . ' ';
         $result .= $cameraControls;
-        return($result);
-    }
-
-    /**
-     * Shutdown camera to unlock its settings
-     * 
-     * @param int $cameraId
-     * 
-     * @return void
-     */
-    public function deactivate($cameraId) {
-        $cameraId = ubRouting::filters($cameraId, 'int');
-        if (isset($this->allCameras[$cameraId])) {
-            $recorder = new Recorder();
-            //shutdown recording process
-            $recorder->stopRecord($cameraId); //this method locks execution until capture process will be really killed
-            //disabling camera activity flag
-            $this->camerasDb->where('id', '=', $cameraId);
-            $this->camerasDb->data('active', 0);
-            $this->camerasDb->save();
-            log_register('CAMERA DEACTIVATE [' . $cameraId . ']');
-        }
-    }
-
-    /**
-     * Enables camera to lock its settings
-     * 
-     * @param int $cameraId
-     * 
-     * @return void
-     */
-    public function activate($cameraId) {
-        $cameraId = ubRouting::filters($cameraId, 'int');
-        if (isset($this->allCameras[$cameraId])) {
-            //enabling camera activity flag
-            $this->camerasDb->where('id', '=', $cameraId);
-            $this->camerasDb->data('active', 1);
-            $this->camerasDb->save();
-            $this->allCameras[$cameraId]['active'] = 1;
-            log_register('CAMERA ACTIVATE [' . $cameraId . ']');
-
-            //starting capture now if enabled
-            if ($this->altCfg['RECORDER_ON_CAMERA_ACTIVATION']) {
-                $recorder = new Recorder();
-                $recorder->runRecordBackground($cameraId);
-            }
-        }
-    }
-
-    /**
-     * Returns camera comment or IP by its channelId
-     * 
-     * @param string $channelId
-     * 
-     * @return string
-     */
-    public function getCameraComment($channelId) {
-        $result = '';
-        if (!empty($this->allCameras)) {
-            foreach ($this->allCameras as $io => $each) {
-                if ($each['channel'] == $channelId) {
-                    if (!empty($each['comment'])) {
-                        $result = $each['comment'];
-                    } else {
-                        $result = $each['ip'];
-                    }
-                }
-            }
-        }
-        if (empty($result)) {
-            $result = __('Lost');
-        }
         return($result);
     }
 

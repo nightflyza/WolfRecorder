@@ -5,7 +5,15 @@ if (cfr('CAMERAS')) {
 
     //new camera creation
     if (ubRouting::checkPost(array($cameras::PROUTE_NEWMODEL, $cameras::PROUTE_NEWIP, $cameras::PROUTE_NEWLOGIN, $cameras::PROUTE_NEWPASS, $cameras::PROUTE_NEWSTORAGE))) {
-        $creationResult = $cameras->create(ubRouting::post($cameras::PROUTE_NEWMODEL), ubRouting::post($cameras::PROUTE_NEWIP), ubRouting::post($cameras::PROUTE_NEWLOGIN), ubRouting::post($cameras::PROUTE_NEWPASS), ubRouting::post($cameras::PROUTE_NEWACT), ubRouting::post($cameras::PROUTE_NEWSTORAGE), ubRouting::post($cameras::PROUTE_NEWCOMMENT));
+        $newModelId = ubRouting::post($cameras::PROUTE_NEWMODEL);
+        $newIp = ubRouting::post($cameras::PROUTE_NEWIP);
+        $newLogin = ubRouting::post($cameras::PROUTE_NEWLOGIN);
+        $newPass = ubRouting::post($cameras::PROUTE_NEWPASS);
+        $newAct = ubRouting::post($cameras::PROUTE_NEWACT);
+        $newStorageId = ubRouting::post($cameras::PROUTE_NEWSTORAGE);
+        $newComment = ubRouting::post($cameras::PROUTE_NEWCOMMENT);
+
+        $creationResult = $cameras->create($newModelId, $newIp, $newLogin, $newPass, $newAct, $newStorageId, $newStorageId);
         if ($creationResult) {
             show_error($creationResult);
         } else {
@@ -42,6 +50,23 @@ if (cfr('CAMERAS')) {
             show_error($renameResult);
         } else {
             ubRouting::nav($cameras::URL_ME . '&' . $cameras::ROUTE_EDIT . '=' . ubRouting::post($cameras::PROUTE_ED_CAMERAID_ACT));
+        }
+    }
+
+    //camera editing
+    if (ubRouting::checkPost(array($cameras::PROUTE_ED_CAMERAID, $cameras::PROUTE_ED_MODEL, $cameras::PROUTE_ED_IP, $cameras::PROUTE_ED_LOGIN, $cameras::PROUTE_ED_PASS, $cameras::PROUTE_ED_STORAGE))) {
+        $edCameraId = ubRouting::post($cameras::PROUTE_ED_CAMERAID);
+        $edModelId = ubRouting::post($cameras::PROUTE_ED_MODEL);
+        $edIp = ubRouting::post($cameras::PROUTE_ED_IP);
+        $edLogin = ubRouting::post($cameras::PROUTE_ED_LOGIN);
+        $edPass = ubRouting::post($cameras::PROUTE_ED_PASS);
+        $edStorageId = ubRouting::post($cameras::PROUTE_ED_STORAGE);
+        $edComment = ubRouting::post($cameras::PROUTE_ED_COMMENT);
+        $editingResult = $cameras->save($edCameraId, $edModelId, $edIp, $edLogin, $edPass, $edStorageId, $edComment);
+        if ($editingResult) {
+            show_error($editingResult);
+        } else {
+            ubRouting::nav($cameras::URL_ME . '&' . $cameras::ROUTE_EDIT . '=' . $edCameraId);
         }
     }
 
