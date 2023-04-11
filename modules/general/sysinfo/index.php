@@ -8,7 +8,7 @@ if (cfr('SYSINFO')) {
     $systemHealth = $sysInfo->renderSerialInfo();
     $systemHealth .= $sysInfo->renderLA();
     $systemHealth .= $sysInfo->renderDisksCapacity();
-    
+
     show_window(__('System health'), $systemHealth);
     wr_Stats();
 } else {

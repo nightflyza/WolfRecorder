@@ -70,6 +70,7 @@ class Cameras {
     const ROUTE_EDIT = 'editcameraid';
     const ROUTE_ACTIVATE = 'activatecameraid';
     const ROUTE_DEACTIVATE = 'deactivatecameraid';
+    const CHANNEL_ID_LEN = 11; // 4.738 * 10^18
 
     /**
      * Dinosaurs are my best friends
@@ -81,6 +82,7 @@ class Cameras {
      * I wish that the world could see
      * The dinosaurs are a part of me
      */
+
     public function __construct() {
         $this->initMessages();
         $this->loadConfigs();
@@ -196,9 +198,9 @@ class Cameras {
             }
         }
 
-        $result = zb_rand_string(11);
+        $result = zb_rand_string(self::CHANNEL_ID_LEN);
         while (isset($busyCnannelIds[$result])) {
-            $result = zb_rand_string(11);
+            $result = zb_rand_string(self::CHANNEL_ID_LEN);
         }
 
         return($result);

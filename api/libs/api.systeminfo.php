@@ -166,7 +166,10 @@ class SystemInfo {
         $result = '';
         $instanceSerial = wr_SerialGet();
         if (!empty($instanceSerial)) {
-            $result .= $this->messages->getStyledMessage(wf_tag('center') . __('This system serial number') . ': ' . wf_tag('b') . wr_SerialGet() . wf_tag('b', true) . wf_tag('center', true), 'info');
+            $rawRelease = file_get_contents('RELEASE');
+            $infoLabel = __('WolfRecorder') . ' ' . $rawRelease . ', ';
+            $infoLabel .= __('This system serial number') . ': ' . wf_tag('b') . $instanceSerial . wf_tag('b', true);
+            $result .= $this->messages->getStyledMessage(wf_tag('center') . $infoLabel . wf_tag('center', true), 'info');
         } else {
             $result .= $this->messages->getStyledMessage(__('Something went wrong'), 'error');
         }
