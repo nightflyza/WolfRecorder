@@ -31,8 +31,8 @@ if (cfr('EXPORT')) {
 
 
         //export interface here
-        $exportDate = (ubRouting::checkPost($export::PROUTE_DATE_EXPORT)) ? ubRouting::post($export::PROUTE_DATE_EXPORT) : curdate();
-        show_window(__('Export records') . ': ' . $exportDate, $export->renderExportLookup(ubRouting::get($export::ROUTE_CHANNEL)));
+        $channelName = $export->getCameraComment(ubRouting::get($export::ROUTE_CHANNEL));
+        show_window(__('Export records') . ': ' . $channelName, $export->renderExportLookup(ubRouting::get($export::ROUTE_CHANNEL)));
 
         //rendering schedule if not empty
         $exportSchedule = $export->renderScheduledExports();
