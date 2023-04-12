@@ -294,8 +294,8 @@ class Export {
             }
             if (!empty($datesTmp)) {
                 $inputs = wf_Selector(self::PROUTE_DATE_EXPORT, $datesTmp, __('Date'), $dayPointer, false) . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_TIME_FROM, __('from'), ubRouting::post(self::PROUTE_TIME_FROM), false, 5, '', self::PROUTE_TIME_FROM, self::PROUTE_TIME_FROM, 'style="display:none;"');
-                $inputs .= wf_TextInput(self::PROUTE_TIME_TO, __('to'), ubRouting::post(self::PROUTE_TIME_TO), false, 5, '', self::PROUTE_TIME_TO, self::PROUTE_TIME_TO, 'style="display:none;"');
+                $inputs .= wf_TextInput(self::PROUTE_TIME_FROM, __('from'), ubRouting::post(self::PROUTE_TIME_FROM), false, 5, '', self::PROUTE_TIME_FROM, self::PROUTE_TIME_FROM, 'DISABLED').' ';
+                $inputs .= wf_TextInput(self::PROUTE_TIME_TO, __('to'), ubRouting::post(self::PROUTE_TIME_TO), false, 5, '', self::PROUTE_TIME_TO, self::PROUTE_TIME_TO, 'DISABLED').' ';
                 $sliderCode = file_get_contents('modules/jsc/exportSlider.js');
                 $inputs .= $sliderCode;
                 $inputs .= wf_delimiter();
