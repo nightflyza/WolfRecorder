@@ -251,7 +251,7 @@ class Export {
             //any records here?
             if ($chunksByDay) {
                 if ($chunksByDay > 3) {
-                    $barWidth = 0.064;
+                    $barWidth = 0.069444444;
                     $barStyle = 'width:' . $barWidth . '%;';
                     $result = wf_tag('div', false, '', 'style = "width:100%;"');
                     foreach ($dayMinAlloc as $eachMin => $recAvail) {
@@ -298,13 +298,15 @@ class Export {
                 $inputs .= wf_TextInput(self::PROUTE_TIME_TO, __('to'), ubRouting::post(self::PROUTE_TIME_TO), false, 5, '', self::PROUTE_TIME_TO, self::PROUTE_TIME_TO, 'style="display:none;"') . ' ';
                 $sliderCode = file_get_contents('modules/jsc/exportSlider.js');
                 $inputs .= wf_delimiter();
+                //time range selection slider
                 $inputs .= $sliderCode;
                 $inputs .= wf_delimiter();
+                //here some timeline for selected day to indicate records availability
+                $inputs .= $this->renderDayRecordsAvailability($chunksList, $dayPointer);
                 $inputs .= wf_Submit(__('Export'));
                 $result .= wf_Form('', 'POST', $inputs, '');
 
-                //here some timeline for selected day
-                //$result .= $this->renderDayRecordsAvailability($chunksList, $dayPointer);
+
                 $result .= wf_CleanDiv();
             } else {
                 $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
