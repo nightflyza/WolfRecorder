@@ -294,8 +294,8 @@ class Export {
             }
             if (!empty($datesTmp)) {
                 $inputs = wf_Selector(self::PROUTE_DATE_EXPORT, $datesTmp, __('Date'), $dayPointer, false) . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_TIME_FROM, __('from'), ubRouting::post(self::PROUTE_TIME_FROM), false, 5, '', self::PROUTE_TIME_FROM, self::PROUTE_TIME_FROM, 'style="display:none;"').' ';
-                $inputs .= wf_TextInput(self::PROUTE_TIME_TO, __('to'), ubRouting::post(self::PROUTE_TIME_TO), false, 5, '', self::PROUTE_TIME_TO, self::PROUTE_TIME_TO, 'style="display:none;"').' ';
+                $inputs .= wf_TextInput(self::PROUTE_TIME_FROM, __('from'), ubRouting::post(self::PROUTE_TIME_FROM), false, 5, '', self::PROUTE_TIME_FROM, self::PROUTE_TIME_FROM, 'style="display:none;"') . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_TIME_TO, __('to'), ubRouting::post(self::PROUTE_TIME_TO), false, 5, '', self::PROUTE_TIME_TO, self::PROUTE_TIME_TO, 'style="display:none;"') . ' ';
                 $sliderCode = file_get_contents('modules/jsc/exportSlider.js');
                 $inputs .= wf_delimiter();
                 $inputs .= $sliderCode;
@@ -817,7 +817,11 @@ class Export {
             }
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table sortable');
         } else {
-            $result .= $this->messages->getStyledMessage(__('You have no exported records yet'), 'info');
+            $noRecordsNotice = __('You have no exported records yet');
+            if ($channelId) {
+                $noRecordsNotice .= ' ' . __('for this camera');
+            }
+            $result .= $this->messages->getStyledMessage($noRecordsNotice, 'info');
         }
         $maxUserSpace = $this->getUserMaxSpace();
         $usedSpaceByMe = $this->getUserUsedSpace($userRecordingsDir);
