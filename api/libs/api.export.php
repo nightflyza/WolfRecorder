@@ -822,9 +822,12 @@ class Export {
 
 
         if (!empty($filePath)) {
-            if (file_exists($filePath)) {
+            @$filePath = base64_decode($filePath);
+            if ($filePath AND file_exists($filePath)) {
                 $webPlayer .= $this->renderRecordPlayer($filePath, '80%', true, $filePath);
                 $controls .= wf_Link($filePath, web_icon_download() . ' ' . __('Download'), false, 'ubButton');
+            } else {
+                $result .= $this->messages->getStyledMessage(__('File not exists'), 'error');
             }
         }
 
@@ -874,7 +877,7 @@ class Export {
                 $fileUrl = $userRecordingsDir . $eachFile;
                 $actLinks = $this->renderRecDelDialog($eachFile);
                 $actLinks .= wf_Link($fileUrl, web_icon_download());
-                $previewUrl = self::URL_RECORDS . '&' . self::ROUTE_PREVIEW . '=' . $fileUrl;
+                $previewUrl = self::URL_RECORDS . '&' . self::ROUTE_PREVIEW . '=' . base64_encode($fileUrl);
                 if ($channelId) {
                     $previewUrl .= '&' . self::ROUTE_BACK_EXPORT . '=' . $channelId;
                 }
