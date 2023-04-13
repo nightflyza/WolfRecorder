@@ -563,6 +563,7 @@ sub, sup {
     text-decoration:none;
     text-shadow:1px 1px 0px #ffffff;
     color:#777777;
+    margin: 0px 0px 4px 0px;
 }
 
 .ubButton:hover {
