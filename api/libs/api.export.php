@@ -84,6 +84,8 @@ class Export {
     const ROUTE_CHANNEL = 'exportchannel';
     const ROUTE_SHOWDATE = 'exportdatearchive';
     const ROUTE_DELETE = 'delrec';
+    const ROUTE_PREVIEW = 'previewrecord';
+    const ROUTE_BACK_EXPORT = 'chanback';
     const PROUTE_DATE_EXPORT = 'dateexport';
     const PROUTE_TIME_FROM = 'timefrom';
     const PROUTE_TIME_TO = 'timeto';
@@ -775,6 +777,64 @@ class Export {
     }
 
     /**
+     * Renders howl player for previously generated playlist
+     * 
+     * @param string $filePath - full playlist path
+     * @param string $width - width in px or %
+     * @param bool $autoPlay - start playback right now?
+     * @param string $playerId - must be equal to channel name to access playlist in DOM
+     * 
+     * @return string
+     */
+    protected function renderRecordPlayer($filePath, $width = '600px', $autoPlay = false, $playerId = '') {
+        $autoPlay = ($autoPlay) ? 'true' : 'false';
+        $playerId = ($playerId) ? $playerId : 'recplayer' . wf_InputId();
+
+        $result = '';
+        $result .= '<script src="modules/jsc/playerjs/w_playerjs.js"></script >
+            <div style="float:left; width:' . $width . '; margin:5px;">
+            <div id = "' . $playerId . '" style="width:90%;"></div >
+            <script >var player = new Playerjs({id:"' . $playerId . '", file:"' . $filePath . '", autoplay:' . $autoPlay . '});
+            </script>
+            </div>
+            ';
+        $result .= wf_CleanDiv();
+        return($result);
+    }
+
+    /**
+     * Renders recording preview with web-player
+     * 
+     * @return string
+     */
+    public function renderRecordPreview($filePath) {
+        $result = '';
+        $webPlayer = '';
+        $controls = '';
+
+        if (ubRouting::checkGet(self::ROUTE_BACK_EXPORT)) {
+            //back to channel export interface
+            $controls .= wf_BackLink(self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . ubRouting::get(self::ROUTE_BACK_EXPORT)) . ' ';
+        } else {
+            //just back to records list
+            $controls .= wf_BackLink(self::URL_RECORDS) . ' ';
+        }
+
+
+        if (!empty($filePath)) {
+            if (file_exists($filePath)) {
+                $webPlayer .= $this->renderRecordPlayer($filePath, '80%', true, $filePath);
+                $controls .= wf_Link($filePath, web_icon_download() . ' ' . __('Download'), false, 'ubButton');
+            }
+        }
+
+        $result .= $webPlayer;
+        $result .= wf_delimiter(0);
+        $result .= $controls;
+        return($result);
+    }
+
+    /**
      * Returns list of available records
      * 
      * @param string $channelId
@@ -814,6 +874,11 @@ class Export {
                 $fileUrl = $userRecordingsDir . $eachFile;
                 $actLinks = $this->renderRecDelDialog($eachFile);
                 $actLinks .= wf_Link($fileUrl, web_icon_download());
+                $previewUrl = self::URL_RECORDS . '&' . self::ROUTE_PREVIEW . '=' . $fileUrl;
+                if ($channelId) {
+                    $previewUrl .= '&' . self::ROUTE_BACK_EXPORT . '=' . $channelId;
+                }
+                $actLinks .= wf_Link($previewUrl, web_icon_search(__('Show')));
                 $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
             }

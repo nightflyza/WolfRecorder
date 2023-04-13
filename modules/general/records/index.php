@@ -12,14 +12,19 @@ if (cfr('EXPORT')) {
         }
     }
 
-    //rendering schedule if not empty
-    $exportSchedule = $export->renderScheduledExports();
-    if ($exportSchedule) {
-        show_window(__('Your scheduled export records'), $exportSchedule);
-    }
+    //existing record preview
+    if (ubRouting::checkGet($export::ROUTE_PREVIEW)) {
+        show_window(__('Preview'), $export->renderRecordPreview(ubRouting::get($export::ROUTE_PREVIEW)));
+    } else {
+        //rendering schedule if not empty
+        $exportSchedule = $export->renderScheduledExports();
+        if ($exportSchedule) {
+            show_window(__('Your scheduled export records'), $exportSchedule);
+        }
 
-    //already saved records here
-    show_window(__('Your saved records'), $export->renderAvailableRecords());
+        //already saved records here
+        show_window(__('Your saved records'), $export->renderAvailableRecords());
+    }
 } else {
     show_error(__('Access denied'));
 }
