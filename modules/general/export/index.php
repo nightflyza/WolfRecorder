@@ -15,6 +15,11 @@ if (cfr('EXPORT')) {
             }
         }
 
+        //show scheduling confirmation notification
+        if (ubRouting::checkGet(array($export::ROUTE_SCHED_OK, $export::ROUTE_CHANNEL))) {
+            show_window('', $export->renderExportScheduledNotify(ubRouting::get($export::ROUTE_CHANNEL)));
+        }
+
         //run export if required
         if (ubRouting::checkPost(array($export::PROUTE_DATE_EXPORT, $export::PROUTE_TIME_FROM, $export::PROUTE_TIME_TO))) {
             $exportChannel = ubRouting::get($export::ROUTE_CHANNEL);
@@ -25,19 +30,20 @@ if (cfr('EXPORT')) {
             if (!empty($exportRequestResult)) {
                 show_error($exportRequestResult);
             } else {
-                ubRouting::nav($export::URL_ME . '&' . $export::ROUTE_CHANNEL . '=' . $exportChannel);
+                //redirect to success scheduling confirmation
+                ubRouting::nav($export::URL_ME . '&' . $export::ROUTE_CHANNEL . '=' . $exportChannel . '&' . $export::ROUTE_SCHED_OK . '=true');
             }
         }
 
 
         //export interface here
         $channelName = $export->getCameraComment(ubRouting::get($export::ROUTE_CHANNEL));
-        show_window(__('Export records') . ': ' . $channelName, $export->renderExportLookup(ubRouting::get($export::ROUTE_CHANNEL)));
+        show_window(__('Save records') . ': ' . $channelName, $export->renderExportLookup(ubRouting::get($export::ROUTE_CHANNEL)));
 
         //rendering schedule if not empty
         $exportSchedule = $export->renderScheduledExports();
         if ($exportSchedule) {
-            show_window(__('Your scheduled export records'), $exportSchedule);
+            show_window(__('Your scheduled records saving'), $exportSchedule);
         }
 
         //already saved records here

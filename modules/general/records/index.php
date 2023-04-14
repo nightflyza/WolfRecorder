@@ -19,7 +19,7 @@ if (cfr('EXPORT')) {
         //rendering schedule if not empty
         $exportSchedule = $export->renderScheduledExports();
         if ($exportSchedule) {
-            show_window(__('Your scheduled export records'), $exportSchedule);
+            show_window(__('Your scheduled records saving'), $exportSchedule);
         }
 
         //already saved records here

@@ -85,6 +85,7 @@ class Export {
     const ROUTE_SHOWDATE = 'exportdatearchive';
     const ROUTE_DELETE = 'delrec';
     const ROUTE_PREVIEW = 'previewrecord';
+    const ROUTE_SCHED_OK = 'scheduledsuccess';
     const ROUTE_BACK_EXPORT = 'chanback';
     const PROUTE_DATE_EXPORT = 'dateexport';
     const PROUTE_TIME_FROM = 'timefrom';
@@ -212,7 +213,7 @@ class Export {
                     }
                     $cells .= wf_TableCell($eachCamIp);
                     $cells .= wf_TableCell($eachCamDesc);
-                    $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $eachCamChannel, wf_img('skins/icon_export.png', __('Export')));
+                    $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $eachCamChannel, wf_img('skins/icon_export.png', __('Save records')));
                     $cells .= wf_TableCell($actLinks);
                     $rows .= wf_TableRow($cells, 'row5');
                 }
@@ -296,8 +297,8 @@ class Export {
             }
             if (!empty($datesTmp)) {
                 $inputs = wf_Selector(self::PROUTE_DATE_EXPORT, $datesTmp, __('Date'), $dayPointer, false) . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_TIME_FROM, __('from'), ubRouting::post(self::PROUTE_TIME_FROM), false, 5, '', self::PROUTE_TIME_FROM, self::PROUTE_TIME_FROM, 'style="display:none;"') . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_TIME_TO, __('to'), ubRouting::post(self::PROUTE_TIME_TO), false, 5, '', self::PROUTE_TIME_TO, self::PROUTE_TIME_TO, 'style="display:none;"') . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_TIME_FROM, '', ubRouting::post(self::PROUTE_TIME_FROM), false, 5, '', self::PROUTE_TIME_FROM, self::PROUTE_TIME_FROM, 'style="display:none;"') . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_TIME_TO, '', ubRouting::post(self::PROUTE_TIME_TO), false, 5, '', self::PROUTE_TIME_TO, self::PROUTE_TIME_TO, 'style="display:none;"') . ' ';
                 $sliderCode = file_get_contents('modules/jsc/exportSlider.js');
                 $inputs .= wf_delimiter();
                 //time range selection slider
@@ -305,7 +306,7 @@ class Export {
                 $inputs .= wf_delimiter();
                 //here some timeline for selected day to indicate records availability
                 $inputs .= $this->renderDayRecordsAvailability($chunksList, $dayPointer);
-                $inputs .= wf_Submit(__('Export'));
+                $inputs .= wf_Submit(__('Save record'));
                 $result .= wf_Form('', 'POST', $inputs, '');
 
 
@@ -356,7 +357,7 @@ class Export {
             }
         }
         if (cfr('ARCHIVE')) {
-            $result .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $channelId, wf_img('skins/icon_archive_small.png') . ' ' . __('Archive'), false, 'ubButton');
+            $result .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $channelId, wf_img('skins/icon_archive_small.png') . ' ' . __('Video from camera'), false, 'ubButton');
         }
         return($result);
     }
@@ -860,34 +861,36 @@ class Export {
             }
         }
         if (!empty($allRecords)) {
-            $cells = wf_TableCell(__('Time') . ' ' . __('from'));
+            $cells = wf_TableCell(__('Camera'));
+            $cells .= wf_TableCell(__('Time') . ' ' . __('from'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('to'));
-            $cells .= wf_TableCell(__('Camera'));
             $cells .= wf_TableCell(__('Size'));
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
             foreach ($allRecords as $io => $eachFile) {
                 $fileNameParts = $this->parseRecordFileName($eachFile);
-                $cells = wf_TableCell($fileNameParts['from']);
+                $cells = wf_TableCell($this->cameras->getCameraComment($fileNameParts['channel']));
+                $cells .= wf_TableCell($fileNameParts['from']);
                 $cells .= wf_TableCell($fileNameParts['to']);
-                $cells .= wf_TableCell($this->cameras->getCameraComment($fileNameParts['channel']));
+
                 $recordSize = filesize($userRecordingsDir . $eachFile);
                 $recordSizeLabel = wr_convertSize($recordSize);
                 $cells .= wf_TableCell($recordSizeLabel, '', '', 'sorttable_customkey="' . $recordSize . '"');
+                $actLinks = '';
                 $fileUrl = $userRecordingsDir . $eachFile;
-                $actLinks = $this->renderRecDelDialog($eachFile);
-                $actLinks .= wf_Link($fileUrl, web_icon_download());
                 $previewUrl = self::URL_RECORDS . '&' . self::ROUTE_PREVIEW . '=' . base64_encode($fileUrl);
                 if ($channelId) {
                     $previewUrl .= '&' . self::ROUTE_BACK_EXPORT . '=' . $channelId;
                 }
-                $actLinks .= wf_Link($previewUrl, web_icon_search(__('Show')));
+                $actLinks .= wf_Link($previewUrl, wf_img('skins/icon_play_small.png', __('Show'))) . ' ';
+                $actLinks .= wf_Link($fileUrl, web_icon_download()) . ' ';
+                $actLinks .= $this->renderRecDelDialog($eachFile) . ' ';
                 $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
             }
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table sortable');
         } else {
-            $noRecordsNotice = __('You have no exported records yet');
+            $noRecordsNotice = __('You have no saved records yet');
             if ($channelId) {
                 $noRecordsNotice .= ' ' . __('for this camera');
             }
@@ -908,7 +911,7 @@ class Export {
             $notificationType = 'warning';
         }
 
-        $result .= $this->messages->getStyledMessage(__('Free space for exporting your records') . ': ' . $spaceLabel, $notificationType);
+        $result .= $this->messages->getStyledMessage(__('Free space for saving your records') . ': ' . $spaceLabel, $notificationType);
         return($result);
     }
 
@@ -961,6 +964,28 @@ class Export {
         if ($channelId) {
             $result .= $this->cameras->getCameraComment($channelId);
         }
+        return($result);
+    }
+
+    /**
+     * Just renders successfull export notification and confirmation
+     * 
+     * @param string $channelId
+     * 
+     * @return string
+     */
+    public function renderExportScheduledNotify($channelId) {
+        $result = '';
+        $notification = '';
+        $notification .= wf_tag('center') . wf_img('skins/checked.png') . wf_tag('center', true);
+        $notification .= wf_delimiter(0);
+
+        $notification .= __('Saving recording from the camera is scheduled for you') . '.';
+        $notification .= wf_delimiter(0);
+        $notification .= __('This will start in a few minutes and may take a while depending on the length of the recording') . '.';
+        $notification .= wf_delimiter();
+        $notification .= wf_tag('center') . wf_Link(self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $channelId, __('Got it') . '!', true, 'confirmagree') . wf_tag('center', true);
+        $result .= wf_modalOpenedAuto(__('Success'), $notification);
         return($result);
     }
 

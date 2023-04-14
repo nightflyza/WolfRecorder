@@ -761,11 +761,11 @@ class Cameras {
             }
 
             if (cfr('ARCHIVE')) {
-                $cameraControls .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $cameraData['channel'], wf_img('skins/icon_archive_small.png') . ' ' . __('Archive'), false, 'ubButton');
+                $cameraControls .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $cameraData['channel'], wf_img('skins/icon_archive_small.png') . ' ' . __('Video from camera'), false, 'ubButton');
             }
 
             if (cfr('EXPORT')) {
-                $cameraControls .= wf_Link(Export::URL_ME . '&' . Export::ROUTE_CHANNEL . '=' . $cameraData['channel'], wf_img('skins/icon_export.png') . ' ' . __('Export'), false, 'ubButton');
+                $cameraControls .= wf_Link(Export::URL_ME . '&' . Export::ROUTE_CHANNEL . '=' . $cameraData['channel'], wf_img('skins/icon_export.png') . ' ' . __('Save record'), false, 'ubButton');
             }
 
             if (!$cameraData['active']) {
