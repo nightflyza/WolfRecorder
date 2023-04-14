@@ -706,13 +706,21 @@ class Export {
                 $channelId = ubRouting::get(self::ROUTE_CHANNEL);
                 $deleteUrl = self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $channelId . '&' . self::ROUTE_DELETE . '=' . $fileName;
                 $cancelUrl = self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $channelId;
-                $result .= wf_ConfirmDialog($deleteUrl, web_delete_icon(), $this->messages->getDeleteAlert(), '', $cancelUrl, __('Delete') . ' ' . __('Recording') . '?');
+                $label = wf_tag('center') . wf_img('skins/trash-bin.png') . wf_tag('center', true);
+                $label .= wf_delimiter(0);
+                $label .= $this->messages->getDeleteAlert();
+                $label .= wf_delimiter(0);
+                $result .= wf_ConfirmDialog($deleteUrl, web_delete_icon(), $label, '', $cancelUrl, __('Delete') . ' ' . __('Recording') . '?');
             }
 
             if ($currentModule == 'records') {
                 $deleteUrl = self::URL_RECORDS . '&' . self::ROUTE_DELETE . '=' . $fileName;
                 $cancelUrl = self::URL_RECORDS;
-                $result .= wf_ConfirmDialog($deleteUrl, web_delete_icon(), $this->messages->getDeleteAlert(), '', $cancelUrl, __('Delete') . ' ' . __('Recording') . '?');
+                $label = wf_tag('center') . wf_img('skins/trash-bin.png') . wf_tag('center', true);
+                $label .= wf_delimiter(0);
+                $label .= $this->messages->getDeleteAlert();
+                $label .= wf_delimiter(0);
+                $result .= wf_ConfirmDialog($deleteUrl, web_delete_icon(), $label, '', $cancelUrl, __('Delete') . ' ' . __('Recording') . '?');
             }
         }
         return($result);
@@ -752,9 +760,10 @@ class Export {
             $starDust = new StarDust();
             $allExportProcesses = $starDust->getAllStates();
             $cells = wf_TableCell(__('Created'));
+            $cells .= wf_TableCell(__('Camera'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('from'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('to'));
-            $cells .= wf_TableCell(__('Camera'));
+
             $cells .= wf_TableCell(__('Size forecast'));
             $rows = wf_TableRowStyled($cells, 'row1');
             foreach ($allUndoneTasks as $io => $each) {
@@ -766,9 +775,10 @@ class Export {
                     }
                 }
                 $cells = wf_TableCell($each['date']);
+                $cells .= wf_TableCell($this->cameras->getCameraComment($each['channel']) . $runningLabel);
                 $cells .= wf_TableCell($each['datetimefrom']);
                 $cells .= wf_TableCell($each['datetimeto']);
-                $cells .= wf_TableCell($this->cameras->getCameraComment($each['channel']) . $runningLabel);
+
                 $cells .= wf_TableCell(wr_convertSize($each['sizeforecast']), '', '', 'sorttable_customkey="' . $each['sizeforecast'] . '"');
                 $rows .= wf_TableRowStyled($cells, 'row5');
             }
