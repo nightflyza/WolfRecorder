@@ -792,7 +792,7 @@ class Export {
     /**
      * Renders howl player for previously generated playlist
      * 
-     * @param string $filePath - full playlist path
+     * @param string $filePath - full file path
      * @param string $width - width in px or %
      * @param bool $autoPlay - start playback right now?
      * @param string $playerId - must be equal to channel name to access playlist in DOM
@@ -800,18 +800,8 @@ class Export {
      * @return string
      */
     protected function renderRecordPlayer($filePath, $width = '600px', $autoPlay = false, $playerId = '') {
-        $autoPlay = ($autoPlay) ? 'true' : 'false';
-        $playerId = ($playerId) ? $playerId : 'recplayer' . wf_InputId();
-
-        $result = '';
-        $result .= '<script src="modules/jsc/playerjs/w_playerjs.js"></script >
-            <div style="float:left; width:' . $width . '; margin:5px;">
-            <div id = "' . $playerId . '" style="width:90%;"></div >
-            <script >var player = new Playerjs({id:"' . $playerId . '", file:"' . $filePath . '", autoplay:' . $autoPlay . '});
-            </script>
-            </div>
-            ';
-        $result .= wf_CleanDiv();
+        $player = new Player($width, $autoPlay);
+        $result = $player->renderSinglePlayer($filePath, $playerId);
         return($result);
     }
 

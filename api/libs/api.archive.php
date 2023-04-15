@@ -182,16 +182,14 @@ class Archive {
      * Renders howl player for previously generated playlist
      * 
      * @param string $playlistPath - full playlist path
-     * @param string $width - width in px or %
      * @param bool $autoPlay - start playback right now?
      * @param string $playerId - must be equal to channel name to access playlist in DOM
      * 
      * @return string
      */
-    protected function renderArchivePlayer($playlistPath, $width = '600px', $autoPlay = false, $playerId = '') {
-        $autoPlay = ($autoPlay) ? 'true' : 'false';
-        $playerId = ($playerId) ? $playerId : 'archplayer' . wf_InputId();
-        $plStart = '';
+    protected function renderArchivePlayer($playlistPath, $autoPlay = false, $playerId = '') {
+       $plStart = '';
+       
         if (!ubRouting::checkGet(self::ROUTE_SHOWDATE)) {
             $fewMinsAgo = strtotime("-5 minute", time());
             $fewMinsAgo = date("H:i", $fewMinsAgo);
@@ -202,15 +200,10 @@ class Archive {
         if (ubRouting::checkGet(self::ROUTE_TIMESEGMENT)) {
             $plStart = ', plstart:"s_' . ubRouting::get(self::ROUTE_TIMESEGMENT, 'mres') . '"';
         }
-        $result = '';
-        $result .= '<script src="modules/jsc/playerjs/w_playerjs.js"></script >
-            <div style="float:left; width:' . $width . '; margin:5px;">
-            <div id = "' . $playerId . '" style="width:90%;"></div >
-            <script >var player = new Playerjs({id:"' . $playerId . '", file:"' . $playlistPath . '", autoplay:' . $autoPlay . ' ' . $plStart . '});
-            </script >
-            </div>
-            ';
-        $result .= wf_CleanDiv();
+
+        $player = new Player($this->playerWidth, $autoPlay);
+        $result = $player->renderPlaylistPlayer($playlistPath, $plStart, $playerId);
+
         return($result);
     }
 
@@ -421,7 +414,7 @@ class Archive {
                 if (!empty($chunksList)) {
                     $archivePlayList = $this->generateArchivePlaylist($cameraId, $showDate, $showDate, $chunksList);
                     if ($archivePlayList) {
-                        $result .= $this->renderArchivePlayer($archivePlayList, $this->playerWidth, true, $cameraData['channel']);
+                        $result .= $this->renderArchivePlayer($archivePlayList, true, $cameraData['channel']);
                     } else {
                         $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
                         $result .= wf_delimiter(0);
