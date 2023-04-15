@@ -451,7 +451,7 @@ class Storages {
     }
 
     /**
-     * Filters some chanks array and lefts only chunks between some timestamps in range
+     * Filters some chunks array and lefts only chunks between some timestamps in range
      * 
      * @param array $chunksList
      * @param int $timeFrom
