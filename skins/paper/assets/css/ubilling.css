@@ -751,3 +751,11 @@ sub, sup {
     box-shadow:         3px 3px 4px rgba(50, 50, 50, 0.75);
 
 }
+
+.camlink {
+    color:#777777;
+}
+.camlink:hover {
+    color:#777777;
+    text-decoration: none;
+}

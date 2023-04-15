@@ -212,8 +212,9 @@ class Export {
                         $cells .= wf_TableCell($eachCamId);
                         $cells .= wf_TableCell($eachCamIp);
                     }
-                    $cells .= wf_TableCell($eachCamDesc);
-                    $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $eachCamChannel, wf_img('skins/icon_export.png', __('Save records')));
+                    $eachCamUrl = self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $eachCamChannel;
+                    $cells .= wf_TableCell(wf_Link($eachCamUrl, $eachCamDesc, false, 'camlink'));
+                    $actLinks = wf_Link($eachCamUrl, wf_img('skins/icon_export.png', __('Save records')));
                     $cells .= wf_TableCell($actLinks);
                     $rows .= wf_TableRow($cells, 'row5');
                 }

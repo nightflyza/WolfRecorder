@@ -162,8 +162,9 @@ class Archive {
                         $cells .= wf_TableCell($eachCamId);
                         $cells .= wf_TableCell($eachCamIp, '', '', 'sorttable_customkey="' . ip2int($eachCamIp) . '"');
                     }
-                    $cells .= wf_TableCell($eachCamDesc);
-                    $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel, wf_img('skins/icon_play_small.png', __('View')));
+                    $eachCamUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel;
+                    $cells .= wf_TableCell(wf_Link($eachCamUrl, $eachCamDesc, false, 'camlink'));
+                    $actLinks = wf_Link($eachCamUrl, wf_img('skins/icon_play_small.png', __('View')));
                     $cells .= wf_TableCell($actLinks);
                     $rows .= wf_TableRow($cells, 'row5');
                 }
