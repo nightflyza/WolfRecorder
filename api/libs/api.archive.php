@@ -163,7 +163,7 @@ class Archive {
                     }
                     $cells .= wf_TableCell($eachCamIp, '', '', 'sorttable_customkey="' . ip2int($eachCamIp) . '"');
                     $cells .= wf_TableCell($eachCamDesc);
-                    $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel, wf_img('skins/icon_play_small.png',__('View')));
+                    $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel, wf_img('skins/icon_play_small.png', __('View')));
                     $cells .= wf_TableCell($actLinks);
                     $rows .= wf_TableRow($cells, 'row5');
                 }
@@ -242,8 +242,8 @@ class Archive {
             $dayMinAlloc = $this->allocDayTimeline();
             $chunksByDay = 0;
             $curDate = curdate();
-            $fewMinAgo = date("H:i", strtotime("-5 minute", time()));
-            $fewMinLater = date("H:i", strtotime("+1 minute", time()));
+            $fewMinAgo = strtotime("-5 minute", time());
+            $fewMinLater = strtotime("+1 minute", time());
             foreach ($chunksList as $timeStamp => $eachChunk) {
                 $dayOfMonth = date("Y-m-d", $timeStamp);
                 if ($dayOfMonth == $date) {
@@ -332,14 +332,17 @@ class Archive {
      * @param int $cameraId
      * @param string $dateFrom
      * @param string $dateTo
+     * @param array $chunksList
      * 
      * @return string/void on error
      */
-    protected function generateArchivePlaylist($cameraId, $dateFrom, $dateTo) {
+    protected function generateArchivePlaylist($cameraId, $dateFrom, $dateTo, $chunksList = array()) {
         $result = '';
         $cameraId = ubRouting::filters($cameraId, 'int');
         if (isset($this->allCamerasData[$cameraId])) {
             $curDate = curdate();
+            $dateFromTs = strtotime($dateFrom . ' 00:00:00');
+            $dateToTs = strtotime($dateFrom . ' 23:59:59');
             $minuteBetweenNow = strtotime('-1 minute', time());
             $cameraData = $this->allCamerasData[$cameraId]['CAMERA'];
             $cameraStorageData = $this->allCamerasData[$cameraId]['STORAGE'];
@@ -350,23 +353,19 @@ class Archive {
                 $storagePath = $storagePath . '/';
             }
             $howlChunkPath = Storages::PATH_HOWL . '/';
-            $chunksList = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
+            if (empty($chunksList)) {
+                $chunksList = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
+            }
             $filteredChunks = array();
             if (!empty($chunksList)) {
-                foreach ($chunksList as $timeStamp => $chunkPath) {
-                    $chunkDate = date("Y-m-d", $timeStamp);
+                foreach ($chunksList as $chunkTimeStamp => $chunkPath) {
 
-                    if (zb_isDateBetween($dateFrom, $dateTo, $chunkDate)) {
+                    if (zb_isTimeStampBetween($dateFromTs, $dateToTs, $chunkTimeStamp)) {
                         $howlChunkFullPath = str_replace($storagePath, $howlChunkPath, $chunkPath);
                         $howlChunkFullPath = str_replace('//', '/', $howlChunkFullPath);
-//exclude last minute chunk - it may be unfinished now
-                        if ($chunkDate == $curDate) {
-                            if ($timeStamp < $minuteBetweenNow) {
-                                $filteredChunks[$timeStamp] = $howlChunkFullPath;
-                            }
-                        } else {
-//or just push to playlist
-                            $filteredChunks[$timeStamp] = $howlChunkFullPath;
+                        //excluding last minute chunk - it may be unfinished now
+                        if ($chunkTimeStamp < $minuteBetweenNow) {
+                            $filteredChunks[$chunkTimeStamp] = $howlChunkFullPath;
                         }
                     }
                 }
@@ -417,15 +416,15 @@ class Archive {
                 $showDate = (ubRouting::checkGet(self::ROUTE_SHOWDATE)) ? ubRouting::get(self::ROUTE_SHOWDATE, 'mres') : curdate();
                 $chunksList = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
                 if (!empty($chunksList)) {
-                    $archivePlayList = $this->generateArchivePlaylist($cameraId, $showDate, $showDate);
+                    $archivePlayList = $this->generateArchivePlaylist($cameraId, $showDate, $showDate, $chunksList);
                     if ($archivePlayList) {
                         $result .= $this->renderArchivePlayer($archivePlayList, $this->playerWidth, true, $cameraData['channel']);
                     } else {
                         $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
                         $result .= wf_delimiter(0);
                     }
-//some timeline here
-                    $result .= $this->renderDaysTimeline($channelId, $chunksList);
+                        //some timeline here
+                        $result .= $this->renderDaysTimeline($channelId, $chunksList);
                 } else {
                     $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
                 }

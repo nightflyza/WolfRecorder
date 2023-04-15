@@ -90,7 +90,7 @@ class Recorder {
     const PID_PREFIX = 'RECORD_';
     const CAPTURE_PID = 'CAPTURE';
     const WRAPPER = '/bin/wrapi';
-    const CHUNKS_MASK = '%Y-%m-%d_%H-%M-%S';
+    const CHUNKS_MASK = '%s';
     const CHUNKS_EXT = '.mp4';
     const DEBUG_LOG = 'exports/recorder_debug.log';
 

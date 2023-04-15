@@ -858,3 +858,20 @@ function zb_isDateBetween($fromDate, $toDate, $checkDate) {
     }
     return($result);
 }
+
+/**
+ * Checks is timestamp between some other time ranges?
+ * 
+ * @param int $fromTime start time
+ * @param int $toTime end time
+ * @param int $checkTime time to check
+ * 
+ * @return bool
+ */
+function zb_isTimeStampBetween($fromTime, $toTime, $checkTime) {
+    $result = false;
+    if ($checkTime >= $fromTime AND $checkTime <= $toTime) {
+        $result = true;
+    }
+    return ($result);
+}

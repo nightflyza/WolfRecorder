@@ -394,20 +394,11 @@ class Storages {
                 if (file_exists($storagePath)) {
                     if (file_exists($storagePath . $channel)) {
                         $chunksExt = Recorder::CHUNKS_EXT;
-                        $chunksMask = Recorder::CHUNKS_MASK;
                         $allChunksNames = scandir($storagePath . $channel);
                         if (!empty($allChunksNames)) {
                             foreach ($allChunksNames as $io => $eachFileName) {
                                 if ($eachFileName != '.' AND $eachFileName != '..') {
-                                    $nameSkips = array($chunksExt, '_');
-                                    $nameReplaces = array('', ' ');
-                                    $cleanChunkName = str_replace($nameSkips, $nameReplaces, $eachFileName);
-                                    $explodedName = explode(' ', $cleanChunkName);
-                                    $chunkDate = $explodedName[0];
-                                    $chunkTime = $explodedName[1];
-                                    $chunkTime = str_replace('-', ':', $chunkTime);
-                                    $chunkDateTime = $chunkDate . ' ' . $chunkTime;
-                                    $cleanChunkTimeStamp = strtotime($chunkDateTime);
+                                    $cleanChunkTimeStamp = str_replace($chunksExt, '', $eachFileName);
                                     $result[$cleanChunkTimeStamp] = $storagePath . $channel . '/' . $eachFileName;
                                 }
                             }
