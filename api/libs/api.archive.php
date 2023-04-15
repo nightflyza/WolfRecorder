@@ -147,8 +147,8 @@ class Archive {
                 $cells = '';
                 if (cfr('CAMERAS')) {
                     $cells .= wf_TableCell(__('ID'));
+                    $cells .= wf_TableCell(__('IP'));
                 }
-                $cells .= wf_TableCell(__('IP'));
                 $cells .= wf_TableCell(__('Description'));
                 $cells .= wf_TableCell(__('Actions'));
                 $rows = wf_TableRow($cells, 'row1');
@@ -160,8 +160,8 @@ class Archive {
                     $cells = '';
                     if (cfr('CAMERAS')) {
                         $cells .= wf_TableCell($eachCamId);
+                        $cells .= wf_TableCell($eachCamIp, '', '', 'sorttable_customkey="' . ip2int($eachCamIp) . '"');
                     }
-                    $cells .= wf_TableCell($eachCamIp, '', '', 'sorttable_customkey="' . ip2int($eachCamIp) . '"');
                     $cells .= wf_TableCell($eachCamDesc);
                     $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel, wf_img('skins/icon_play_small.png', __('View')));
                     $cells .= wf_TableCell($actLinks);
@@ -255,6 +255,7 @@ class Archive {
                 }
             }
 
+
             //any records here?
             if ($chunksByDay) {
                 if ($chunksByDay > 3) {
@@ -264,7 +265,8 @@ class Archive {
                     foreach ($dayMinAlloc as $eachMin => $recAvail) {
                         $recAvailBar = ($recAvail) ? 'skins/rec_avail.png' : 'skins/rec_unavail.png';
                         if ($curDate == $date) {
-                            if (zb_isTimeBetween($fewMinAgo, $fewMinLater, $eachMin)) {
+                            $eachMinTs = strtotime($date . ' ' . $eachMin . ':00');
+                            if (zb_isTimeStampBetween($fewMinAgo, $fewMinLater, $eachMinTs)) {
                                 $recAvailBar = 'skins/rec_now.png';
                             }
                         }
@@ -423,8 +425,8 @@ class Archive {
                         $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
                         $result .= wf_delimiter(0);
                     }
-                        //some timeline here
-                        $result .= $this->renderDaysTimeline($channelId, $chunksList);
+                    //some timeline here
+                    $result .= $this->renderDaysTimeline($channelId, $chunksList);
                 } else {
                     $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
                 }

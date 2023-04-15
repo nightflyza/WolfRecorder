@@ -197,8 +197,8 @@ class Export {
                 $cells = '';
                 if (cfr('CAMERAS')) {
                     $cells .= wf_TableCell(__('ID'));
+                    $cells .= wf_TableCell(__('IP'));
                 }
-                $cells .= wf_TableCell(__('IP'));
                 $cells .= wf_TableCell(__('Description'));
                 $cells .= wf_TableCell(__('Actions'));
                 $rows = wf_TableRow($cells, 'row1');
@@ -210,8 +210,8 @@ class Export {
                     $cells = '';
                     if (cfr('CAMERAS')) {
                         $cells .= wf_TableCell($eachCamId);
+                        $cells .= wf_TableCell($eachCamIp);
                     }
-                    $cells .= wf_TableCell($eachCamIp);
                     $cells .= wf_TableCell($eachCamDesc);
                     $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $eachCamChannel, wf_img('skins/icon_export.png', __('Save records')));
                     $cells .= wf_TableCell($actLinks);
@@ -238,8 +238,8 @@ class Export {
             $dayMinAlloc = $this->archive->allocDayTimeline();
             $chunksByDay = 0;
             $curDate = curdate();
-            $fewMinAgo = date("H:i", strtotime("-5 minute", time()));
-            $fewMinLater = date("H:i", strtotime("+1 minute", time()));
+            $fewMinAgo = strtotime("-5 minute", time());
+            $fewMinLater = strtotime("+1 minute", time());
             foreach ($chunksList as $timeStamp => $eachChunk) {
                 $dayOfMonth = date("Y-m-d", $timeStamp);
                 if ($dayOfMonth == $date) {
@@ -260,7 +260,8 @@ class Export {
                     foreach ($dayMinAlloc as $eachMin => $recAvail) {
                         $recAvailBar = ($recAvail) ? 'skins/rec_avail.png' : 'skins/rec_unavail.png';
                         if ($curDate == $date) {
-                            if (zb_isTimeBetween($fewMinAgo, $fewMinLater, $eachMin)) {
+                            $eachMinTs = strtotime($date . ' ' . $eachMin . ':00');
+                            if (zb_isTimeStampBetween($fewMinAgo, $fewMinLater, $eachMinTs)) {
                                 $recAvailBar = 'skins/rec_now.png';
                             }
                         }
