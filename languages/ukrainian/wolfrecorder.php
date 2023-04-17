@@ -207,6 +207,6 @@ $lang['def']['This will start in a few minutes and may take a while depending on
 $lang['def']['Previous'] = 'Попередній';
 $lang['def']['Next'] = 'Наступний';
 $lang['def']['Files'] = 'Файли';
-$lang['def'][''] = '';
+$lang['def']['My cameras'] = 'Мої камери';
 $lang['def'][''] = '';
 
