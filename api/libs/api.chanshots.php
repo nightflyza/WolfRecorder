@@ -66,7 +66,7 @@ class ChanShots {
      *
      * @var string
      */
-    protected $screenshotOpts = '-frames:v 1 -q:v 15';
+    protected $screenshotOpts = '-loglevel error -frames:v 1 -q:v 15';
 
     public function __construct() {
         $this->loadConfigs();
@@ -111,6 +111,26 @@ class ChanShots {
      */
     public function getScreenshotsPath() {
         return($this->screenshotsPath);
+    }
+
+    /**
+     * Returns channel latest screenshot path
+     * 
+     * @param string $channelId
+     * 
+     * @return string/void
+     */
+    public function getChannelScreenShot($channelId) {
+        $result = '';
+        $channelId = ubRouting::filters($channelId, 'mres');
+        if (file_exists($this->screenshotsPath)) {
+            $screenshotName = $channelId . self::SHOTS_EXT;
+            $fullPath = $this->screenshotsPath . $screenshotName;
+            if (file_exists($fullPath)) {
+                $result = $fullPath;
+            }
+        }
+        return($result);
     }
 
     /**
