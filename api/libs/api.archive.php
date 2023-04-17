@@ -144,6 +144,8 @@ class Archive {
         $allStotagesData = $this->storages->getAllStoragesData();
         if (!empty($allStotagesData)) {
             if (!empty($this->allCamerasData)) {
+                $screenshots = new ChanShots();
+
                 $cells = '';
                 if (cfr('CAMERAS')) {
                     $cells .= wf_TableCell(__('ID'));
@@ -163,7 +165,12 @@ class Archive {
                         $cells .= wf_TableCell($eachCamIp, '', '', 'sorttable_customkey="' . ip2int($eachCamIp) . '"');
                     }
                     $eachCamUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel;
-                    $cells .= wf_TableCell(wf_Link($eachCamUrl, $eachCamDesc, false, 'camlink'));
+                    $camPreview = '';
+                    $chanShot = $screenshots->getChannelScreenShot($eachCamChannel);
+                    if ($chanShot) {
+                        $camPreview .= wf_img_sized($chanShot, $eachCamDesc, '25').' ';
+                    }
+                    $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview . $eachCamDesc, false, 'camlink'));
                     $actLinks = wf_Link($eachCamUrl, wf_img('skins/icon_play_small.png', __('View')));
                     $cells .= wf_TableCell($actLinks);
                     $rows .= wf_TableRow($cells, 'row5');
@@ -188,8 +195,8 @@ class Archive {
      * @return string
      */
     protected function renderArchivePlayer($playlistPath, $autoPlay = false, $playerId = '') {
-       $plStart = '';
-       
+        $plStart = '';
+
         if (!ubRouting::checkGet(self::ROUTE_SHOWDATE)) {
             $fewMinsAgo = strtotime("-5 minute", time());
             $fewMinsAgo = date("H:i", $fewMinsAgo);
