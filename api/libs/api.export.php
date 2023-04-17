@@ -326,7 +326,7 @@ class Export {
            ";
         }
 
-        $jsCode.=$daysEnable;
+        $jsCode .= $daysEnable;
         $jsCode .= " $('#" . $divId . "').datepicker({
                         inline: true,
                         altField: '#" . $inputId . "',
@@ -372,10 +372,21 @@ class Export {
             }
             if (!empty($datesTmp)) {
                 //TODO: render latest channel screenshot here
-//                    $chanShots = new ChanShots();
-//                    $latestScreenShot = $chanShots->getChannelScreenShot($channelId);
-//                    $result .= wf_img_sized($latestScreenShot, '', '50%');
-                $inputs = $this->wf_InlineDatePicker(self::PROUTE_DATE_EXPORT, $datesTmp, $dayPointer);
+                $chanShots = new ChanShots();
+                $latestScreenShot = $chanShots->getChannelScreenShot($channelId);
+                $grid = '';
+                if ($latestScreenShot) {
+                    $grid .= wf_tag('div', false, '', 'style="float:left; margin: 5px;"');
+                    $grid .= wf_img_sized($latestScreenShot, '', '', '', 'float:left; height:240px;');
+                    $grid .= wf_tag('div', true);
+                }
+
+                $grid .= wf_tag('div', false, '', 'style="float:left; margin: 5px;"');
+                $grid .= $this->wf_InlineDatePicker(self::PROUTE_DATE_EXPORT, $datesTmp, $dayPointer);
+                $grid .= wf_tag('div', true);
+
+                $inputs = $grid;
+                $inputs .= wf_CleanDiv();
                 $inputs .= wf_TextInput(self::PROUTE_TIME_FROM, '', ubRouting::post(self::PROUTE_TIME_FROM), false, 5, '', self::PROUTE_TIME_FROM, self::PROUTE_TIME_FROM, 'style="display:none;"') . ' ';
                 $inputs .= wf_TextInput(self::PROUTE_TIME_TO, '', ubRouting::post(self::PROUTE_TIME_TO), false, 5, '', self::PROUTE_TIME_TO, self::PROUTE_TIME_TO, 'style="display:none;"') . ' ';
                 $sliderCode = file_get_contents('modules/jsc/exportSlider.js');
@@ -838,8 +849,8 @@ class Export {
         if (!empty($allUndoneTasks)) {
             $starDust = new StarDust();
             $allExportProcesses = $starDust->getAllStates();
-            $cells = wf_TableCell(__('Created'));
-            $cells .= wf_TableCell(__('Camera'));
+
+            $cells = wf_TableCell(__('Camera'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('from'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('to'));
 
@@ -853,8 +864,8 @@ class Export {
                         $runningLabel = ' 🏁 ';
                     }
                 }
-                $cells = wf_TableCell($each['date']);
-                $cells .= wf_TableCell($this->cameras->getCameraComment($each['channel']) . $runningLabel);
+
+                $cells = wf_TableCell($this->cameras->getCameraComment($each['channel']) . $runningLabel);
                 $cells .= wf_TableCell($each['datetimefrom']);
                 $cells .= wf_TableCell($each['datetimeto']);
 
