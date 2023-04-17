@@ -217,6 +217,11 @@ class Cameras {
                         if (isset($allModels[$modelId])) {
                             if (zb_isIPValid($ipF)) {
                                 if (!empty($loginF) AND ! empty($passwordF)) {
+                                    //storage migration?
+                                    if ($cameraData['storageid'] != $storageId) {
+                                        $this->storages->migrateChannel($storageId, $cameraData['channel']);
+                                    }
+                                    //updating db
                                     $this->camerasDb->where('id', '=', $cameraId);
                                     $this->camerasDb->data('modelid', $modelId);
                                     $this->camerasDb->data('ip', $ipF);

@@ -2,4 +2,4 @@
 */2 * * * *     /bin/wrapi "capture"
 */1 * * * *     /bin/wrapi "rotator"
 */1 * * * *     /bin/wrapi "exportsched"
-
+*/5 * * * *     /bin/wrapi "streamdog"

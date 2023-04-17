@@ -511,16 +511,20 @@ class Storages {
                         }
                         $chanDirName = $storagePath . $delimiter . $channel;
                         $fullPath = $chanDirName . '/';
+                        $howlLink = self::PATH_HOWL . $channel;
                         //allocate channel dir
                         if (!file_exists($fullPath)) {
                             //creating new directory
                             mkdir($fullPath, 0777);
                             chmod($fullPath, 0777);
-                            //linking to howl
-                            $howlLink = self::PATH_HOWL . $channel;
+                            log_register('STORAGE ALLOCATED `' . $storagePath . '` CHANNEL `' . $channel . '`');
+                        }
+
+                        //linking to howl?
+                        if (!file_exists($howlLink)) {
                             symlink($chanDirName, $howlLink);
                             chmod($howlLink, 0777);
-                            log_register('STORAGE ALLOCATED `' . $storagePath . '` CHANNEL `' . $channel . '`');
+                            log_register('STORAGE LINKED `' . $storagePath . '` HOWL `' . $channel . '`');
                         }
 
                         //seems ok?
@@ -532,6 +536,31 @@ class Storages {
             }
         }
         return($result);
+    }
+
+    /**
+     * Migrates howl symlink to new storage
+     * 
+     * @param int $newStorageId
+     * @param string $channel
+     * 
+     * @return void
+     */
+    public function migrateChannel($newStorageId, $channel) {
+        $newStorageId = ubRouting::filters($newStorageId, 'int');
+        $channel = ubRouting::filters($channel, 'mres');
+        if (isset($this->allStorages[$newStorageId])) {
+            $storageData = $this->getStorageData($newStorageId);
+            $storagePath = $storageData['path'];
+            $howlLink = self::PATH_HOWL . $channel;
+            if (file_exists($howlLink)) {
+                //cleanin old howl link
+                unlink($howlLink);
+                //new storage channel alocation
+                $this->allocateChannel($storagePath, $channel);
+                log_register('STORAGE MIGRATED `' . $storagePath . '` HOWL `' . $channel . '`');
+            }
+        }
     }
 
     /**
