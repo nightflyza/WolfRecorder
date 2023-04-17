@@ -58,19 +58,20 @@ class Player {
      * @param string $playlistPath - full playlist path
      * @param string $plStart - starting segment for playback
      * @param string $playerId - must be equal to channel name to access playlist in DOM
+     * @param string $poster - optional channel screenshot
      * 
      * @return string
      */
-    public function renderPlaylistPlayer($playlistPath, $plStart = '', $playerId = '') {
+    public function renderPlaylistPlayer($playlistPath, $plStart = '', $playerId = '', $poster = '') {
         $autoPlay = ($this->autoPlayFlag) ? 'true' : 'false';
         $playerId = ($playerId) ? $playerId : 'plplayer' . wf_InputId();
-
+        $poster = ($poster) ? ' poster:"' . $poster . '",' : '';
         $result = '';
         $result .= wf_tag('script', false, '', 'src="' . $this->playerLib . '"') . wf_tag('script', true);
         $result .= wf_tag('div', false, '', 'style="float:left; width:' . $this->width . '; margin:5px;"');
         $result .= wf_tag('div', false, '', 'id = "' . $playerId . '" style="width:90%;"') . wf_tag('div', true);
         $result .= wf_tag('script');
-        $result .= 'var player = new Playerjs({id:"' . $playerId . '", file:"' . $playlistPath . '", autoplay:' . $autoPlay . ' ' . $plStart . '});';
+        $result .= 'var player = new Playerjs({id:"' . $playerId . '", ' . $poster . ' file:"' . $playlistPath . '", autoplay:' . $autoPlay . ' ' . $plStart . '});';
         $result .= wf_tag('script', true);
         $result .= wf_tag('div', true);
         $result .= wf_CleanDiv();
@@ -82,19 +83,19 @@ class Player {
      * 
      * @param string $playlistPath - full playlist path
      * @param string $playerId - must be equal to channel name to access playlist in DOM
-     * 
+     * @param string $poster - optional channel screenshot
      * @return string
      */
-    public function renderSinglePlayer($filePath, $playerId = '') {
+    public function renderSinglePlayer($filePath, $playerId = '', $poster = '') {
         $autoPlay = ($this->autoPlayFlag) ? 'true' : 'false';
         $playerId = ($playerId) ? $playerId : 'singleplayer' . wf_InputId();
-
+        $poster = ($poster) ? ' poster:"' . $poster . '",' : '';
         $result = '';
         $result .= wf_tag('script', false, '', 'src="' . $this->playerLib . '"') . wf_tag('script', true);
         $result .= wf_tag('div', false, '', 'style="float:left; width:' . $this->width . '; margin:5px;"');
         $result .= wf_tag('div', false, '', 'id = "' . $playerId . '" style="width:90%;"') . wf_tag('div', true);
         $result .= wf_tag('script');
-        $result .= 'var player = new Playerjs({id:"' . $playerId . '", file:"' . $filePath . '", autoplay:' . $autoPlay . '});';
+        $result .= 'var player = new Playerjs({id:"' . $playerId . '", ' . $poster . ' file:"' . $filePath . '", autoplay:' . $autoPlay . '});';
         $result .= wf_tag('script', true);
         $result .= wf_tag('div', true);
         $result .= wf_CleanDiv();

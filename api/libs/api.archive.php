@@ -134,6 +134,27 @@ class Archive {
         $this->storages = new Storages();
     }
 
+    protected function renderToolTip($channel, $screenshot) {
+        $result = '';
+        $result .= '
+            <style>
+            .preview' . $channel . ' {
+                float: left;
+                position: relative;
+                margin-right: 10px;
+                }
+         
+       
+            </style>
+            
+           <div class="preview' . $channel . '">
+           <img src="' . $screenshot . '" width="124" class="preview' . $channel . '">
+           </div>
+      
+        ';
+        return($result);
+    }
+
     /**
      * Renders available cameras list
      * 
@@ -168,9 +189,10 @@ class Archive {
                     $camPreview = '';
                     $chanShot = $screenshots->getChannelScreenShot($eachCamChannel);
                     if ($chanShot) {
-                        $camPreview .= wf_img_sized($chanShot, $eachCamDesc, '25').' ';
+                        // $camPreview .= wf_img_sized($chanShot, $eachCamDesc, '25') . ' ';
+                        $camPreview = $this->renderToolTip($eachCamChannel, $chanShot);
                     }
-                    $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview . $eachCamDesc, false, 'camlink'));
+                    $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview . $eachCamDesc, false, 'camlink', 'id="camlink' . $eachCamChannel . '"'));
                     $actLinks = wf_Link($eachCamUrl, wf_img('skins/icon_play_small.png', __('View')));
                     $cells .= wf_TableCell($actLinks);
                     $rows .= wf_TableRow($cells, 'row5');
@@ -210,7 +232,6 @@ class Archive {
 
         $player = new Player($this->playerWidth, $autoPlay);
         $result = $player->renderPlaylistPlayer($playlistPath, $plStart, $playerId);
-
         return($result);
     }
 
