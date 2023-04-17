@@ -147,7 +147,6 @@ class Archive {
             <style>
             
             .preview' . $channel . ' {
-                float: left;
                 position: relative;
                 margin-right: 10px;
                 }
@@ -155,10 +154,8 @@ class Archive {
             </style>
             
            <span class="preview' . $channel . '">
-           <img src="' . $screenshot . '" width="124" class="preview' . $channel . '">
-           </span>
-      
-        ';
+           <img src="' . $screenshot . '" width="124" class="preview' . $channel . '"> 
+           </span>';
         return($result);
     }
 
