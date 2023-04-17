@@ -206,7 +206,7 @@ $lang['def']['Saving recording from the camera is scheduled for you'] = 'Для 
 $lang['def']['This will start in a few minutes and may take a while depending on the length of the recording'] = 'Збереження розпочнеться за декілька хвилин, та може тривати деякий час, в залежності від тривалості запису';
 $lang['def']['Previous'] = 'Попередній';
 $lang['def']['Next'] = 'Наступний';
-$lang['def'][''] = '';
+$lang['def']['Files'] = 'Файли';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
 

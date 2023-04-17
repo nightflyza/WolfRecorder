@@ -143,6 +143,7 @@ class Archive {
      */
     protected function renderToolTip($channel, $screenshot) {
         $result = '';
+        //TODO: make this middle level of huyovost
         $result .= '
             <style>
             
