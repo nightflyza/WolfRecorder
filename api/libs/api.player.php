@@ -21,7 +21,7 @@ class Player {
      *
      * @var string
      */
-    protected $playerLib = 'modules/jsc/playerjs/w_playerjs.js';
+    protected $playerLib = 'modules/jsc/playerjs/w2_playerjs.js';
 
     public function __construct($width = '', $autoPlay = false) {
         if ($width) {
