@@ -743,7 +743,7 @@ class Cameras {
             $cells .= wf_TableCell($archiveDepth);
             $rows .= wf_TableRow($cells, 'row3');
 
-            $cells = wf_TableCell(__('Bitrate'), '', 'row2');
+            $cells = wf_TableCell(__('Average bitrate'), '', 'row2');
             $cells .= wf_TableCell($chanBitrateLabel);
             $rows .= wf_TableRow($cells, 'row3');
 
