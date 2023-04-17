@@ -280,6 +280,79 @@ class Export {
     }
 
     /**
+     * Returns custom inline datepicker
+     * 
+     * @param string $name
+     * @param array $datesAvail
+     * @param string $selected
+     * 
+     * @return string
+     */
+    protected function wf_InlineDatePicker($name, $datesAvail, $selected = '') {
+        $result = '';
+        $inputId = wf_InputId();
+        $divId = 'inline' . $inputId;
+        $result .= wf_HiddenInput($name, $selected, $inputId);
+        $result .= wf_tag('div', false, '', 'id="' . $divId . '"') . wf_tag('div', true);
+        $jsCode = wf_tag('script');
+        $curlang = curlang();
+
+        $locale = "monthNamesShort: ['" . rcms_date_localise('Jan') . "','" . rcms_date_localise('Feb') . "','" . rcms_date_localise('Mar') . "','" . rcms_date_localise('Apr') . "','" . rcms_date_localise('Ma') . "','" . rcms_date_localise('Jun') . "','" . rcms_date_localise('Jul') . "','" . rcms_date_localise('Aug') . "','" . rcms_date_localise('Sep') . "','" . rcms_date_localise('Oct') . "','" . rcms_date_localise('Nov') . "','" . rcms_date_localise('Dec') . "'],";
+        $locale .= "dayNamesMin: ['" . rcms_date_localise('Sun') . "','" . rcms_date_localise('Mon') . "','" . rcms_date_localise('Tue') . "','" . rcms_date_localise('Wed') . "','" . rcms_date_localise('Thu') . "','" . rcms_date_localise('Fri') . "','" . rcms_date_localise('Sat') . "'],";
+        $locale .= "prevText: '" . __('Previous') . "',";
+        $locale .= "nextText: '" . __('Next') . "',";
+
+        $daysEnable = '';
+        if (!empty($datesAvail)) {
+            $allowedDatesJs = '        var enableDays = [';
+            foreach ($datesAvail as $io => $each) {
+                $allowedDatesJs .= "'" . $each . "',";
+            }
+            $allowedDatesJs = substr($allowedDatesJs, 1, -1);
+            $allowedDatesJs .= ']';
+            $daysEnable .= $allowedDatesJs;
+            $daysEnable .= " 
+                function enableAllTheseDays(date) {
+                var fDate = $.datepicker.formatDate('yy-mm-dd', date);
+                var result = [false, \"\"];
+                $.each(enableDays, function(k, d) {
+                  if (fDate === d) {
+                    result = [true, \"row1\"];
+                  }
+                });
+                return result;
+              }
+
+           ";
+        }
+
+        $jsCode.=$daysEnable;
+        $jsCode .= " $('#" . $divId . "').datepicker({
+                        inline: true,
+                        altField: '#" . $inputId . "',
+                        changeMonth: true,
+                        yearRange: \"-2:+0\",
+                        changeYear: true,
+                        dateFormat: 'yy-mm-dd',
+                        firstDay: 1,
+                        beforeShowDay: enableAllTheseDays,
+                        " . $locale . "
+                    }    
+                    ); 
+
+
+                    $('#" . $inputId . "').change(function(){
+                        $('#" . $divId . "').datepicker('setDate', $(this).val());
+                    });
+                    
+";
+        $jsCode .= wf_tag('script', true);
+
+        $result .= $jsCode;
+        return($result);
+    }
+
+    /**
      * Renders export form with timeline for some chunks list
      * 
      * @param string $channelId
@@ -298,7 +371,11 @@ class Export {
                 $datesTmp[$chunkDate] = $chunkDate;
             }
             if (!empty($datesTmp)) {
-                $inputs = wf_Selector(self::PROUTE_DATE_EXPORT, $datesTmp, __('Date'), $dayPointer, false) . ' ';
+                //TODO: render latest channel screenshot here
+//                    $chanShots = new ChanShots();
+//                    $latestScreenShot = $chanShots->getChannelScreenShot($channelId);
+//                    $result .= wf_img_sized($latestScreenShot, '', '50%');
+                $inputs = $this->wf_InlineDatePicker(self::PROUTE_DATE_EXPORT, $datesTmp, $dayPointer);
                 $inputs .= wf_TextInput(self::PROUTE_TIME_FROM, '', ubRouting::post(self::PROUTE_TIME_FROM), false, 5, '', self::PROUTE_TIME_FROM, self::PROUTE_TIME_FROM, 'style="display:none;"') . ' ';
                 $inputs .= wf_TextInput(self::PROUTE_TIME_TO, '', ubRouting::post(self::PROUTE_TIME_TO), false, 5, '', self::PROUTE_TIME_TO, self::PROUTE_TIME_TO, 'style="display:none;"') . ' ';
                 $sliderCode = file_get_contents('modules/jsc/exportSlider.js');

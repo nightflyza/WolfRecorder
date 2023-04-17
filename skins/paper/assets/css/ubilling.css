@@ -28,6 +28,22 @@ dirty magic class ;)
 }
 
 
+.ui-state-highlight {
+
+    color: #000000 !important;
+
+}
+
+.ui-state-active {
+    background: #2980b9 !important; 
+    color: #FFFFFF !important;
+
+}
+
+.ui-state-hover {
+    background: #ffcc33 !important; 
+    color: #000000 !important;
+}
 
 .loginform label {	
     font-size: 20px; 
