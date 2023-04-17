@@ -134,22 +134,29 @@ class Archive {
         $this->storages = new Storages();
     }
 
+    /**
+     * 
+     * @param string $channel
+     * @param string $screenshot
+     * 
+     * @return string
+     */
     protected function renderToolTip($channel, $screenshot) {
         $result = '';
         $result .= '
             <style>
+            
             .preview' . $channel . ' {
                 float: left;
                 position: relative;
                 margin-right: 10px;
                 }
-         
        
             </style>
             
-           <div class="preview' . $channel . '">
+           <span class="preview' . $channel . '">
            <img src="' . $screenshot . '" width="124" class="preview' . $channel . '">
-           </div>
+           </span>
       
         ';
         return($result);
@@ -189,7 +196,6 @@ class Archive {
                     $camPreview = '';
                     $chanShot = $screenshots->getChannelScreenShot($eachCamChannel);
                     if ($chanShot) {
-                        // $camPreview .= wf_img_sized($chanShot, $eachCamDesc, '25') . ' ';
                         $camPreview = $this->renderToolTip($eachCamChannel, $chanShot);
                     }
                     $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview . $eachCamDesc, false, 'camlink', 'id="camlink' . $eachCamChannel . '"'));
