@@ -75,7 +75,7 @@ class LiveCams {
     public function renderList() {
         $result = '';
         if (!empty($this->allCamerasData)) {
-            $style='style="float: left; margin: 5px; width: 30%; height:10%; border: 1px solid black;"';
+            $style = 'style="float: left; margin: 5px; width: 30%;  border: 1px solid black;"';
             $result .= wf_tag('div');
             foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
                 $cameraChannel = $eachCameraData['CAMERA']['channel'];
