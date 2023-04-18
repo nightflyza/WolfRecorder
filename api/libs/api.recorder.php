@@ -231,7 +231,9 @@ class Recorder {
                                 log_register('RECORDER FAILED [' . $cameraId . '] CHANNEL NOT EXISTS');
                             }
                         } else {
-                            log_register('RECORDER NOTSTARTED [' . $cameraId . '] CAMERA NOT ACCESSIBLE');
+                            if ($this->debugFlag) {
+                                log_register('RECORDER NOTSTARTED [' . $cameraId . '] CAMERA NOT ACCESSIBLE');
+                            }
                         }
                     } else {
                         log_register('RECORDER NOTSTARTED [' . $cameraId . '] ALREADY RUNNING STARDUST');

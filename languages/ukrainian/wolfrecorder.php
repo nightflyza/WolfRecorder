@@ -209,4 +209,6 @@ $lang['def']['Next'] = 'Наступний';
 $lang['def']['Files'] = 'Файли';
 $lang['def']['My cameras'] = 'Мої камери';
 $lang['def'][''] = '';
+$lang['def'][''] = '';
+$lang['def'][''] = '';
 
