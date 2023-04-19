@@ -13,7 +13,7 @@ if (cfr('CAMERAS')) {
         $newStorageId = ubRouting::post($cameras::PROUTE_NEWSTORAGE);
         $newComment = ubRouting::post($cameras::PROUTE_NEWCOMMENT);
 
-        $creationResult = $cameras->create($newModelId, $newIp, $newLogin, $newPass, $newAct, $newStorageId, $newStorageId);
+        $creationResult = $cameras->create($newModelId, $newIp, $newLogin, $newPass, $newAct, $newStorageId, $newComment);
         if ($creationResult) {
             show_error($creationResult);
         } else {
