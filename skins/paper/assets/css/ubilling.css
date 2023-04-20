@@ -23,6 +23,11 @@ dirty magic class ;)
 
 }
 
+ .ui-datepicker.ui-datepicker-inline {
+   min-width: 350px !important;
+   width: 100% !important;
+ }
+
 .row5:hover {
     background-color: #e1e1e1;
 }
