@@ -135,32 +135,6 @@ class Archive {
     }
 
     /**
-     * 
-     * @param string $channel
-     * @param string $screenshot
-     * 
-     * @return string
-     */
-    protected function renderToolTip($channel, $screenshot) {
-        $result = '';
-        //TODO: make this middle level of huyovost
-        $result .= '
-            <style>
-            
-            .preview' . $channel . ' {
-                position: relative;
-                margin-right: 10px;
-                }
-       
-            </style>
-            
-           <span class="preview' . $channel . '">
-           <img src="' . $screenshot . '" width="124" class="preview' . $channel . '"> 
-           </span>';
-        return($result);
-    }
-
-    /**
      * Renders available cameras list
      * 
      * @return string
@@ -193,9 +167,10 @@ class Archive {
                     $eachCamUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel;
                     $camPreview = '';
                     $chanShot = $screenshots->getChannelScreenShot($eachCamChannel);
-                    if ($chanShot) {
-                        $camPreview = $this->renderToolTip($eachCamChannel, $chanShot);
+                    if (empty($chanShot)) {
+                        $chanShot = 'skins/noimage.jpg';
                     }
+                    $camPreview = $screenshots->renderListBox($eachCamChannel, $chanShot);
                     $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview . $eachCamDesc, false, 'camlink', 'id="camlink' . $eachCamChannel . '"'));
                     $actLinks = wf_Link($eachCamUrl, wf_img('skins/icon_play_small.png', __('View')));
                     $cells .= wf_TableCell($actLinks);

@@ -194,6 +194,7 @@ class Export {
         $allStotagesData = $this->storages->getAllStoragesData();
         if (!empty($allStotagesData)) {
             if (!empty($this->allCamerasData)) {
+                $screenshots = new ChanShots();
                 $cells = '';
                 if (cfr('CAMERAS')) {
                     $cells .= wf_TableCell(__('ID'));
@@ -213,7 +214,13 @@ class Export {
                         $cells .= wf_TableCell($eachCamIp);
                     }
                     $eachCamUrl = self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $eachCamChannel;
-                    $cells .= wf_TableCell(wf_Link($eachCamUrl, $eachCamDesc, false, 'camlink'));
+                      $camPreview = '';
+                    $chanShot = $screenshots->getChannelScreenShot($eachCamChannel);
+                    if (empty($chanShot)) {
+                        $chanShot = 'skins/noimage.jpg';
+                    }
+                    $camPreview = $screenshots->renderListBox($eachCamChannel, $chanShot);
+                    $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview.$eachCamDesc, false, 'camlink'));
                     $actLinks = wf_Link($eachCamUrl, wf_img('skins/icon_export.png', __('Save records')));
                     $cells .= wf_TableCell($actLinks);
                     $rows .= wf_TableRow($cells, 'row5');
