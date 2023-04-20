@@ -75,17 +75,17 @@ class LiveCams {
     public function renderList() {
         $result = '';
         if (!empty($this->allCamerasData)) {
-            $style = 'style="float: left; margin: 5px; width: 30%;  border: 1px solid black;"';
+            $style = 'style="float: left; margin: 5px;"';
             $result .= wf_tag('div');
             foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
                 $cameraChannel = $eachCameraData['CAMERA']['channel'];
                 $channelScreenshot = $this->chanshots->getChannelScreenShot($cameraChannel);
                 $cameraLabel = $this->cameras->getCameraComment($cameraChannel);
                 if (empty($channelScreenshot)) {
-                    $channelScreenshot = 'skins/noimage.png';
+                    $channelScreenshot = 'skins/noimage.jpg';
                 }
                 $result .= wf_tag('div', false, '', $style);
-                $result .= wf_img($channelScreenshot, $cameraLabel, 'width: 100%;');
+                $result .= wf_img($channelScreenshot, $cameraLabel, 'height: 480px; height: 270px;  object-fit: cover;');
                 $result .= wf_tag('div', true);
             }
             $result .= wf_tag('div', true);
