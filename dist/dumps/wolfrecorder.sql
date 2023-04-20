@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `schedule` (
   `channel` varchar(64) NOT NULL,
   `datetimefrom` datetime NOT NULL,
   `datetimeto` datetime NOT NULL,
-  `sizeforecast` INT(11) NOT NULL,
+  `sizeforecast` BIGINT NOT NULL,
   `done` tinyint(2) NOT NULL DEFAULT 0,
   `finishdate` datetime DEFAULT NULL,
   PRIMARY KEY  (`id`),
