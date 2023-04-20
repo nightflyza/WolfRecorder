@@ -31,7 +31,7 @@ class StarDust {
      *
      * @var bool
      */
-    protected $separateKeys = false;
+    protected $separateKeys = true;
 
     /**
      * Some predefined stuff
@@ -42,7 +42,7 @@ class StarDust {
     const CACHE_KEY = 'STARDUST';
     const REALTIME_PRECISSION = 5;
 
-    public function __construct($processName = '', $separateKeys = false) {
+    public function __construct($processName = '', $separateKeys = true) {
         $this->setProcess($processName);
         $this->setZaWarudo($separateKeys);
         $this->initCache();
