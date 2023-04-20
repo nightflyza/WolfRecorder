@@ -85,7 +85,7 @@ class LiveCams {
                     $channelScreenshot = 'skins/noimage.jpg';
                 }
                 $result .= wf_tag('div', false, '', $style);
-                $result .= wf_img($channelScreenshot, $cameraLabel, 'height: 480px; height: 270px;  object-fit: cover;');
+                $result .= wf_img($channelScreenshot, $cameraLabel, 'width: 480px; height: 270px;  object-fit: cover;');
                 $result .= wf_tag('div', true);
             }
             $result .= wf_tag('div', true);
