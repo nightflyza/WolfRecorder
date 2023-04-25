@@ -293,6 +293,25 @@ class Cameras {
     }
 
     /**
+     * Checks is camera with some IP already registered or not?
+     * 
+     * @param string $ip
+     * 
+     * @return bool
+     */
+    protected function isCameraIpUsed($ip) {
+        $result = false;
+        if (!empty($this->allCameras)) {
+            foreach ($this->allCameras as $io => $each) {
+                if ($ip == $each['ip']) {
+                    $result = true;
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Creates new camera
      * 
      * @param int $modelId
@@ -324,20 +343,24 @@ class Cameras {
             if ($storagePathValid) {
                 if (isset($allModels[$modelId])) {
                     if (zb_isIPValid($ipF)) {
-                        if (!empty($loginF) AND ! empty($passwordF)) {
-                            $this->camerasDb->data('modelid', $modelId);
-                            $this->camerasDb->data('ip', $ipF);
-                            $this->camerasDb->data('login', $loginF);
-                            $this->camerasDb->data('password', $passwordF);
-                            $this->camerasDb->data('active', $actF);
-                            $this->camerasDb->data('storageid', $storageId);
-                            $this->camerasDb->data('channel', $channelId);
-                            $this->camerasDb->data('comment', $commentF);
-                            $this->camerasDb->create();
-                            $newId = $this->camerasDb->getLastId();
-                            log_register('CAMERA CREATE [' . $newId . ']  MODEL [' . $modelId . '] IP `' . $ip . '` STORAGE [' . $storageId . '] COMMENT `' . $comment . '`');
+                        if (!$this->isCameraIpUsed($ipF)) {
+                            if (!empty($loginF) AND ! empty($passwordF)) {
+                                $this->camerasDb->data('modelid', $modelId);
+                                $this->camerasDb->data('ip', $ipF);
+                                $this->camerasDb->data('login', $loginF);
+                                $this->camerasDb->data('password', $passwordF);
+                                $this->camerasDb->data('active', $actF);
+                                $this->camerasDb->data('storageid', $storageId);
+                                $this->camerasDb->data('channel', $channelId);
+                                $this->camerasDb->data('comment', $commentF);
+                                $this->camerasDb->create();
+                                $newId = $this->camerasDb->getLastId();
+                                log_register('CAMERA CREATE [' . $newId . ']  MODEL [' . $modelId . '] IP `' . $ip . '` STORAGE [' . $storageId . '] COMMENT `' . $comment . '`');
+                            } else {
+                                $result .= __('Login or password is empty');
+                            }
                         } else {
-                            $result .= __('Login or password is empty');
+                            $result .= __('Camera IP already registered');
                         }
                     } else {
                         $result .= __('Wrong IP format') . ': `' . $ip . '`';

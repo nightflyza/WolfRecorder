@@ -208,7 +208,7 @@ $lang['def']['Previous'] = 'Попередній';
 $lang['def']['Next'] = 'Наступний';
 $lang['def']['Files'] = 'Файли';
 $lang['def']['My cameras'] = 'Мої камери';
-$lang['def'][''] = '';
+$lang['def']['Camera IP already registered'] = 'Камеру з таким IP вже зареєстровано';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
 
