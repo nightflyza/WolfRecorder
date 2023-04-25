@@ -168,7 +168,10 @@ class Archive {
                     $camPreview = '';
                     $chanShot = $screenshots->getChannelScreenShot($eachCamChannel);
                     if (empty($chanShot)) {
-                        $chanShot = 'skins/noimage.jpg';
+                        $chanShot = 'skins/nosignal.gif';
+                    }
+                    if (!$each['CAMERA']['active']) {
+                        $chanShot = 'skins/chanblock.gif';
                     }
                     $camPreview = $screenshots->renderListBox($eachCamChannel, $chanShot);
                     $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview . $eachCamDesc, false, 'camlink', 'id="camlink' . $eachCamChannel . '"'));

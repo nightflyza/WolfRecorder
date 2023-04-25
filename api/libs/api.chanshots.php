@@ -231,6 +231,12 @@ class ChanShots {
                 position: relative;
                 margin-right: 10px;
                }
+               
+              .preview' . $channel . ' img {
+                   object-fit: cover;
+                   width: 124px;
+                   height: 75px;
+                  }
                ';
         $result .= wf_tag('style', true);
         $result .= wf_tag('span', false, 'preview' . $channel);

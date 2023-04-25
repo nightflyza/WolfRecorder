@@ -82,7 +82,11 @@ class LiveCams {
                 $channelScreenshot = $this->chanshots->getChannelScreenShot($cameraChannel);
                 $cameraLabel = $this->cameras->getCameraComment($cameraChannel);
                 if (empty($channelScreenshot)) {
-                    $channelScreenshot = 'skins/noimage.jpg';
+                    $channelScreenshot = 'skins/nosignal.gif';
+                }
+
+                if (!$eachCameraData['CAMERA']['active']) {
+                    $channelScreenshot = 'skins/chanblock.gif';
                 }
                 $result .= wf_tag('div', false, '', $style);
                 $result .= wf_img($channelScreenshot, $cameraLabel, 'width: 480px; height: 270px;  object-fit: cover;');
