@@ -209,6 +209,9 @@ $lang['def']['Next'] = 'Наступний';
 $lang['def']['Files'] = 'Файли';
 $lang['def']['My cameras'] = 'Мої камери';
 $lang['def']['Camera IP already registered'] = 'Камеру з таким IP вже зареєстровано';
+$lang['def']['Cameras access'] = 'Доступ до камер';
+$lang['def']['right to view cameras'] = 'Право переглядати камери';
+$lang['def']['right to manage cameras access'] = 'Право керувати доступами до камер';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
 
