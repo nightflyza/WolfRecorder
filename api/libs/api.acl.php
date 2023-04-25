@@ -52,11 +52,14 @@ class ACL {
      */
     const TABLE_ACL = 'acl';
 
-    public function __construct() {
+    public function __construct($loadCameras = false) {
         $this->initMessages();
         $this->setLogin();
         $this->initAclDb();
-        $this->initCamerasDb();
+        if ($loadCameras) {
+            $this->initCamerasDb();
+            $this->loadCamerasData();
+        }
         $this->loadAcls();
     }
 
@@ -93,7 +96,8 @@ class ACL {
      * @return void
      */
     protected function loadCamerasData() {
-        $this->allCamerasData = $this->camerasDb->getAll();
+        $this->camerasDb->selectable(array('id', 'ip', 'active', 'channel', 'comment'));
+        $this->allCamerasData = $this->camerasDb->getAll('id');
     }
 
     /**
@@ -164,6 +168,38 @@ class ACL {
         } else {
             //all cameras is accessible by ROOT users
             $result = true;
+        }
+        return($result);
+    }
+
+    /**
+     * Renders existing ACLs list
+     * 
+     * @return string
+     */
+    public function renderAclList() {
+        $result = '';
+        if (!empty($this->allAcls)) {
+            $cells = wf_TableCell(__('User'));
+            $cells .= wf_TableCell(__('Camera'));
+            $cells .= wf_TableCell(__('Actions'));
+            $rows = wf_TableRow($cells, 'row1');
+            foreach ($this->allAcls as $io => $each) {
+                $cameraLabel = '';
+                if (isset($this->allCamerasData[$each['cameraid']])) {
+                    $cameraData = $this->allCamerasData[$each['cameraid']];
+                    $cameraLabel = $cameraData['ip'] . ' - ' . $cameraData['comment'];
+                } else {
+                    $cameraLabel = '[' . $each['cameraid'] . '] ' . __('Lost');
+                }
+                $cells = wf_TableCell($each['user']);
+                $cells .= wf_TableCell($cameraLabel, '', '', 'sorttable_customkey="' . $each['cameraid'] . '"');
+                $cells .= wf_TableCell('TODO');
+                $rows .= wf_TableRow($cells, 'row5');
+            }
+            $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
         }
         return($result);
     }
