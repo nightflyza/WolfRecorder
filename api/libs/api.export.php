@@ -214,13 +214,13 @@ class Export {
                         $cells .= wf_TableCell($eachCamIp);
                     }
                     $eachCamUrl = self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $eachCamChannel;
-                      $camPreview = '';
+                    $camPreview = '';
                     $chanShot = $screenshots->getChannelScreenShot($eachCamChannel);
                     if (empty($chanShot)) {
                         $chanShot = 'skins/noimage.jpg';
                     }
                     $camPreview = $screenshots->renderListBox($eachCamChannel, $chanShot);
-                    $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview.$eachCamDesc, false, 'camlink'));
+                    $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview . $eachCamDesc, false, 'camlink'));
                     $actLinks = wf_Link($eachCamUrl, wf_img('skins/icon_export.png', __('Save records')));
                     $cells .= wf_TableCell($actLinks);
                     $rows .= wf_TableRow($cells, 'row5');
@@ -538,7 +538,11 @@ class Export {
         $storageTotalSpace = disk_total_space('/');
         $storageFreeSpace = disk_free_space('/');
         $usedStorageSpace = $storageTotalSpace - $storageFreeSpace;
-        $maxUsagePercent = 100 - ($this->altCfg['STORAGE_RESERVED_SPACE'] / 2); // half of reserved space
+        if (isset($this->altCfg['EXPORTS_RESERVED_SPACE'])) {
+            $maxUsagePercent = 100 - ($this->altCfg['EXPORTS_RESERVED_SPACE']); // explict value
+        } else {
+            $maxUsagePercent = 100 - ($this->altCfg['STORAGE_RESERVED_SPACE'] / 2); // half of reserved space
+        }
         $maxUsageSpace = zb_Percent($storageTotalSpace, $maxUsagePercent);
         $mustBeFree = $storageTotalSpace - $maxUsageSpace;
         $usersCount = $this->getUserCount();
