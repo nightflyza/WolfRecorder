@@ -27,6 +27,13 @@ class LiveCams {
     protected $allCamerasData = array();
 
     /**
+     * ACL instance placeholder
+     *
+     * @var object
+     */
+    protected $acl = '';
+
+    /**
      * Contains system messages helper instance
      *
      * @var object
@@ -37,6 +44,7 @@ class LiveCams {
         $this->initMessages();
         $this->initCameras();
         $this->initChanshots();
+        $this->initAcl();
     }
 
     /**
@@ -55,6 +63,15 @@ class LiveCams {
      */
     protected function initChanshots() {
         $this->chanshots = new ChanShots();
+    }
+
+    /**
+     * Inits ACL instance
+     * 
+     * @return void
+     */
+    protected function initAcl() {
+        $this->acl = new ACL();
     }
 
     /**
