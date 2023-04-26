@@ -27,7 +27,7 @@ class ACL {
     protected $allCamerasData = '';
 
     /**
-     * Contains all available ACLs as user=>aclData[id/user/cameraid/channel]
+     * Contains all available ACLs as aclId=>aclData[id/user/cameraid/channel]
      *
      * @var array
      */
@@ -54,6 +54,7 @@ class ACL {
     const URL_ME = '?module=acl';
     const PROUTE_NEWLOGIN = 'newacllogin';
     const PROUTE_NEWCAMID = 'newaclcameraid';
+    const ROUTE_DEL = 'deleteaclid';
 
     public function __construct($loadCameras = false) {
         $this->initMessages();
@@ -153,6 +154,27 @@ class ACL {
     }
 
     /**
+     * Deletes existing ACL from database
+     * 
+     * @param int $aclId
+     * 
+     * @return void/string on error
+     */
+    public function delete($aclId) {
+        $result = '';
+        $aclId = ubRouting::filters($aclId, 'int');
+        if (isset($this->allAcls[$aclId])) {
+            $aclData = $this->allAcls[$aclId];
+            $this->aclDb->where('id', '=', $aclId);
+            $this->aclDb->delete();
+            log_register('ACL DELETE [' . $aclId . '] CAMERA [' . $aclData['cameraid'] . '] CHANNEL `' . $aclData['channel'] . '` FOR {' . $aclData['user'] . '}');
+        } else {
+            $result .= __('ACL') . ' [' . $aclId . '] ' . __('not exists');
+        }
+        return($result);
+    }
+
+    /**
      * Checks is some camera allowed for current user?
      * 
      * @param int $cameraId
@@ -229,7 +251,10 @@ class ACL {
 
                 $cells = wf_TableCell($each['user']);
                 $cells .= wf_TableCell($cameraLabel, '', '', 'sorttable_customkey="' . $each['cameraid'] . '"');
-                $cells .= wf_TableCell('TODO');
+                $delUrl = self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'];
+                $cancelUrl = self::URL_ME;
+                $actLinks = wf_ConfirmDialog($delUrl, web_delete_icon(), $this->messages->getDeleteAlert(), '', $cancelUrl, __('Delete') . '?');
+                $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
             }
             $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
