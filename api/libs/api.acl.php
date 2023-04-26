@@ -51,16 +51,19 @@ class ACL {
      * some predefined stuff
      */
     const TABLE_ACL = 'acl';
+    const URL_ME = '?module=acl';
+    const PROUTE_NEWLOGIN = 'newacllogin';
+    const PROUTE_NEWCAMID = 'newaclcameraid';
 
     public function __construct($loadCameras = false) {
         $this->initMessages();
         $this->setLogin();
         $this->initAclDb();
+        $this->loadAcls();
         if ($loadCameras) {
             $this->initCamerasDb();
             $this->loadCamerasData();
         }
-        $this->loadAcls();
     }
 
     /**
@@ -115,7 +118,38 @@ class ACL {
      * @return void
      */
     protected function loadAcls() {
-        $this->allAcls = $this->aclDb->getAll('user');
+        $this->allAcls = $this->aclDb->getAll('id');
+    }
+
+    /**
+     * Creates new ACL database record
+     * 
+     * @param string $login
+     * @param int $cameraId
+     * 
+     * @return void/string on error
+     */
+    public function create($login, $cameraId) {
+        $result = '';
+        $loginF = ubRouting::filters($login, 'mres');
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        if (isset($this->allCamerasData[$cameraId])) {
+            $cameraChannel = $this->allCamerasData[$cameraId]['channel'];
+            if (file_exists(USERS_PATH . $loginF)) {
+                $this->aclDb->data('user', $loginF);
+                $this->aclDb->data('cameraid', $cameraId);
+                $this->aclDb->data('channel', $cameraChannel);
+                $this->aclDb->create();
+                $newId = $this->aclDb->getLastId();
+                log_register('ACL CREATE [' . $newId . '] CAMERA [' . $cameraId . '] CHANNEL `' . $cameraChannel . '` FOR {' . $login . '}');
+            } else {
+                $result .= __('User') . ' {' . $loginF . '} ' . __('not exists');
+            }
+        } else {
+            $result .= __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
+        }
+
+        return($result);
     }
 
     /**
@@ -130,8 +164,8 @@ class ACL {
         if (!cfr('ROOT')) {
             if (!empty($this->myLogin)) {
                 if (!empty($this->allAcls)) {
-                    foreach ($this->allAcls as $eachUserLogin => $eachAclData) {
-                        if ($eachUserLogin == $this->myLogin AND $eachAclData['cameraid'] == $cameraId) {
+                    foreach ($this->allAcls as $eachAclId => $eachAclData) {
+                        if ($eachAclData['user'] == $this->myLogin AND $eachAclData['cameraid'] == $cameraId) {
                             $result = true;
                             break;
                         }
@@ -157,8 +191,8 @@ class ACL {
         if (!cfr('ROOT')) {
             if (!empty($this->myLogin)) {
                 if (!empty($this->allAcls)) {
-                    foreach ($this->allAcls as $eachUserLogin => $eachAclData) {
-                        if ($eachUserLogin == $this->myLogin AND $eachAclData['channel'] == $channelId) {
+                    foreach ($this->allAcls as $eachAclId => $eachAclData) {
+                        if ($eachAclData['user'] == $this->myLogin AND $eachAclData['channel'] == $channelId) {
                             $result = true;
                             break;
                         }
@@ -192,6 +226,7 @@ class ACL {
                 } else {
                     $cameraLabel = '[' . $each['cameraid'] . '] ' . __('Lost');
                 }
+
                 $cells = wf_TableCell($each['user']);
                 $cells .= wf_TableCell($cameraLabel, '', '', 'sorttable_customkey="' . $each['cameraid'] . '"');
                 $cells .= wf_TableCell('TODO');
@@ -200,6 +235,43 @@ class ACL {
             $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
+        }
+        return($result);
+    }
+
+    /**
+     * Renders new ACL creation form
+     * 
+     * @return string
+     */
+    public function renderCreateForm() {
+        $result = '';
+        $allUsers = rcms_scandir(USERS_PATH);
+        $usersParams = array();
+        $camerasParams = array();
+        if (!empty($allUsers)) {
+            foreach ($allUsers as $io => $eachUser) {
+                $usersParams[$eachUser] = $eachUser;
+            }
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Available users') . ': ' . __('not exists'), 'error');
+        }
+
+        if (!empty($this->allCamerasData)) {
+            foreach ($this->allCamerasData as $io => $eachCameraData) {
+                $camerasParams[$eachCameraData['id']] = $eachCameraData['ip'] . ' - ' . $eachCameraData['comment'];
+            }
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Cameras') . ': ' . __('not exists'), 'error');
+        }
+
+        //preprocessed data not empty?
+        if ($usersParams AND $camerasParams) {
+            $inputs = wf_SelectorSearchable(self::PROUTE_NEWLOGIN, $usersParams, __('User'), '', false) . ' ';
+            $inputs .= wf_SelectorSearchable(self::PROUTE_NEWCAMID, $camerasParams, __('Camera'), '', false) . ' ';
+            $inputs .= wf_Submit(__('Create'));
+
+            $result .= wf_Form('', 'POST', $inputs, 'glamour');
         }
         return($result);
     }

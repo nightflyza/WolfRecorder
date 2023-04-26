@@ -212,6 +212,9 @@ $lang['def']['Camera IP already registered'] = 'Камеру з таким IP в
 $lang['def']['Cameras access'] = 'Доступ до камер';
 $lang['def']['right to view cameras'] = 'Право переглядати камери';
 $lang['def']['right to manage cameras access'] = 'Право керувати доступами до камер';
+$lang['def']['Create new rule'] = 'Створити нове правило';
+$lang['def'][''] = '';
+$lang['def'][''] = '';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
 
