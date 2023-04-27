@@ -67,6 +67,13 @@ class Archive {
     protected $playerWidth = '70%';
 
     /**
+     * ACL instance placeholder
+     *
+     * @var object
+     */
+    protected $acl = '';
+
+    /**
      * other predefined stuff like routes
      */
     const PLAYLIST_MASK = '_playlist.txt';
@@ -135,12 +142,22 @@ class Archive {
     }
 
     /**
+     * Inits ACL instance
+     * 
+     * @return void
+     */
+    protected function initAcl() {
+        $this->acl = new ACL();
+    }
+
+    /**
      * Renders available cameras list
      * 
      * @return string
      */
     public function renderCamerasList() {
         $result = '';
+        $this->initAcl();
         $allStotagesData = $this->storages->getAllStoragesData();
         if (!empty($allStotagesData)) {
             if (!empty($this->allCamerasData)) {
@@ -156,28 +173,30 @@ class Archive {
                 $rows = wf_TableRow($cells, 'row1');
                 foreach ($this->allCamerasData as $io => $each) {
                     $eachCamId = $each['CAMERA']['id'];
-                    $eachCamIp = $each['CAMERA']['ip'];
-                    $eachCamDesc = $each['CAMERA']['comment'];
-                    $eachCamChannel = $each['CAMERA']['channel'];
-                    $cells = '';
-                    if (cfr('CAMERAS')) {
-                        $cells .= wf_TableCell($eachCamId);
-                        $cells .= wf_TableCell($eachCamIp, '', '', 'sorttable_customkey="' . ip2int($eachCamIp) . '"');
+                    if ($this->acl->isMyCamera($eachCamId)) {
+                        $eachCamIp = $each['CAMERA']['ip'];
+                        $eachCamDesc = $each['CAMERA']['comment'];
+                        $eachCamChannel = $each['CAMERA']['channel'];
+                        $cells = '';
+                        if (cfr('CAMERAS')) {
+                            $cells .= wf_TableCell($eachCamId);
+                            $cells .= wf_TableCell($eachCamIp, '', '', 'sorttable_customkey="' . ip2int($eachCamIp) . '"');
+                        }
+                        $eachCamUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel;
+                        $camPreview = '';
+                        $chanShot = $screenshots->getChannelScreenShot($eachCamChannel);
+                        if (empty($chanShot)) {
+                            $chanShot = 'skins/nosignal.gif';
+                        }
+                        if (!$each['CAMERA']['active']) {
+                            $chanShot = 'skins/chanblock.gif';
+                        }
+                        $camPreview = $screenshots->renderListBox($eachCamChannel, $chanShot);
+                        $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview . $eachCamDesc, false, 'camlink', 'id="camlink' . $eachCamChannel . '"'));
+                        $actLinks = wf_Link($eachCamUrl, wf_img('skins/icon_play_small.png', __('View')));
+                        $cells .= wf_TableCell($actLinks);
+                        $rows .= wf_TableRow($cells, 'row5');
                     }
-                    $eachCamUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel;
-                    $camPreview = '';
-                    $chanShot = $screenshots->getChannelScreenShot($eachCamChannel);
-                    if (empty($chanShot)) {
-                        $chanShot = 'skins/nosignal.gif';
-                    }
-                    if (!$each['CAMERA']['active']) {
-                        $chanShot = 'skins/chanblock.gif';
-                    }
-                    $camPreview = $screenshots->renderListBox($eachCamChannel, $chanShot);
-                    $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview . $eachCamDesc, false, 'camlink', 'id="camlink' . $eachCamChannel . '"'));
-                    $actLinks = wf_Link($eachCamUrl, wf_img('skins/icon_play_small.png', __('View')));
-                    $cells .= wf_TableCell($actLinks);
-                    $rows .= wf_TableRow($cells, 'row5');
                 }
                 $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
             } else {
