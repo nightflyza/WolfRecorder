@@ -91,29 +91,33 @@ class LiveCams {
      */
     public function renderList() {
         $result = '';
-        if (!empty($this->allCamerasData)) {
-            $style = 'style="float: left; margin: 5px;"';
-            $result .= wf_tag('div');
-            foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
-                if ($this->acl->isMyCamera($eachCameraId)) {
-                    $cameraChannel = $eachCameraData['CAMERA']['channel'];
-                    $channelScreenshot = $this->chanshots->getChannelScreenShot($cameraChannel);
-                    $cameraLabel = $this->cameras->getCameraComment($cameraChannel);
-                    if (empty($channelScreenshot)) {
-                        $channelScreenshot = 'skins/nosignal.gif';
-                    }
+        if ($this->acl->haveCamsAssigned()) {
+            if (!empty($this->allCamerasData)) {
+                $style = 'style="float: left; margin: 5px;"';
+                $result .= wf_tag('div');
+                foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
+                    if ($this->acl->isMyCamera($eachCameraId)) {
+                        $cameraChannel = $eachCameraData['CAMERA']['channel'];
+                        $channelScreenshot = $this->chanshots->getChannelScreenShot($cameraChannel);
+                        $cameraLabel = $this->cameras->getCameraComment($cameraChannel);
+                        if (empty($channelScreenshot)) {
+                            $channelScreenshot = 'skins/nosignal.gif';
+                        }
 
-                    if (!$eachCameraData['CAMERA']['active']) {
-                        $channelScreenshot = 'skins/chanblock.gif';
+                        if (!$eachCameraData['CAMERA']['active']) {
+                            $channelScreenshot = 'skins/chanblock.gif';
+                        }
+                        $result .= wf_tag('div', false, '', $style);
+                        $result .= wf_img($channelScreenshot, $cameraLabel, 'width: 480px; height: 270px;  object-fit: cover;');
+                        $result .= wf_tag('div', true);
                     }
-                    $result .= wf_tag('div', false, '', $style);
-                    $result .= wf_img($channelScreenshot, $cameraLabel, 'width: 480px; height: 270px;  object-fit: cover;');
-                    $result .= wf_tag('div', true);
                 }
+                $result .= wf_tag('div', true);
+            } else {
+                $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
             }
-            $result .= wf_tag('div', true);
         } else {
-            $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
+            $result.= $this->messages->getStyledMessage(__('No assigned cameras to show'), 'warning');
         }
         return($result);
     }

@@ -34,6 +34,20 @@ class ACL {
     protected $allAcls = array();
 
     /**
+     * Contains all accessible by all users camerasIds as login=>cameraId=>channel
+     *
+     * @var array
+     */
+    protected $accessibleCameras = array();
+
+    /**
+     * Contains all accessible by all users channelIds as login=>channelId=>cameraId
+     *
+     * @var array
+     */
+    protected $accessibleChannels = array();
+
+    /**
      * System messages helper instance placeholder
      *
      * @var object
@@ -120,6 +134,13 @@ class ACL {
      */
     protected function loadAcls() {
         $this->allAcls = $this->aclDb->getAll('id');
+        if (!empty($this->allAcls)) {
+            //some ACL data postprocessing
+            foreach ($this->allAcls as $io => $each) {
+                $this->accessibleCameras[$each['user']][$each['cameraid']] = $each['channel'];
+                $this->accessibleChannels[$each['user']][$each['channel']] = $each['cameraid'];
+            }
+        }
     }
 
     /**
@@ -175,6 +196,27 @@ class ACL {
     }
 
     /**
+     * Returns availablilty of cameras accessible by user
+     * 
+     * @return int
+     */
+    public function haveCamsAssigned() {
+        $result = false;
+        if (!cfr('ROOT')) {
+            if (!empty($this->myLogin)) {
+                if (!empty($this->allAcls)) {
+                    if (isset($this->accessibleCameras[$this->myLogin])) {
+                        $result = true;
+                    }
+                }
+            }
+        } else {
+            $result = true;
+        }
+        return($result);
+    }
+
+    /**
      * Checks is some camera allowed for current user?
      * 
      * @param int $cameraId
@@ -186,10 +228,9 @@ class ACL {
         if (!cfr('ROOT')) {
             if (!empty($this->myLogin)) {
                 if (!empty($this->allAcls)) {
-                    foreach ($this->allAcls as $eachAclId => $eachAclData) {
-                        if ($eachAclData['user'] == $this->myLogin AND $eachAclData['cameraid'] == $cameraId) {
+                    if (isset($this->accessibleCameras[$this->myLogin])) {
+                        if (isset($this->accessibleCameras[$this->myLogin][$cameraId])) {
                             $result = true;
-                            break;
                         }
                     }
                 }
@@ -213,10 +254,9 @@ class ACL {
         if (!cfr('ROOT')) {
             if (!empty($this->myLogin)) {
                 if (!empty($this->allAcls)) {
-                    foreach ($this->allAcls as $eachAclId => $eachAclData) {
-                        if ($eachAclData['user'] == $this->myLogin AND $eachAclData['channel'] == $channelId) {
+                    if (isset($this->accessibleChannels[$this->myLogin])) {
+                        if (isset($this->accessibleChannels[$this->myLogin][$channelId])) {
                             $result = true;
-                            break;
                         }
                     }
                 }
