@@ -980,8 +980,10 @@ class Export {
         //channel filter applied?
         if ($channelId) {
             if (!empty($allRecords)) {
+                $cameraId = $this->cameras->getCameraIdByChannel($channelId);
+                $filteredRecordMask = '_' . $cameraId . self::RECORDS_EXT;
                 foreach ($allRecords as $io => $each) {
-                    if (!ispos($each, $channelId)) {
+                    if (!ispos($each, $filteredRecordMask)) {
                         unset($allRecords[$io]);
                     }
                 }

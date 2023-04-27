@@ -293,6 +293,22 @@ class Cameras {
     }
 
     /**
+     * Returns camera ID by its channel
+     * 
+     * @param string $channelId
+     * 
+     * @return int/bool
+     */
+    public function getCameraIdByChannel($channelId) {
+        $result = false;
+        $allCameraChannels = $this->getAllCamerasChannels();
+        if (isset($allCameraChannels[$channelId])) {
+            $result = $allCameraChannels[$channelId];
+        }
+        return($result);
+    }
+
+    /**
      * Checks is camera with some IP already registered or not?
      * 
      * @param string $ip
