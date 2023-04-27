@@ -616,7 +616,7 @@ class Export {
                 file_put_contents($exportListPath, $exportListData);
                 //record file name
                 $dateFmt = "Y-m-d-H-i-s";
-                $recordFileName = date($dateFmt, $firstTs) . '_' . date($dateFmt, $lastTs) . '_' . $channelId . self::RECORDS_EXT;
+                $recordFileName = date($dateFmt, $firstTs) . '_' . date($dateFmt, $lastTs) . '_' . $cameraId . self::RECORDS_EXT;
                 $fullRecordFilePath = $directory . $recordFileName;
                 if (!file_exists($fullRecordFilePath)) {
                     $command = $this->ffmpgPath . ' -loglevel error -f concat -safe 0 -i ' . $exportListPath . ' -c copy ' . $fullRecordFilePath;
@@ -813,7 +813,7 @@ class Export {
             $to = $rawTo[0] . '-' . $rawTo[1] . '-' . $rawTo[2] . ' ' . $rawTo[3] . ':' . $rawTo[4] . ':' . $rawTo[5];
             $result['from'] = $from;
             $result['to'] = $to;
-            $result['channel'] = $explodedName[2];
+            $result['cameraid'] = $explodedName[2];
         }
         return($result);
     }
@@ -996,7 +996,7 @@ class Export {
             $rows = wf_TableRow($cells, 'row1');
             foreach ($allRecords as $io => $eachFile) {
                 $fileNameParts = $this->parseRecordFileName($eachFile);
-                $cells = wf_TableCell($this->cameras->getCameraComment($fileNameParts['channel']));
+                $cells = wf_TableCell($this->cameras->getCameraCommentById($fileNameParts['cameraid']));
                 $cells .= wf_TableCell($fileNameParts['from']);
                 $cells .= wf_TableCell($fileNameParts['to']);
 

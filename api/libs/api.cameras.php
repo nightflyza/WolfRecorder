@@ -551,6 +551,32 @@ class Cameras {
     }
 
     /**
+     * Returns camera comment or IP by its cameraId
+     * 
+     * @param string $cameraId
+     * 
+     * @return string
+     */
+    public function getCameraCommentById($cameraId) {
+        $result = '';
+        if (!empty($this->allCameras)) {
+            foreach ($this->allCameras as $io => $each) {
+                if ($each['id'] == $cameraId) {
+                    if (!empty($each['comment'])) {
+                        $result = $each['comment'];
+                    } else {
+                        $result = $each['ip'];
+                    }
+                }
+            }
+        }
+        if (empty($result)) {
+            $result = __('Lost');
+        }
+        return($result);
+    }
+
+    /**
      * Returns camera creation form
      * 
      * @return string

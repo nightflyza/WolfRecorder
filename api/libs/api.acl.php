@@ -196,6 +196,34 @@ class ACL {
     }
 
     /**
+     * Flushes all available ACLs for some user
+     * 
+     * @param string $login
+     * 
+     * @return void
+     */
+    public function flushUser($login) {
+        $loginF = ubRouting::filters($login, 'mres');
+        $this->aclDb->where('user', '=', $loginF);
+        $this->aclDb->delete();
+        log_register('ACL FLUSH USER {' . $login . '}');
+    }
+
+    /**
+     * Flushes all available ACLs for some camera
+     * 
+     * @param string $cameraId
+     * 
+     * @return void
+     */
+    public function flushCamera($cameraId) {
+        $cameraId = ubRouting::filters($cameraId, 'mres');
+        $this->aclDb->where('cameraid', '=', $cameraId);
+        $this->aclDb->delete();
+        log_register('ACL FLUSH CAMERA [' . $cameraId . ']');
+    }
+
+    /**
      * Returns availablilty of cameras accessible by user
      * 
      * @return int
