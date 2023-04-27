@@ -340,8 +340,8 @@ class ACL {
     public function renderCreateForm() {
         $result = '';
         $allUsers = rcms_scandir(USERS_PATH);
-        $usersParams = array();
-        $camerasParams = array();
+        $usersParams = array('' => '-');
+        $camerasParams = array('' => '-');
         if (!empty($allUsers)) {
             foreach ($allUsers as $io => $eachUser) {
                 $usersParams[$eachUser] = $eachUser;
