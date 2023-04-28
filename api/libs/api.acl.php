@@ -114,6 +114,7 @@ class ACL {
      * @return void
      */
     protected function loadCamerasData() {
+        $this->camerasDb->orderBy('id', 'DESC');
         $this->camerasDb->selectable(array('id', 'ip', 'active', 'channel', 'comment'));
         $this->allCamerasData = $this->camerasDb->getAll('id');
     }
