@@ -283,7 +283,7 @@ class Recorder {
      * 
      * @return array
      */
-    protected function getRunningRecorders() {
+    public function getRunningRecorders() {
         $result = array();
         if (!empty($this->allCamerasData)) {
             $recorderPids = $this->getRecordersPids();

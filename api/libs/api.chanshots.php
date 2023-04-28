@@ -27,6 +27,13 @@ class ChanShots {
     protected $cameras = '';
 
     /**
+     * Recorder instance placeholder
+     *
+     * @var object
+     */
+    protected $recorder = '';
+
+    /**
      * Storages instance placeholder.
      *
      * @var object
@@ -39,6 +46,13 @@ class ChanShots {
      * @var array
      */
     protected $allCamerasData = array();
+
+    /**
+     * Contains camera running recorders state as cameraId=>PID
+     *
+     * @var array
+     */
+    protected $cameraRecordersRunning = array();
 
     /**
      * Contains ffmpeg binary path
@@ -105,6 +119,16 @@ class ChanShots {
     }
 
     /**
+     * Inits recorder instance for detecting is camera alive or not?
+     * 
+     * @return void
+     */
+    protected function initRecorder() {
+        $this->recorder = new Recorder();
+        $this->cameraRecordersRunning = $this->recorder->getRunningRecorders();
+    }
+
+    /**
      * Returns screenshots base path
      * 
      * @return string
@@ -160,6 +184,23 @@ class ChanShots {
     }
 
     /**
+     * Cleanups old screenshot if it exists
+     * 
+     * @param string $channel
+     * 
+     * @return void
+     */
+    protected function flushOldScreenshot($channel) {
+        if (!empty($channel)) {
+            $fileName = $channel . self::SHOTS_EXT;
+            $fullScreenShotPath = $this->screenshotsPath . $fileName;
+            if (file_exists($fullScreenShotPath)) {
+                unlink($fullScreenShotPath);
+            }
+        }
+    }
+
+    /**
      * Tooks screenshot from some channel chunk
      * 
      * @param string $chunkPath
@@ -173,9 +214,8 @@ class ChanShots {
             $fileName = $channel . self::SHOTS_EXT;
             $fullScreenShotPath = $this->screenshotsPath . $fileName;
             //old screenshot cleanup
-            if (file_exists($fullScreenShotPath)) {
-                unlink($fullScreenShotPath);
-            }
+            $this->flushOldScreenshot($channel);
+            //taking new screenshot for this channel
             $command = $this->ffmpgPath . ' -ss ' . $this->timeOffset . ' -i ' . $chunkPath . ' ' . $this->screenshotOpts . ' ' . $fullScreenShotPath;
             $result = shell_exec($command);
         }
@@ -196,19 +236,26 @@ class ChanShots {
             $this->initCameras();
             //any cameras here?
             if (!empty($this->allCamerasData)) {
+                $this->initRecorder();
                 $this->allocateScreenshotsPath();
                 foreach ($this->allCamerasData as $eachCamId => $eachCameraData) {
                     if ($eachCameraData['CAMERA']['active']) {
                         $channel = $eachCameraData['CAMERA']['channel'];
                         $storageId = $eachCameraData['CAMERA']['storageid'];
-                        $allCameraChunks = $this->storages->getChannelChunks($storageId, $channel);
-                        $chunksCount = sizeof($allCameraChunks);
-                        //dont shot single chunk - it may be unfinished
-                        if ($chunksCount > 1) {
-                            $lastChunk = array_pop($allCameraChunks);
-                            $secondLastChunk = array_pop($allCameraChunks);
-                            //taking screenshot from second last channel chunk
-                            $this->takeChunkScreenshot($secondLastChunk, $channel);
+                        //camera recorder now running?
+                        if (isset($this->cameraRecordersRunning[$eachCamId])) {
+                            $allCameraChunks = $this->storages->getChannelChunks($storageId, $channel);
+                            $chunksCount = sizeof($allCameraChunks);
+                            //dont shot single chunk - it may be unfinished
+                            if ($chunksCount > 1) {
+                                $lastChunk = array_pop($allCameraChunks);
+                                $secondLastChunk = array_pop($allCameraChunks);
+                                //taking screenshot from second last channel chunk
+                                $this->takeChunkScreenshot($secondLastChunk, $channel);
+                            }
+                        } else {
+                            //if no recorder now running just flush channel scrreenshot
+                            $this->flushOldScreenshot($channel);
                         }
                     }
                 }
