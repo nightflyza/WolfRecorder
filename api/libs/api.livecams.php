@@ -274,6 +274,21 @@ class LiveCams {
     }
 
     /**
+     * Returns some channel human-readable comment
+     * 
+     * @param string $channelId
+     * 
+     * @return string
+     */
+    public function getCameraComment($channelId) {
+        $result = '';
+        if ($channelId) {
+            $result .= $this->cameras->getCameraComment($channelId);
+        }
+        return($result);
+    }
+
+    /**
      * Allocates streams path, returns it if its writable
      * 
      * @return string/void on error
@@ -361,6 +376,14 @@ class LiveCams {
                 $fullStreamUrl = $streamPath . self::STREAM_PLAYLIST;
                 if (file_exists($fullStreamUrl)) {
                     $result = $fullStreamUrl;
+                } else {
+                    $retries = 3;
+                    for ($i = 0; $i < $retries; $i++) {
+                        sleep(1);
+                        if (file_exists($fullStreamUrl)) {
+                            $result = $fullStreamUrl;
+                        }
+                    }
                 }
             }
         }
@@ -382,25 +405,10 @@ class LiveCams {
             $player = new Player($this->playerWidth, true);
             $result .= $player->renderSinglePlayer($streamUrl, $playerId);
         } else {
-            $result.= $this->messages->getStyledMessage(__('Oh no').': '.__('No such live stream'), 'error');
+            $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such live stream'), 'error');
         }
-        $result.= wf_delimiter();
+        $result .= wf_delimiter();
         $result .= wf_BackLink(self::URL_ME);
-        return($result);
-    }
-
-    /**
-     * Returns some channel human-readable comment
-     * 
-     * @param string $channelId
-     * 
-     * @return string
-     */
-    public function getCameraComment($channelId) {
-        $result = '';
-        if ($channelId) {
-            $result .= $this->cameras->getCameraComment($channelId);
-        }
         return($result);
     }
 
