@@ -355,7 +355,7 @@ class LiveCams {
             if ($cameraId) {
                 $this->stardust->setProcess(self::PID_PREFIX . $cameraId);
                 if ($this->stardust->notRunning()) {
-                    $this->stardust->runBackgroundProcess(self::WRAPPER . ' "liveswarm&cameraid=' . $cameraId . '"');
+                    $this->stardust->runBackgroundProcess(self::WRAPPER . ' "liveswarm&cameraid=' . $cameraId . '"', 1);
                 }
 
                 $fullStreamUrl = $streamPath . self::STREAM_PLAYLIST;
@@ -380,8 +380,11 @@ class LiveCams {
         if ($streamUrl) {
             $playerId = 'liveplayer_' . $channelId;
             $player = new Player($this->playerWidth, true);
-            $result = $player->renderSinglePlayer($streamUrl, $playerId);
+            $result .= $player->renderSinglePlayer($streamUrl, $playerId);
+        } else {
+            $result.= $this->messages->getStyledMessage(__('Oh no').': '.__('No such live stream'), 'error');
         }
+        $result.= wf_delimiter();
         $result .= wf_BackLink(self::URL_ME);
         return($result);
     }

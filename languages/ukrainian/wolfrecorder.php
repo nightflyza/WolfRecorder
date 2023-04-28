@@ -215,6 +215,8 @@ $lang['def']['right to manage cameras access'] = 'Право керувати д
 $lang['def']['Create new rule'] = 'Створити нове правило';
 $lang['def']['No assigned cameras to show'] = 'Немає присвоєних камер доступних для перегляду';
 $lang['def']['Live'] = 'Наживо';
+$lang['def']['Oh no'] = 'Журбинка';
+$lang['def'][''] = '';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
 
