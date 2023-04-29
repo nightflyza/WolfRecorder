@@ -216,7 +216,9 @@ $lang['def']['Create new rule'] = 'Створити нове правило';
 $lang['def']['No assigned cameras to show'] = 'Немає присвоєних камер доступних для перегляду';
 $lang['def']['Live'] = 'Наживо';
 $lang['def']['Oh no'] = 'Журбинка';
-$lang['def'][''] = '';
+$lang['def']['No such camera'] = 'Немає такої камери';
+$lang['def']['No such live stream'] = 'Живий потік не знайдено';
+$lang['def']['Camera disabled now'] = 'Ця камера наразі вимкнена';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
 

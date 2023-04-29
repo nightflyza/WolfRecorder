@@ -400,13 +400,24 @@ class LiveCams {
      */
     public function renderLive($channelId) {
         $result = '';
-        $streamUrl = $this->getStreamUrl($channelId);
-        if ($streamUrl) {
-            $playerId = 'liveplayer_' . $channelId;
-            $player = new Player($this->playerWidth, true);
-            $result .= $player->renderLivePlayer($streamUrl, $playerId);
+        $cameraId = $this->cameras->getCameraIdByChannel($channelId);
+        if ($cameraId) {
+            $cameraData = $this->allCamerasData[$cameraId];
+            if ($cameraData['CAMERA']['active']) {
+                $streamUrl = $this->getStreamUrl($channelId);
+                if ($streamUrl) {
+                    $playerId = 'liveplayer_' . $channelId;
+                    $player = new Player($this->playerWidth, true);
+                    $result .= $player->renderLivePlayer($streamUrl, $playerId);
+                } else {
+                    $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such live stream'), 'error');
+                }
+            } else {
+
+                $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('Camera disabled now'), 'error');
+            }
         } else {
-            $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such live stream'), 'error');
+            $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such camera'), 'error');
         }
         $result .= wf_delimiter();
         $result .= wf_BackLink(self::URL_ME);
