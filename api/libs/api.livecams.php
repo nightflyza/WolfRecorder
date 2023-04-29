@@ -401,9 +401,10 @@ class LiveCams {
         $result = '';
         $streamUrl = $this->getStreamUrl($channelId);
         if ($streamUrl) {
+            deb($streamUrl);
             $playerId = 'liveplayer_' . $channelId;
             $player = new Player($this->playerWidth, true);
-            $result .= $player->renderSinglePlayer($streamUrl, $playerId);
+            $result .= $player->renderLivePlayer($streamUrl, $playerId);
         } else {
             $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such live stream'), 'error');
         }

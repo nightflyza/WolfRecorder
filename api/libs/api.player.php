@@ -21,7 +21,7 @@ class Player {
      *
      * @var string
      */
-    protected $playerLib = 'modules/jsc/playerjs/w3_playerjs.js';
+    protected $playerLib = 'modules/jsc/playerjs/w4_playerjs.js';
 
     public function __construct($width = '', $autoPlay = false) {
         if ($width) {
@@ -87,6 +87,30 @@ class Player {
      * @return string
      */
     public function renderSinglePlayer($filePath, $playerId = '', $poster = '') {
+        $autoPlay = ($this->autoPlayFlag) ? 'true' : 'false';
+        $playerId = ($playerId) ? $playerId : 'singleplayer' . wf_InputId();
+        $poster = ($poster) ? ' poster:"' . $poster . '",' : '';
+        $result = '';
+        $result .= wf_tag('script', false, '', 'src="' . $this->playerLib . '"') . wf_tag('script', true);
+        $result .= wf_tag('div', false, '', 'style="float:left; width:' . $this->width . '; margin:5px;"');
+        $result .= wf_tag('div', false, '', 'id = "' . $playerId . '" style="width:90%;"') . wf_tag('div', true);
+        $result .= wf_tag('script');
+        $result .= 'var player = new Playerjs({id:"' . $playerId . '", ' . $poster . ' file:"' . $filePath . '", autoplay:' . $autoPlay . '});';
+        $result .= wf_tag('script', true);
+        $result .= wf_tag('div', true);
+        $result .= wf_CleanDiv();
+        return($result);
+    }
+    
+      /**
+     * Renders web player for some single file
+     * 
+     * @param string $playlistPath - full playlist path
+     * @param string $playerId - must be equal to channel name to access playlist in DOM
+     * @param string $poster - optional channel screenshot
+     * @return string
+     */
+    public function renderLivePlayer($filePath, $playerId = '', $poster = '') {
         $autoPlay = ($this->autoPlayFlag) ? 'true' : 'false';
         $playerId = ($playerId) ? $playerId : 'singleplayer' . wf_InputId();
         $poster = ($poster) ? ' poster:"' . $poster . '",' : '';
