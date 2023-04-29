@@ -377,11 +377,12 @@ class LiveCams {
                 if (file_exists($fullStreamUrl)) {
                     $result = $fullStreamUrl;
                 } else {
-                    $retries = 3;
+                    $retries = 5;
                     for ($i = 0; $i < $retries; $i++) {
                         sleep(1);
                         if (file_exists($fullStreamUrl)) {
                             $result = $fullStreamUrl;
+                            break;
                         }
                     }
                 }
