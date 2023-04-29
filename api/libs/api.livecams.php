@@ -52,7 +52,7 @@ class LiveCams {
      *
      * @var string
      */
-    protected $playerWidth = '70%';
+    protected $playerWidth = '80%';
 
     /**
      * Contains system messages helper instance
