@@ -356,6 +356,22 @@ class LiveCams {
     }
 
     /**
+     * Destroys live stream
+     * 
+     * @return void
+     */
+    public function stopStream($cameraId) {
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        $allRunningStreams = $this->getRunningStreams();
+        //is camera live stream running?
+        if (isset($allRunningStreams[$cameraId])) {
+            $streamPid = $allRunningStreams[$cameraId];
+            $command= $this->binPaths['SUDO'].' '.$this->binPaths['KILL'].' -9 '.$streamPid;
+            shell_exec($command);
+        }
+    }
+
+    /**
      * Returns live stream full URL
      * 
      * @param string $channelId
@@ -400,10 +416,10 @@ class LiveCams {
      */
     protected function renderKeepAliveCallback($cameraId) {
         $result = '';
-        $streamDog=new StreamDog();
+        $streamDog = new StreamDog();
         $timeout = 10000; // in ms
         $keepAliveLink = self::URL_ME . '&' . StreamDog::ROUTE_KEEPALIVE . '=' . $cameraId;
-        $result.=$streamDog->getKeepAliveCallback($keepAliveLink, $timeout);
+        $result .= $streamDog->getKeepAliveCallback($keepAliveLink, $timeout);
         return($result);
     }
 
