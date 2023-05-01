@@ -219,6 +219,8 @@ $lang['def']['Oh no'] = 'Журбинка';
 $lang['def']['No such camera'] = 'Немає такої камери';
 $lang['def']['No such live stream'] = 'Живий потік не знайдено';
 $lang['def']['Camera disabled now'] = 'Ця камера наразі вимкнена';
+$lang['def']['Passwords did not match'] = 'Паролі не зпівпадають';
+$lang['def']['User already exists'] = 'Користувач вже існує';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
 

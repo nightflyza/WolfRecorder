@@ -13,11 +13,21 @@ if ($system->getAuthEnabled()) {
 
         //User creation
         if (ubRouting::checkPost($userManager::PROUTE_DOREGISTER)) {
-            $registerResult = $userManager->createUser();
-            if (empty($registerResult)) {
-                ubRouting::nav($userManager::URL_ME);
-            } else {
-                show_error($registerResult);
+            //all of this props are required for normal registration
+            $requiredParams = array(
+                $userManager::PROUTE_USERNAME,
+                $userManager::PROUTE_PASSWORD,
+                $userManager::PROUTE_PASSWORDCONFIRM,
+                $userManager::PROUTE_USERROLE,
+            );
+
+            if (ubRouting::checkPost($requiredParams)) {
+                $registerResult = $userManager->createUser(ubRouting::post($userManager::PROUTE_USERNAME), ubRouting::post($userManager::PROUTE_PASSWORD), ubRouting::post($userManager::PROUTE_PASSWORDCONFIRM), ubRouting::post($userManager::PROUTE_USERROLE));
+                if (empty($registerResult)) {
+                    ubRouting::nav($userManager::URL_ME);
+                } else {
+                    show_error($registerResult);
+                }
             }
         }
 

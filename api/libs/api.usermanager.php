@@ -20,6 +20,20 @@ class UserManager {
     protected $messages = '';
 
     /**
+     * Contains predefined user roles as role=>name
+     *
+     * @var array
+     */
+    protected $userRoles = array();
+
+    /**
+     * Contains predefined roles rights
+     *
+     * @var array
+     */
+    protected $rolesRights = array();
+
+    /**
      * Some static routes etc
      */
     const URL_ME = '?module=usermanager';
@@ -39,6 +53,7 @@ class UserManager {
     const PROUTE_PASSWORDCONFIRM = 'confirmation';
     const PROUTE_NICKNAME = 'nickname';
     const PROUTE_EMAIL = 'email';
+    const PROUTE_USERROLE = 'userrole';
     const PROUTE_ROOTUSER = 'thisisrealyrootuser'; // root user permission flag
 
     /**
@@ -48,6 +63,33 @@ class UserManager {
     public function __construct() {
         $this->initMessages();
         $this->initSystemCore();
+        $this->setUserRoles();
+    }
+
+    /**
+     * Sets some predefined user roles
+     * 
+     * @return void
+     */
+    protected function setUserRoles() {
+        global $ubillingConfig;
+        $this->userRoles = array(
+            'LIMITED' => __('User'),
+            'ADMINISTRATOR' => __('Administrator'),
+        );
+
+
+        $limitedRights = $ubillingConfig->getAlterParam('LIMITED_RIGHTS');
+        if (!empty($limitedRights)) {
+            $limitedRights = explode(',', $limitedRights);
+            $rightsString = '';
+            foreach ($limitedRights as $io => $each) {
+                $rightsString .= '|' . $each . '|';
+            }
+            $this->rolesRights['LIMITED'] = $rightsString;
+        }
+
+        $this->rolesRights['ADMINISTRATOR'] = '*';
     }
 
     /**
@@ -126,13 +168,13 @@ class UserManager {
      */
     public function renderRegisterForm() {
         $result = '';
-
         $inputs = wf_HiddenInput(self::PROUTE_DOREGISTER, 'true');
         $inputs .= wf_TextInput(self::PROUTE_USERNAME, __('Login'), '', true, 20, 'alphanumeric');
         $inputs .= wf_PasswordInput(self::PROUTE_PASSWORD, __('Password'), '', true, 20);
         $inputs .= wf_PasswordInput(self::PROUTE_PASSWORDCONFIRM, __('Password confirmation'), '', true, 20);
-        $inputs .= wf_TextInput(self::PROUTE_NICKNAME, __('NickName'), '', true, 20, 'alphanumeric');
-        $inputs .= wf_TextInput(self::PROUTE_EMAIL, __('Email'), '', true, 20);
+        $inputs .= wf_Selector(self::PROUTE_USERROLE, $this->userRoles, __('Permissions'), '', true);
+        $inputs .= wf_HiddenInput(self::PROUTE_NICKNAME, __('NickName'), '', true, 20, 'alphanumeric');
+        $inputs .= wf_HiddenInput(self::PROUTE_EMAIL, __('Email'), '', true, 20);
         $inputs .= wf_Submit(__('Create'));
 
         $result .= wf_Form('', 'POST', $inputs, 'glamour');
@@ -142,65 +184,64 @@ class UserManager {
     /**
      * Registers new user
      * 
+     * @param string $login
+     * @param string $password
+     * @param string $confirmation
+     * @param string $role
+     * 
      * @return void/string on error
      */
-    public function createUser() {
+    public function createUser($login, $password, $confirmation, $role = '') {
         $result = '';
-
-        //all of this props are required for normal registration
-        $requiredParams = array(
-            self::PROUTE_USERNAME,
-            self::PROUTE_PASSWORD,
-            self::PROUTE_PASSWORDCONFIRM,
-            self::PROUTE_NICKNAME,
-            self::PROUTE_NICKNAME,
-            self::PROUTE_EMAIL
-        );
-
-        if (ubRouting::checkPost($requiredParams)) {
-            $newLogin = ubRouting::post(self::PROUTE_USERNAME, 'vf');
-            $newPasword = ubRouting::post(self::PROUTE_PASSWORD);
-            $confirmation = ubRouting::post(self::PROUTE_PASSWORDCONFIRM);
-            $newNickName = ubRouting::post(self::PROUTE_NICKNAME, 'mres');
-            $newEmail = ubRouting::post(self::PROUTE_EMAIL, 'mres');
-            $newUserRights = '';
-
-            if (!empty($newLogin)) {
-                $userDataPath = USERS_PATH . $newLogin;
-                if (!file_exists($userDataPath)) {
-                    if ($newPasword == $confirmation) {
-                        if (!empty($newEmail)) {
-                            if (!empty($newNickName)) {
-                                $newUserData = array(
-                                    'admin' => $newUserRights,
-                                    'password' => md5($newPasword),
-                                    'nickname' => $newNickName,
-                                    'username' => $newLogin,
-                                    'email' => $newEmail,
-                                    'hideemail' => '1',
-                                    'tz' => '2'
-                                );
-
-                                $saveUserData = serialize($newUserData);
-
-                                file_put_contents($userDataPath, $saveUserData);
-                                log_register('USER REGISTER {' . $newLogin . '}');
-                            } else {
-                                $result .= __('Empty NickName');
-                            }
-                        } else {
-                            $result .= __('Empty email');
-                        }
-                    } else {
-                        $result .= __('Passwords did not match');
-                    }
-                } else {
-                    $result .= __('User already exists');
-                }
-            } else {
-                $result .= __('Empty login');
+        $newLogin = ubRouting::filters($login, 'vf');
+        $newPasword = ubRouting::filters($password);
+        $confirmation = ubRouting::filters($confirmation);
+        $newNickName = ubRouting::filters($login, 'mres');
+        $newRole = ubRouting::filters($role, 'vf');
+        $newEmail = $newLogin . '@wolfrecorder.com';
+        $newUserRights = '';
+        if (!empty($newRole)) {
+            if (isset($this->rolesRights[$newRole])) {
+                $newUserRights = $this->rolesRights[$newRole];
             }
         }
+
+        if (!empty($newLogin)) {
+            $userDataPath = USERS_PATH . $newLogin;
+            if (!file_exists($userDataPath)) {
+                if ($newPasword == $confirmation) {
+                    if (!empty($newEmail)) {
+                        if (!empty($newNickName)) {
+                            $newUserData = array(
+                                'admin' => $newUserRights,
+                                'password' => md5($newPasword),
+                                'nickname' => $newNickName,
+                                'username' => $newLogin,
+                                'email' => $newEmail,
+                                'hideemail' => '1',
+                                'tz' => '2'
+                            );
+
+                            $saveUserData = serialize($newUserData);
+
+                            file_put_contents($userDataPath, $saveUserData);
+                            log_register('USER REGISTER {' . $newLogin . '}');
+                        } else {
+                            $result .= __('Empty NickName');
+                        }
+                    } else {
+                        $result .= __('Empty email');
+                    }
+                } else {
+                    $result .= __('Passwords did not match');
+                }
+            } else {
+                $result .= __('User already exists');
+            }
+        } else {
+            $result .= __('Empty login');
+        }
+
         return($result);
     }
 
