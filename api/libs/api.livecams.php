@@ -439,6 +439,9 @@ class LiveCams {
         $streamDog = new StreamDog();
         $timeout = 10000; // in ms
         $keepAliveLink = self::URL_ME . '&' . StreamDog::ROUTE_KEEPALIVE . '=' . $cameraId;
+        //preventing stream destroy before first callback
+        $streamDog->keepAlive($cameraId);
+        //appending periodic requests code
         $result .= $streamDog->getKeepAliveCallback($keepAliveLink, $timeout);
         return($result);
     }
@@ -460,6 +463,7 @@ class LiveCams {
             if ($cameraData['CAMERA']['active']) {
                 $streamUrl = $this->getStreamUrl($channelId);
                 if ($streamUrl) {
+                    //seems live stream now live
                     $playerId = 'liveplayer_' . $channelId;
                     $player = new Player($this->playerWidth, true);
                     $result .= $player->renderLivePlayer($streamUrl, $playerId);

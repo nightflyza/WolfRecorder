@@ -1,14 +1,15 @@
 <?php
 
 if (cfr('LIVECAMS')) {
-    $liveCams = new LiveCams();
+    //catching keep alive requests
     $streamDog = new StreamDog();
-    
     if (ubRouting::checkGet($streamDog::ROUTE_KEEPALIVE)) {
         $streamDog->keepAlive(ubRouting::get($streamDog::ROUTE_KEEPALIVE));
         die();
     }
 
+
+    $liveCams = new LiveCams();
     if (ubRouting::checkGet($liveCams::ROUTE_VIEW)) {
         $acl = new ACL();
         if ($acl->isMyChannel(ubRouting::get($liveCams::ROUTE_VIEW))) {
