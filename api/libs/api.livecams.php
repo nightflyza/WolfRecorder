@@ -360,11 +360,12 @@ class LiveCams {
     }
 
     /**
-     * Destroys live stream
+     * Destroys live stream. Returns true if stream was alive.
      * 
-     * @return void
+     * @return bool
      */
     public function stopStream($cameraId) {
+        $result = false;
         $cameraId = ubRouting::filters($cameraId, 'int');
         $allRunningStreams = $this->getRunningStreams();
         //is camera live stream running?
@@ -385,7 +386,9 @@ class LiveCams {
                     }
                 }
             }
+            $result = true;
         }
+        return($result);
     }
 
     /**
@@ -468,7 +471,11 @@ class LiveCams {
 
                 $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('Camera disabled now'), 'error');
             }
-            
+
+            if (cfr('CAMERAS')) {
+                $cameraControls .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraData['CAMERA']['id'], wf_img('skins/icon_camera_small.png') . ' ' . __('Camera'), false, 'ubButton');
+            }
+
             if (cfr('ARCHIVE')) {
                 $cameraControls .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $cameraData['CAMERA']['channel'], wf_img('skins/icon_archive_small.png') . ' ' . __('Video from camera'), false, 'ubButton');
             }

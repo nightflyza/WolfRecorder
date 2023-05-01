@@ -539,8 +539,14 @@ class Cameras {
         $cameraId = ubRouting::filters($cameraId, 'int');
         if (isset($this->allCameras[$cameraId])) {
             $recorder = new Recorder();
-            //shutdown recording process
+            //shutdown recording process if it runs
             $recorder->stopRecord($cameraId); //this method locks execution until capture process will be really killed
+            //shutdown camera live streams if it runs
+            $liveCams = new LiveCams();
+            $streamStopResult = $liveCams->stopStream($cameraId);
+            if ($streamStopResult) {
+                log_register('LIVESTREAM STOPPED [' . $cameraId . ']');
+            }
             //disabling camera activity flag
             $this->camerasDb->where('id', '=', $cameraId);
             $this->camerasDb->data('active', 0);
@@ -875,10 +881,10 @@ class Cameras {
             } else {
                 $cameraControls .= wf_Link(self::URL_ME . '&' . self::ROUTE_ACTIVATE . '=' . $cameraData['id'], web_bool_led(1) . ' ' . __('Enable'), false, 'ubButton') . ' ';
             }
-            
+
             if ($cameraData['active']) {
                 if (cfr('LIVECAMS')) {
-                    $cameraControls.=wf_Link(LiveCams::URL_ME . '&' . LiveCams::ROUTE_VIEW . '=' . $cameraData['channel'], wf_img('skins/icon_live_small.png') . ' ' . __('Live'), false, 'ubButton');
+                    $cameraControls .= wf_Link(LiveCams::URL_ME . '&' . LiveCams::ROUTE_VIEW . '=' . $cameraData['channel'], wf_img('skins/icon_live_small.png') . ' ' . __('Live'), false, 'ubButton');
                 }
             }
 
