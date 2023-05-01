@@ -239,7 +239,7 @@ class LiveCams {
                 if (isset($eachLine[0])) {
                     $eachPid = $eachLine[0];
                     if (is_numeric($eachPid)) {
-                        //is this really live stream process?
+//is this really live stream process?
                         if (ispos($rawLine, $this->liveOptsSuffix) AND ispos($rawLine, self::STREAM_PLAYLIST)) {
                             $result[$eachPid] = $rawLine;
                         }
@@ -262,7 +262,7 @@ class LiveCams {
             if (!empty($liveStreamPids)) {
                 foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
                     foreach ($liveStreamPids as $eachPid => $eachProcess) {
-                        //looks familiar?
+//looks familiar?
                         if (ispos($eachProcess, $eachCameraData['CAMERA']['ip']) AND ispos($eachProcess, $eachCameraData['CAMERA']['login'])) {
                             $result[$eachCameraId] = $eachPid;
                         }
@@ -392,6 +392,22 @@ class LiveCams {
     }
 
     /**
+     * Renders camera keep alive container
+     * 
+     * @param int $cameraId
+     * 
+     * @return string
+     */
+    protected function renderKeepAliveCallback($cameraId) {
+        $result = '';
+        $streamDog=new StreamDog();
+        $timeout = 10000; // in ms
+        $keepAliveLink = self::URL_ME . '&' . StreamDog::ROUTE_KEEPALIVE . '=' . $cameraId;
+        $result.=$streamDog->getKeepAliveCallback($keepAliveLink, $timeout);
+        return($result);
+    }
+
+    /**
      * Returns channel live stream preview
      * 
      * @param string $channelId
@@ -409,6 +425,7 @@ class LiveCams {
                     $playerId = 'liveplayer_' . $channelId;
                     $player = new Player($this->playerWidth, true);
                     $result .= $player->renderLivePlayer($streamUrl, $playerId);
+                    $result .= $this->renderKeepAliveCallback($cameraId);
                 } else {
                     $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such live stream'), 'error');
                 }

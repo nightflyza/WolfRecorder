@@ -2,6 +2,12 @@
 
 if (cfr('LIVECAMS')) {
     $liveCams = new LiveCams();
+    $streamDog = new StreamDog();
+    
+    if (ubRouting::checkGet($streamDog::ROUTE_KEEPALIVE)) {
+        $streamDog->keepAlive(ubRouting::get($streamDog::ROUTE_KEEPALIVE));
+        die();
+    }
 
     if (ubRouting::checkGet($liveCams::ROUTE_VIEW)) {
         $acl = new ACL();
