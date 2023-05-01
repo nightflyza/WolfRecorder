@@ -465,11 +465,17 @@ class Archive {
         }
         $result .= wf_delimiter(1);
         $result .= wf_BackLink(self::URL_ME);
+        
         if (cfr('CAMERAS')) {
             if ($cameraId) {
                 $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, wf_img('skins/icon_camera_small.png') . ' ' . __('Camera'), false, 'ubButton');
             }
         }
+        
+        if (cfr('LIVECAMS')) {
+            $result .= wf_Link(LiveCams::URL_ME . '&' . LiveCams::ROUTE_VIEW . '=' . $channelId, wf_img('skins/icon_live_small.png') . ' ' . __('Live'), false, 'ubButton');
+        }
+        
         if (cfr('EXPORT')) {
             $result .= wf_Link(Export::URL_ME . '&' . Export::ROUTE_CHANNEL . '=' . $channelId, wf_img('skins/icon_export.png') . ' ' . __('Save record'), false, 'ubButton');
         }

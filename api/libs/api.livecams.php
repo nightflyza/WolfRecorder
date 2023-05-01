@@ -450,6 +450,8 @@ class LiveCams {
     public function renderLive($channelId) {
         $result = '';
         $cameraId = $this->cameras->getCameraIdByChannel($channelId);
+        $cameraControls = wf_BackLink(self::URL_ME);
+
         if ($cameraId) {
             $cameraData = $this->allCamerasData[$cameraId];
             if ($cameraData['CAMERA']['active']) {
@@ -466,11 +468,20 @@ class LiveCams {
 
                 $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('Camera disabled now'), 'error');
             }
+            
+            if (cfr('ARCHIVE')) {
+                $cameraControls .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $cameraData['CAMERA']['channel'], wf_img('skins/icon_archive_small.png') . ' ' . __('Video from camera'), false, 'ubButton');
+            }
+
+            if (cfr('EXPORT')) {
+                $cameraControls .= wf_Link(Export::URL_ME . '&' . Export::ROUTE_CHANNEL . '=' . $cameraData['CAMERA']['channel'], wf_img('skins/icon_export.png') . ' ' . __('Save record'), false, 'ubButton');
+            }
         } else {
             $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such camera'), 'error');
         }
+
         $result .= wf_delimiter();
-        $result .= wf_BackLink(self::URL_ME);
+        $result .= $cameraControls;
         return($result);
     }
 

@@ -786,6 +786,10 @@ class Cameras {
             $allRunningRecorders = $this->getRunningRecorders();
             $recordingFlag = (isset($allRunningRecorders[$cameraId])) ? 1 : 0;
 
+            //live stream process now is running?
+            $allRunningLiveStreams = $this->getRunningStreams();
+            $liveStreamFlag = (isset($allRunningLiveStreams[$cameraId])) ? 1 : 0;
+
             //some channel data collecting
             $channelChunks = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
             $chunksCount = sizeof($channelChunks);
@@ -830,6 +834,10 @@ class Cameras {
             $cells .= wf_TableCell(web_bool_led($recordingFlag));
             $rows .= wf_TableRow($cells, 'row3');
 
+            $cells = wf_TableCell(__('Live'), '', 'row2');
+            $cells .= wf_TableCell(web_bool_led($liveStreamFlag));
+            $rows .= wf_TableRow($cells, 'row3');
+
             $cells = wf_TableCell(__('Description'), '', 'row2');
             $cells .= wf_TableCell($cameraData['comment']);
             $rows .= wf_TableRow($cells, 'row3');
@@ -866,6 +874,12 @@ class Cameras {
                 $cameraControls .= wf_Link($deactUrl, web_bool_led(0) . ' ' . __('Disable'), false, 'ubButton') . ' ';
             } else {
                 $cameraControls .= wf_Link(self::URL_ME . '&' . self::ROUTE_ACTIVATE . '=' . $cameraData['id'], web_bool_led(1) . ' ' . __('Enable'), false, 'ubButton') . ' ';
+            }
+            
+            if ($cameraData['active']) {
+                if (cfr('LIVECAMS')) {
+                    $cameraControls.=wf_Link(LiveCams::URL_ME . '&' . LiveCams::ROUTE_VIEW . '=' . $cameraData['channel'], wf_img('skins/icon_live_small.png') . ' ' . __('Live'), false, 'ubButton');
+                }
             }
 
             if (cfr('ARCHIVE')) {
