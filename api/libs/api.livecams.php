@@ -239,7 +239,7 @@ class LiveCams {
                 if (isset($eachLine[0])) {
                     $eachPid = $eachLine[0];
                     if (is_numeric($eachPid)) {
-//is this really live stream process?
+                        //is this really live stream process?
                         if (ispos($rawLine, $this->liveOptsSuffix) AND ispos($rawLine, self::STREAM_PLAYLIST)) {
                             $result[$eachPid] = $rawLine;
                         }
@@ -262,7 +262,7 @@ class LiveCams {
             if (!empty($liveStreamPids)) {
                 foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
                     foreach ($liveStreamPids as $eachPid => $eachProcess) {
-//looks familiar?
+                        //looks familiar?
                         if (ispos($eachProcess, $eachCameraData['CAMERA']['ip']) AND ispos($eachProcess, $eachCameraData['CAMERA']['login'])) {
                             $result[$eachCameraId] = $eachPid;
                         }
@@ -334,6 +334,10 @@ class LiveCams {
                             $channelId = $cameraData['CAMERA']['channel'];
                             $streamPath = $this->allocateStreamPath($channelId);
                             if ($cameraData['TEMPLATE']['PROTO'] == 'rtsp') {
+                                //set stream as alive
+                                $streamDog = new StreamDog();
+                                $streamDog->keepAlive($cameraId);
+                                //run live stream capture
                                 $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
                                 $streamType = $cameraData['TEMPLATE']['MAIN_STREAM']; //TODO: may be configurable in future?
                                 $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $streamType;
@@ -365,9 +369,22 @@ class LiveCams {
         $allRunningStreams = $this->getRunningStreams();
         //is camera live stream running?
         if (isset($allRunningStreams[$cameraId])) {
+            //killing stream process
             $streamPid = $allRunningStreams[$cameraId];
-            $command= $this->binPaths['SUDO'].' '.$this->binPaths['KILL'].' -9 '.$streamPid;
+            $command = $this->binPaths['SUDO'] . ' ' . $this->binPaths['KILL'] . ' -9 ' . $streamPid;
             shell_exec($command);
+            //livestream location cleanup
+            if (isset($this->allCamerasData[$cameraId])) {
+                $cameraData = $this->allCamerasData[$cameraId];
+                $channelId = $cameraData['CAMERA']['channel'];
+                $streamPath = $this->allocateStreamPath($channelId);
+                if (file_exists($streamPath)) {
+                    $playListPath = $streamPath . self::STREAM_PLAYLIST;
+                    if (file_exists($playListPath)) {
+                        unlink($playListPath);
+                    }
+                }
+            }
         }
     }
 

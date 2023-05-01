@@ -394,12 +394,13 @@ class Cameras {
     }
 
     /**
-     * Returns all running recorders real process PID-s array as pid=>processString
+     * Returns running cameras recording processes as cameraId=>realPid
      * 
      * @return array
      */
-    protected function getRecordersPids() {
+    protected function getRunningRecorders() {
         $result = array();
+        $recorderPids = array();
         $command = $this->binPaths['PS'] . ' ax | ' . $this->binPaths['GREP'] . ' ' . $this->binPaths['FFMPG_PATH'] . ' | ' . $this->binPaths['GREP'] . ' -v grep';
         $rawResult = shell_exec($command);
         if (!empty($rawResult)) {
@@ -412,29 +413,62 @@ class Cameras {
                     $eachPid = $eachLine[0];
                     if (is_numeric($eachPid)) {
                         //is this really capture process?
-                        if (ispos($rawLine, $this->binPaths['FFMPG_PATH'])) {
-                            $result[$eachPid] = $rawLine;
+                        if (ispos($rawLine, $this->binPaths['FFMPG_PATH']) AND ispos($rawLine, 'segment_format')) {
+                            $recorderPids[$eachPid] = $rawLine;
                         }
                     }
                 }
             }
         }
 
+        if (!empty($this->allCameras)) {
+            if (!empty($recorderPids)) {
+                foreach ($this->allCameras as $eachCameraId => $eachCameraData) {
+                    foreach ($recorderPids as $eachPid => $eachProcess) {
+                        //looks familiar?
+                        if (ispos($eachProcess, $eachCameraData['ip']) AND ispos($eachProcess, $eachCameraData['login'])) {
+                            $result[$eachCameraId] = $eachPid;
+                        }
+                    }
+                }
+            }
+        }
         return($result);
     }
 
     /**
-     * Returns running cameras recording processes as cameraId=>realPid
+     * Returns running cameras live stream processes as cameraId=>realPid
      * 
      * @return array
      */
-    protected function getRunningRecorders() {
+    protected function getRunningStreams() {
         $result = array();
+        $liveStreamsPids = array();
+        $command = $this->binPaths['PS'] . ' ax | ' . $this->binPaths['GREP'] . ' ' . $this->binPaths['FFMPG_PATH'] . ' | ' . $this->binPaths['GREP'] . ' -v grep';
+        $rawResult = shell_exec($command);
+
+        if (!empty($rawResult)) {
+            $rawResult = explodeRows($rawResult);
+            foreach ($rawResult as $io => $eachLine) {
+                $eachLine = trim($eachLine);
+                $rawLine = $eachLine;
+                $eachLine = explode(' ', $eachLine);
+                if (isset($eachLine[0])) {
+                    $eachPid = $eachLine[0];
+                    if (is_numeric($eachPid)) {
+                        //is this really live stream process?
+                        if (ispos($rawLine, 'hls') AND ispos($rawLine, LiveCams::STREAM_PLAYLIST)) {
+                            $liveStreamsPids[$eachPid] = $rawLine;
+                        }
+                    }
+                }
+            }
+        }
+
         if (!empty($this->allCameras)) {
-            $recorderPids = $this->getRecordersPids();
-            if (!empty($recorderPids)) {
+            if (!empty($liveStreamsPids)) {
                 foreach ($this->allCameras as $eachCameraId => $eachCameraData) {
-                    foreach ($recorderPids as $eachPid => $eachProcess) {
+                    foreach ($liveStreamsPids as $eachPid => $eachProcess) {
                         //looks familiar?
                         if (ispos($eachProcess, $eachCameraData['ip']) AND ispos($eachProcess, $eachCameraData['login'])) {
                             $result[$eachCameraId] = $eachPid;
@@ -701,10 +735,12 @@ class Cameras {
         if (!empty($this->allCameras)) {
             $totalCount = 0;
             $allRunningRecorders = $this->getRunningRecorders();
+            $allLiveStreams = $this->getRunningStreams();
             $cells = wf_TableCell(__('ID'));
             $cells .= wf_TableCell(__('IP'));
             $cells .= wf_TableCell(__('Enabled'));
             $cells .= wf_TableCell(__('Recording'));
+            $cells .= wf_TableCell(__('Live'));
             $cells .= wf_TableCell(__('Description'));
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
@@ -714,6 +750,8 @@ class Cameras {
                 $cells .= wf_TableCell(web_bool_led($each['active']), '', '', 'sorttable_customkey="' . $each['active'] . '"');
                 $recordingFlag = isset($allRunningRecorders[$each['id']]) ? 1 : 0;
                 $cells .= wf_TableCell(web_bool_led($recordingFlag), '', '', 'sorttable_customkey="' . $recordingFlag . '"');
+                $liveFlag = isset($allLiveStreams[$each['id']]) ? 1 : 0;
+                $cells .= wf_TableCell(web_bool_led($liveFlag), '', '', 'sorttable_customkey="' . $liveFlag . '"');
                 $cells .= wf_TableCell($each['comment']);
                 $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $each['id'], web_edit_icon(), false);
                 $cells .= wf_TableCell($actLinks);
