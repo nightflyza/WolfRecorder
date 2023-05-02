@@ -5,7 +5,10 @@ if (cfr('SYSINFO')) {
 
     $sysInfo = new SystemInfo();
 
-    $systemHealth = $sysInfo->renderSerialInfo();
+    $systemHealth = '';
+    if (cfr('ROOT')) {
+        $systemHealth .= $sysInfo->renderSerialInfo();
+    }
     $systemHealth .= $sysInfo->renderLA();
     $systemHealth .= $sysInfo->renderDisksCapacity();
 
