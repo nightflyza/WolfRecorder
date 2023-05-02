@@ -312,6 +312,15 @@ class Models {
     }
 
     /**
+     * Returns all available models data as id=>modelData 
+     * 
+     * @return array
+     */
+    public function getAllModelData() {
+        return($this->allModels);
+    }
+
+    /**
      * Returns all models templates as modelId=>templateData
      * 
      * @return array
