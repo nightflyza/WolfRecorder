@@ -541,9 +541,10 @@ class Cameras {
      * 
      * @param int $cameraId
      * 
-     * @return void
+     * @return void/string
      */
     public function deactivate($cameraId) {
+        $result = '';
         $cameraId = ubRouting::filters($cameraId, 'int');
         if (isset($this->allCameras[$cameraId])) {
             $recorder = new Recorder();
@@ -560,7 +561,10 @@ class Cameras {
             $this->camerasDb->data('active', 0);
             $this->camerasDb->save();
             log_register('CAMERA DEACTIVATE [' . $cameraId . ']');
+        } else {
+            $result = __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
         }
+        return($result);
     }
 
     /**
@@ -568,9 +572,10 @@ class Cameras {
      * 
      * @param int $cameraId
      * 
-     * @return void
+     * @return void/string
      */
     public function activate($cameraId) {
+        $result = '';
         $cameraId = ubRouting::filters($cameraId, 'int');
         if (isset($this->allCameras[$cameraId])) {
             //enabling camera activity flag
@@ -585,7 +590,10 @@ class Cameras {
                 $recorder = new Recorder();
                 $recorder->runRecordBackground($cameraId);
             }
+        } else {
+            $result = __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
         }
+        return($result);
     }
 
     /**
