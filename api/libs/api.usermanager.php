@@ -172,9 +172,9 @@ class UserManager {
         $inputs .= wf_TextInput(self::PROUTE_USERNAME, __('Login'), '', true, 20, 'alphanumeric');
         $inputs .= wf_PasswordInput(self::PROUTE_PASSWORD, __('Password'), '', true, 20);
         $inputs .= wf_PasswordInput(self::PROUTE_PASSWORDCONFIRM, __('Password confirmation'), '', true, 20);
+        $inputs .= wf_delimiter(0);
         $inputs .= wf_Selector(self::PROUTE_USERROLE, $this->userRoles, __('Permissions'), '', true);
-        $inputs .= wf_HiddenInput(self::PROUTE_NICKNAME, __('NickName'), '', true, 20, 'alphanumeric');
-        $inputs .= wf_HiddenInput(self::PROUTE_EMAIL, __('Email'), '', true, 20);
+        $inputs .= wf_delimiter(0);
         $inputs .= wf_Submit(__('Create'));
 
         $result .= wf_Form('', 'POST', $inputs, 'glamour');
@@ -261,8 +261,9 @@ class UserManager {
                 $inputs = wf_HiddenInput(self::PROUTE_DOEDIT, $userName);
                 $inputs .= wf_PasswordInput(self::PROUTE_PASSWORD, __('New password'), '', true, 20);
                 $inputs .= wf_PasswordInput(self::PROUTE_PASSWORDCONFIRM, __('New password confirmation'), '', true, 20);
-                $inputs .= wf_TextInput(self::PROUTE_NICKNAME, __('NickName'), $currentUserData['nickname'], true, 20, 'alphanumeric');
-                $inputs .= wf_TextInput(self::PROUTE_EMAIL, __('Email'), $currentUserData['email'], true, 20);
+                $inputs .= wf_HiddenInput(self::PROUTE_NICKNAME, $currentUserData['nickname']);
+                $inputs .= wf_HiddenInput(self::PROUTE_EMAIL, $currentUserData['email']);
+                $inputs .= wf_delimiter(0);
                 $inputs .= wf_Submit(__('Save'));
 
                 $result .= wf_Form('', 'POST', $inputs, 'glamour');
@@ -278,76 +279,63 @@ class UserManager {
     /**
      * Saves userdata changes if its required
      * 
+     * @param string $login
+     * @param string $password
+     * @param string $confirmation
+     * 
      * @return void/string on error
      */
-    public function saveUser() {
+    public function saveUser($login, $password, $confirmation) {
         $result = '';
-        if (ubRouting::checkPost(self::PROUTE_DOEDIT)) {
-            $editUserName = ubRouting::post(self::PROUTE_DOEDIT, 'vf');
-            if (!empty($editUserName)) {
-                $saveDataPath = USERS_PATH . $editUserName;
+        $editUserName = ubRouting::filters($login, 'vf');
+        if (!empty($editUserName)) {
+            $saveDataPath = USERS_PATH . $editUserName;
 
-                if (file_exists($saveDataPath)) {
-                    $currentUserData = $this->system->getUserData($editUserName);
-                    $newUserData = $currentUserData;
-                    if (!empty($currentUserData)) {
-                        $updateProfile = false;
+            if (file_exists($saveDataPath)) {
+                $currentUserData = $this->system->getUserData($editUserName);
+                $newUserData = $currentUserData;
+                if (!empty($currentUserData)) {
+                    $updateProfile = false;
 
-                        $newPasword = ubRouting::post(self::PROUTE_PASSWORD);
-                        $confirmation = ubRouting::post(self::PROUTE_PASSWORDCONFIRM);
-                        $newNickName = ubRouting::post(self::PROUTE_NICKNAME, 'mres');
-                        $newEmail = ubRouting::post(self::PROUTE_EMAIL, 'mres');
+                    $newPasword = ubRouting::filters($password);
+                    $confirmation = ubRouting::filters($confirmation);
+                    $newNickName = $currentUserData['nickname'];
+                    $newEmail = $currentUserData['email'];
 
-                        //password update?
-                        if (!empty($newPasword)) {
-                            if ($newPasword == $confirmation) {
-                                $newPasswordHash = md5($newPasword);
-                                if ($currentUserData['password'] != $newPasswordHash) {
-                                    //ok its really new password
-                                    $newUserData['password'] = $newPasswordHash;
-                                    $updateProfile = true;
-                                }
-                            } else {
-                                $result .= __('Passwords did not match');
-                            }
-                        }
-
-                        //nickname update
-                        if (!empty($newNickName)) {
-                            if ($currentUserData['nickname'] != $newNickName) {
-                                $newUserData['nickname'] = $newNickName;
+                    //password update?
+                    if (!empty($newPasword)) {
+                        if ($newPasword == $confirmation) {
+                            $newPasswordHash = md5($newPasword);
+                            if ($currentUserData['password'] != $newPasswordHash) {
+                                //ok its really new password
+                                $newUserData['password'] = $newPasswordHash;
                                 $updateProfile = true;
                             }
+                        } else {
+                            $result .= __('Passwords did not match');
                         }
+                    }
 
-                        //email update
-                        if (!empty($newEmail)) {
-                            if ($currentUserData['email'] != $newEmail) {
-                                $newUserData['email'] = $newEmail;
-                                $updateProfile = true;
-                            }
+                    //saving profile changes if required
+                    if ($updateProfile) {
+                        if (is_writable($saveDataPath)) {
+                            $newProfileToSave = serialize($newUserData);
+                            file_put_contents($saveDataPath, $newProfileToSave);
+                            log_register('USER CHANGE DATA {' . $editUserName . '}');
+                        } else {
+                            $result .= __('Profile write failure');
                         }
-
-                        //saving profile changes if required
-                        if ($updateProfile) {
-                            if (is_writable($saveDataPath)) {
-                                $newProfileToSave = serialize($newUserData);
-                                file_put_contents($saveDataPath, $newProfileToSave);
-                                log_register('USER CHANGE DATA {' . $editUserName . '}');
-                            } else {
-                                $result .= __('Profile write failure');
-                            }
-                        }
-                    } else {
-                        $result .= __('Profile read failure');
                     }
                 } else {
-                    $result .= __('User not exists');
+                    $result .= __('Profile read failure');
                 }
             } else {
-                $result .= __('Empty username');
+                $result .= __('User not exists');
             }
+        } else {
+            $result .= __('Empty username');
         }
+
         return($result);
     }
 

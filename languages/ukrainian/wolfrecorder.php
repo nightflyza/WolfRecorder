@@ -221,6 +221,7 @@ $lang['def']['No such live stream'] = 'Живий потік не знайден
 $lang['def']['Camera disabled now'] = 'Ця камера наразі вимкнена';
 $lang['def']['Passwords did not match'] = 'Паролі не зпівпадають';
 $lang['def']['User already exists'] = 'Користувач вже існує';
+$lang['def']['Users and rights'] = 'Користувачі та привілеї';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
 

@@ -33,7 +33,7 @@ if ($system->getAuthEnabled()) {
 
         //User profile editing
         if (ubRouting::checkPost($userManager::PROUTE_DOEDIT)) {
-            $saveResult = $userManager->saveUser();
+            $saveResult = $userManager->saveUser(ubRouting::post($userManager::PROUTE_DOEDIT), ubRouting::post($userManager::PROUTE_PASSWORD), ubRouting::post($userManager::PROUTE_PASSWORDCONFIRM));
             if (empty($saveResult)) {
                 ubRouting::nav($userManager::URL_ME . '&' . $userManager::ROUTE_EDIT . '=' . ubRouting::post($userManager::PROUTE_DOEDIT));
             } else {
