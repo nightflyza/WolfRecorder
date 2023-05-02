@@ -4,7 +4,7 @@ if (cfr('CAMERAS')) {
     $cameras = new Cameras();
 
     //new camera creation
-    if (ubRouting::checkPost(array($cameras::PROUTE_NEWMODEL, $cameras::PROUTE_NEWIP, $cameras::PROUTE_NEWLOGIN, $cameras::PROUTE_NEWPASS, $cameras::PROUTE_NEWSTORAGE))) {
+    if (ubRouting::checkPost(array($cameras::PROUTE_NEWMODEL, $cameras::PROUTE_NEWIP, $cameras::PROUTE_NEWLOGIN, $cameras::PROUTE_NEWPASS))) {
         $newModelId = ubRouting::post($cameras::PROUTE_NEWMODEL);
         $newIp = ubRouting::post($cameras::PROUTE_NEWIP);
         $newLogin = ubRouting::post($cameras::PROUTE_NEWLOGIN);

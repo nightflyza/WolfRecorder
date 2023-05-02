@@ -348,6 +348,10 @@ class Cameras {
         $passwordF = ubRouting::filters($password, 'mres');
         $actF = ($active) ? 1 : 0;
         $storageId = ubRouting::filters($storageId, 'int');
+        //automatic storage selection?
+        if ($storageId == 0) {
+            $storageId = $this->storages->getLeastUsedStorage();
+        }
         $commentF = ubRouting::filters($comment, 'mres');
         $channelId = $this->getChannelId();
 
@@ -647,9 +651,11 @@ class Cameras {
         $allModels = $this->models->getAllModelNames();
         if (!empty($allStorages)) {
             $storagesParams = array();
+            $storagesParams = array(0 => __('Auto'));
             foreach ($allStorages as $eachStorageId => $eachStorageName) {
                 $storagesParams[$eachStorageId] = __($eachStorageName);
             }
+
             if (!empty($allModels)) {
                 $inputs = wf_Selector(self::PROUTE_NEWMODEL, $allModels, __('Model'), '', true) . ' ';
                 $inputs .= wf_TextInput(self::PROUTE_NEWIP, __('IP'), '', true, 12, 'ip') . ' ';

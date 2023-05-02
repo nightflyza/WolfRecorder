@@ -222,6 +222,7 @@ $lang['def']['Camera disabled now'] = 'Ця камера наразі вимкн
 $lang['def']['Passwords did not match'] = 'Паролі не зпівпадають';
 $lang['def']['User already exists'] = 'Користувач вже існує';
 $lang['def']['Users and rights'] = 'Користувачі та привілеї';
+$lang['def']['Auto'] = 'Автоматично';
 $lang['def'][''] = '';
 $lang['def'][''] = '';
 

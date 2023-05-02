@@ -353,6 +353,20 @@ class Storages {
     }
 
     /**
+     * Returns Id of least used storage
+     * 
+     * @return int
+     */
+    public function getLeastUsedStorage() {
+        $result = 0;
+        $allStoragesCamerasCount = $this->getAllStoragesCamerasCount();
+        if (!empty($allStoragesCamerasCount)) {
+            $result = array_search(min($allStoragesCamerasCount), $allStoragesCamerasCount);
+        }
+        return($result);
+    }
+
+    /**
      * Checks is some storage used by some cameras?
      * 
      * @param int $storageId
