@@ -494,6 +494,10 @@ class Cameras {
         if (isset($this->allCameras[$cameraId])) {
             $cameraData = $this->allCameras[$cameraId];
             if ($cameraData['active'] == 0) {
+                //flushing camera ACLs
+                $acl = new ACL();
+                $acl->flushCamera($cameraId);
+                //deleting camera database record
                 $this->camerasDb->where('id', '=', $cameraId);
                 $this->camerasDb->delete();
                 log_register('CAMERA DELETE [' . $cameraId . ']');

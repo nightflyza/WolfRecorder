@@ -122,6 +122,10 @@ class UserManager {
      */
     public function deleteUser($userName) {
         if (file_exists(USERS_PATH . $userName)) {
+            //flushing ACLs
+            $acl = new ACL();
+            $acl->flushUser($userName);
+            //deleting user
             unlink(USERS_PATH . $userName);
             log_register('USER DELETE {' . $userName . '}');
         }
