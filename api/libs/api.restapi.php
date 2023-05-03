@@ -64,6 +64,11 @@ class RestAPI {
                 'assignchannel' => 'aclsAssignChannel',
                 'assigncamera' => 'aclsAssignCamera',
             ),
+            'channels' => array(
+                'getall' => 'channelsGetAll',
+                'getscreenshot' => 'channelsGetScreenshot',
+                'getlivestream' => 'channelsGetLiveStream',
+            ),
             'system' => array(
                 'gethealth' => 'systemGetHealth'
             ),
@@ -682,6 +687,62 @@ class RestAPI {
             } else {
                 $result = array('error' => 7, 'message' => $aclCreationResult);
             }
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
+    /**
+     * Creates ACL for some user by channelId
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function aclsAssignChannel($request) {
+        $result = array();
+        $requiredFields = array('login', 'channelid');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $login = $request['login'];
+            $channelId = $request['channelid'];
+            $acl = new ACL(true);
+            $aclCreationResult = $acl->assignChannel($login, $channelId);
+            if (empty($aclCreationResult)) {
+                $result = array('error' => 0, 'message' => __('Success'));
+            } else {
+                $result = array('error' => 7, 'message' => $aclCreationResult);
+            }
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
+    ///////////////////////
+    // Channels methods  //
+    ///////////////////////
+
+    /**
+     * Returns all available channels as channelId=>cameraId
+     * 
+     * @return array
+     */
+    protected function channelsGetAll() {
+        $result = array();
+        $cameras = new Cameras();
+        $result = $cameras->getAllCamerasChannels();
+        return($result);
+    }
+
+    protected function channelsGetScreenshot($request) {
+        $result = array();
+        $requiredFields = array('channelid');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $channelId = $request['channelid'];
+            $chanshots = new ChanShots();
+            $screenshotRaw = $chanshots->getChannelScreenShot($channelId);
+            $result = array('error' => 0, 'screenshot' => $screenshotRaw);
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }

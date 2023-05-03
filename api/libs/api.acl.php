@@ -216,6 +216,33 @@ class ACL {
     }
 
     /**
+     * Creates new ACL database record using camera channelId
+     * 
+     * @param string $login
+     * @param int $channelId
+     * 
+     * @return void/string on error
+     */
+    public function assignChannel($login, $channelId) {
+        $result = '';
+        if (!empty($this->allCamerasData)) {
+            $cameraId = 0;
+            foreach ($this->allCamerasData as $io => $each) {
+                if ($each['channel'] == $channelId) {
+                    $cameraId = $each['id'];
+                }
+            }
+
+            if ($cameraId) {
+                $result = $this->create($login, $cameraId);
+            } else {
+                $result .= __('Channel') . ' ' . __('not exists');
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Deletes existing ACL from database
      * 
      * @param int $aclId
