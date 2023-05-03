@@ -145,6 +145,41 @@ class ACL {
     }
 
     /**
+     * Returns all available camera ACLs data as login=>cameraId=>channel
+     * 
+     * @return array
+     */
+    public function getAllCameraAclsData() {
+        $result = array();
+        if (!empty($this->allAcls)) {
+            $result = $this->accessibleCameras;
+        }
+        return($result);
+    }
+
+    /**
+     * Returns all available channel ACLs data as login=>channel=>cameraId
+     * 
+     * @return array
+     */
+    public function getAllChannelAclsData() {
+        $result = array();
+        if (!empty($this->allAcls)) {
+            $result = $this->accessibleChannels;
+        }
+        return($result);
+    }
+
+    /**
+     * Returns all availbale ACLs data as aclId=>aclData[id/user/cameraid/channel]
+     * 
+     * @return array
+     */
+    public function getAllAclsData() {
+        return($this->allAcls);
+    }
+
+    /**
      * Creates new ACL database record
      * 
      * @param string $login
@@ -156,20 +191,25 @@ class ACL {
         $result = '';
         $loginF = ubRouting::filters($login, 'mres');
         $cameraId = ubRouting::filters($cameraId, 'int');
-        if (isset($this->allCamerasData[$cameraId])) {
-            $cameraChannel = $this->allCamerasData[$cameraId]['channel'];
-            if (file_exists(USERS_PATH . $loginF)) {
-                $this->aclDb->data('user', $loginF);
-                $this->aclDb->data('cameraid', $cameraId);
-                $this->aclDb->data('channel', $cameraChannel);
-                $this->aclDb->create();
-                $newId = $this->aclDb->getLastId();
-                log_register('ACL CREATE [' . $newId . '] CAMERA [' . $cameraId . '] CHANNEL `' . $cameraChannel . '` FOR {' . $login . '}');
+        $allCameraAcls = $this->getAllCameraAclsData();
+        if (!isset($allCameraAcls[$loginF][$cameraId])) {
+            if (isset($this->allCamerasData[$cameraId])) {
+                $cameraChannel = $this->allCamerasData[$cameraId]['channel'];
+                if (file_exists(USERS_PATH . $loginF)) {
+                    $this->aclDb->data('user', $loginF);
+                    $this->aclDb->data('cameraid', $cameraId);
+                    $this->aclDb->data('channel', $cameraChannel);
+                    $this->aclDb->create();
+                    $newId = $this->aclDb->getLastId();
+                    log_register('ACL CREATE [' . $newId . '] CAMERA [' . $cameraId . '] CHANNEL `' . $cameraChannel . '` FOR {' . $login . '}');
+                } else {
+                    $result .= __('User') . ' {' . $loginF . '} ' . __('not exists');
+                }
             } else {
-                $result .= __('User') . ' {' . $loginF . '} ' . __('not exists');
+                $result .= __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
             }
         } else {
-            $result .= __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
+            $result .= __('ACL') . ' [' . $cameraId . '] ' . __('already exists');
         }
 
         return($result);

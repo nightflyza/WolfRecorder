@@ -649,6 +649,26 @@ class Cameras {
     }
 
     /**
+     * Checks is camera with some IP registered or not?
+     * 
+     * @param string $ip
+     * 
+     * @return int/bool
+     */
+    public function isRegisteredIp($ip) {
+        $result = false;
+        if (!empty($this->allCameras)) {
+            foreach ($this->allCameras as $io => $each) {
+                if ($each['ip'] == $ip) {
+                    $result = $each['id'];
+                    break;
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Returns camera creation form
      * 
      * @return string

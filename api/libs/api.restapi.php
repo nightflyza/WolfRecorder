@@ -45,6 +45,24 @@ class RestAPI {
                 'deactivate' => 'camerasDeactivate',
                 'setdescription' => 'camerasSetDescription',
                 'delete' => 'camerasDelete',
+                'isregistered' => 'camerasIsRegistered'
+            ),
+            'users' => array(
+                'getall' => 'usersGetAll',
+                'create' => 'usersCreate',
+                'delete' => 'usersDelete',
+                'changepassword' => 'usersChangePassword',
+                'isregistered' => 'usersIsRegistered',
+                'checkauth' => 'usersCheckAuth'
+            ),
+            'acls' => array(
+                'getall' => 'aclsGetAll',
+                'getallchannels' => 'aclsGetAllChannels',
+                'getallcameras' => 'aclsGetAllCameras',
+                'getchannels' => 'aclsGetChannels',
+                'getcameras' => 'aclsGetCameras',
+                'assignchannel' => 'aclsAssignChannel',
+                'assigncamera' => 'aclsAssignCamera',
             ),
             'system' => array(
                 'gethealth' => 'systemGetHealth'
@@ -322,6 +340,27 @@ class RestAPI {
         return($result);
     }
 
+    /**
+     * Checks is camera registered or not by its IP
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function camerasIsRegistered($request) {
+        $result = array();
+        $requiredFields = array('ip');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $cameras = new Cameras();
+            $registerId = $cameras->isRegisteredIp($request['ip']);
+            $registerState = ($registerId) ? 1 : 0;
+            $result = array('error' => 0, 'registered' => $registerState, 'id' => $registerId);
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
     ///////////////////////////
     // System object methods //
     ///////////////////////////
@@ -381,6 +420,271 @@ class RestAPI {
         //system load
         $loadAvg = sys_getloadavg();
         $result['loadavg'] = round($loadAvg[0], 2);
+        return($result);
+    }
+
+    ///////////////////////////
+    // Users object methods  //
+    ///////////////////////////
+
+    /**
+     * Returns list of all available user data
+     * 
+     * @return array
+     */
+    protected function usersGetAll() {
+        $userManager = new UserManager();
+        return($userManager->getAllUsersData());
+    }
+
+    /**
+     * Creates new limited user
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function usersCreate($request) {
+        $result = array();
+        $requiredFields = array('login', 'password');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $userManager = new UserManager();
+            $login = $request['login'];
+            $password = $request['password'];
+            $role = 'LIMITED';
+            $userRegResult = $userManager->createUser($login, $password, $password, $role);
+            if (!empty($userRegResult)) {
+                $result = array('error' => 7, 'message' => $userRegResult);
+            } else {
+                $result = array('error' => 0, 'message' => __('Success'));
+            }
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
+    /**
+     * Changes some existing user password to new one
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function usersChangePassword($request) {
+        $result = array();
+        $requiredFields = array('login', 'password');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $userManager = new UserManager();
+            $login = $request['login'];
+            $password = $request['password'];
+            $userSaveResult = $userManager->saveUser($login, $password, $password);
+            if (!empty($userSaveResult)) {
+                $result = array('error' => 7, 'message' => $userSaveResult);
+            } else {
+                $result = array('error' => 0, 'message' => __('Success'));
+            }
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
+    /**
+     * Checks is user registered or not?
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function usersIsRegistered($request) {
+        $result = array();
+        $requiredFields = array('login');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $userManager = new UserManager();
+            $login = $request['login'];
+            $userCheckResult = ($userManager->isUserRegistered($login)) ? 1 : 0;
+            $result = array('error' => 0, 'registered' => $userCheckResult);
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
+    /**
+     * Deletes an existing user
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function usersDelete($request) {
+        $result = array();
+        $requiredFields = array('login');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $userManager = new UserManager();
+            $login = $request['login'];
+            if ($userManager->isUserRegistered($login)) {
+                $userManager->deleteUser($login);
+                $result = array('error' => 0, 'message' => __('Success'));
+            } else {
+                $result = array('error' => 7, 'message' => __('User') . ' ' . __('not exists'));
+            }
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
+    /**
+     * Checks can user be athorized with some login and password or not
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function usersCheckAuth($request) {
+        $result = array();
+        $requiredFields = array('login', 'password');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $login = $request['login'];
+            $password = $request['password'];
+            if (!empty($login) AND ! empty($password)) {
+                $userManager = new UserManager();
+                $allUsersData = $userManager->getAllUsersData();
+                if (isset($allUsersData[$login])) {
+                    $userData = $allUsersData[$login];
+                    if (!empty($userData)) {
+                        $passwordHash = md5($password);
+                        if ($passwordHash == $userData['password']) {
+                            $result = array('error' => 0, 'auth' => 1, 'message' => __('Success'));
+                        } else {
+                            $result = array('error' => 6, 'auth' => 0, 'message' => __('Wrong credentials'));
+                        }
+                    } else {
+                        $result = array('error' => 7, 'message' => __('Error reading user profile'));
+                    }
+                } else {
+                    $result = array('error' => 6, 'auth' => 0, 'message' => __('Wrong credentials'));
+                }
+            } else {
+                $result = array('error' => 7, 'message' => __('Login') . ' ' . __('or') . ' ' . __('password') . ' ' . __('is empty'));
+            }
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
+    ///////////////////
+    // ACLs methods  //
+    ///////////////////
+
+    /**
+     * Returns array of all available ACLs
+     * 
+     * @return array
+     */
+    protected function aclsGetAll() {
+        $result = array();
+        $acl = new ACL();
+        $result = $acl->getAllAclsData();
+        return($result);
+    }
+
+    /**
+     * Returns array of all available user to cameras ACLs
+     * 
+     * @return array
+     */
+    protected function aclsGetAllCameras() {
+        $result = array();
+        $acl = new ACL();
+        $result = $acl->getAllCameraAclsData();
+        return($result);
+    }
+
+    /**
+     * Returns array of all available user to channels ACLs
+     * 
+     * @return array
+     */
+    protected function aclsGetAllChannels() {
+        $result = array();
+        $acl = new ACL();
+        $result = $acl->getAllChannelAclsData();
+        return($result);
+    }
+
+    /**
+     * Returns all channels assigned to some user as channelId=>cameraId
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function aclsGetChannels($request) {
+        $result = array();
+        $requiredFields = array('login');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $login = $request['login'];
+            $acl = new ACL();
+            $allChannelAcls = $acl->getAllChannelAclsData();
+            if (isset($allChannelAcls[$login])) {
+                $result = $allChannelAcls[$login];
+            }
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
+    /**
+     * Returns all camearas assigned to some user as cameraId=>channelId
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function aclsGetCameras($request) {
+        $result = array();
+        $requiredFields = array('login');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $login = $request['login'];
+            $acl = new ACL();
+            $allCameraAcls = $acl->getAllCameraAclsData();
+            if (isset($allCameraAcls[$login])) {
+                $result = $allCameraAcls[$login];
+            }
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
+    /**
+     * Creates ACL for some user by cameraId
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function aclsAssignCamera($request) {
+        $result = array();
+        $requiredFields = array('login', 'cameraid');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $login = $request['login'];
+            $cameraId = $request['cameraid'];
+            $acl = new ACL(true);
+            $aclCreationResult = $acl->create($login, $cameraId);
+            if (empty($aclCreationResult)) {
+                $result = array('error' => 0, 'message' => __('Success'));
+            } else {
+                $result = array('error' => 7, 'message' => $aclCreationResult);
+            }
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
         return($result);
     }
 

@@ -132,6 +132,48 @@ class UserManager {
     }
 
     /**
+     * Returns all available users data
+     * 
+     * @return array
+     */
+    public function getAllUsersData() {
+        $result = array();
+        $allUsers = rcms_scandir(USERS_PATH);
+        if (!empty($allUsers)) {
+            foreach ($allUsers as $index => $eachLogin) {
+                $eachUserData = $this->system->getUserData($eachLogin);
+                if (!empty($eachUserData)) {
+                    $result[$eachLogin]['login'] = $eachUserData['username'];
+                    $result[$eachLogin]['password'] = $eachUserData['password'];
+                    $result[$eachLogin]['rights'] = $eachUserData['admin'];
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Checks is user registered or not?
+     * 
+     * @param string $login
+     * 
+     * @return bool
+     */
+    public function isUserRegistered($login) {
+        $result = false;
+        $allUsers = rcms_scandir(USERS_PATH);
+        if (!empty($allUsers)) {
+            foreach ($allUsers as $index => $eachLogin) {
+                if ($eachLogin == $login) {
+                    $result = true;
+                    break;
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Renders list of available users with some controls
      * 
      * @return string
@@ -140,7 +182,6 @@ class UserManager {
         $result = '';
         $allUsers = rcms_scandir(USERS_PATH);
         if (!empty($allUsers)) {
-
             $cells = wf_TableCell(__('User'));
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
