@@ -69,6 +69,10 @@ class RestAPI {
                 'getscreenshot' => 'channelsGetScreenshot',
                 'getlivestream' => 'channelsGetLiveStream',
             ),
+            'recorders' => array(
+                'getall' => 'recordersGetAll',
+                'isrunning' => 'recordersIsRunning'
+            ),
             'system' => array(
                 'gethealth' => 'systemGetHealth'
             ),
@@ -735,6 +739,13 @@ class RestAPI {
         return($result);
     }
 
+    /**
+     * Returns latest channel screenshot
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
     protected function channelsGetScreenshot($request) {
         $result = array();
         $requiredFields = array('channelid');
@@ -743,6 +754,43 @@ class RestAPI {
             $chanshots = new ChanShots();
             $screenshotRaw = $chanshots->getChannelScreenShot($channelId);
             $result = array('error' => 0, 'screenshot' => $screenshotRaw);
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
+    ///////////////////////
+    // Recorders methods //
+    ///////////////////////
+
+    /**
+     * Returns all running recorders as cameraId=>PID
+     * 
+     * @return array
+     */
+    protected function recordersGetAll() {
+        $result = array();
+        $recorders = new Recorder();
+        $result = $recorders->getRunningRecorders();
+        return($result);
+    }
+
+    /**
+     * Returns state of running recorder for some camera
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function recordersIsRunning($request) {
+        $requiredFields = array('cameraid');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $cameraId = $request['camearid'];
+            $recorders = new Recorder();
+            $allRunning = $recorders->getRunningRecorders();
+            $runningState = (isset($allRunning[$cameraId])) ? 1 : 0;
+            $result = array('error' => 0, 'running' => $runningState);
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
