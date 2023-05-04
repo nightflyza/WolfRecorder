@@ -786,7 +786,7 @@ class RestAPI {
     protected function recordersIsRunning($request) {
         $requiredFields = array('cameraid');
         if ($this->checkRequestFields($requiredFields, $request)) {
-            $cameraId = $request['camearid'];
+            $cameraId = $request['cameraid'];
             $recorders = new Recorder();
             $allRunning = $recorders->getRunningRecorders();
             $runningState = (isset($allRunning[$cameraId])) ? 1 : 0;
