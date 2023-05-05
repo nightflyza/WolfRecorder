@@ -68,6 +68,7 @@ class RestAPI {
             ),
             'channels' => array(
                 'getall' => 'channelsGetAll',
+                'getscreenshotsall' => 'channelsGetScreenshotsAll',
                 'getscreenshot' => 'channelsGetScreenshot',
                 'getlivestream' => 'channelsGetLiveStream',
             ),
@@ -856,6 +857,29 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
+        return($result);
+    }
+
+    /**
+     * Returns latest all channels screenshot as channelId=>screenshotUrl
+     * 
+     * @return array
+     */
+    protected function channelsGetScreenshotsAll() {
+        $result = array();
+        $cameras = new Cameras();
+        $allCamerasChannels = $cameras->getAllCamerasChannels();
+
+        if (!empty($allCamerasChannels)) {
+            $chanshots = new ChanShots();
+            foreach ($allCamerasChannels as $eachChannelId => $eachCameraId) {
+                $eachScreenShotUrl = $chanshots->getChannelScreenShot($eachChannelId);
+                if (!empty($eachScreenShotUrl)) {
+                    $result[$eachChannelId] = $eachScreenShotUrl;
+                }
+            }
+        }
+
         return($result);
     }
 
