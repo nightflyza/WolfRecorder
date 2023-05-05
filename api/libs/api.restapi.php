@@ -801,7 +801,7 @@ class RestAPI {
             $allAcls = $acl->getAllAclsData();
             if (!empty($allAcls)) {
                 foreach ($allAcls as $io => $each) {
-                    if ($each['login'] == $login AND $each['channelid'] == $channelId) {
+                    if ($each['user'] == $login AND $each['channel'] == $channelId) {
                         $aclDeletionId = $each['id'];
                     }
                 }
