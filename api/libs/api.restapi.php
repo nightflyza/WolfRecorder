@@ -437,6 +437,12 @@ class RestAPI {
         if (!empty($rawUptime)) {
             $rawUptime = explode(',', $rawUptime);
             $uptime = trim($rawUptime[0]);
+            if (ispos($uptime, 'up')) {
+                $uptimeClean = explode('up', $uptime);
+                if (isset($uptimeClean[1])) {
+                    $uptime = trim($uptimeClean[1]);
+                }
+            }
         }
         $result['uptime'] = $uptime;
         //system load
