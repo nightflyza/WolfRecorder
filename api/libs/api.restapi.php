@@ -76,7 +76,8 @@ class RestAPI {
                 'isrunning' => 'recordersIsRunning'
             ),
             'system' => array(
-                'gethealth' => 'systemGetHealth'
+                'gethealth' => 'systemGetHealth',
+                'checkconnection' => 'systemCheckConnection'
             ),
         );
     }
@@ -375,6 +376,16 @@ class RestAPI {
     ///////////////////////////
     // System object methods //
     ///////////////////////////
+
+    /**
+     * Just dummy callback to check API connection
+     * 
+     * @return array
+     */
+    protected function systemCheckConnection() {
+        $result = array('error' => 0, 'connection' => 1, 'message' => __('Success'));
+        return($result);
+    }
 
     /**
      * Returns system health info
