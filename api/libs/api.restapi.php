@@ -761,7 +761,7 @@ class RestAPI {
             $allAcls = $acl->getAllAclsData();
             if (!empty($allAcls)) {
                 foreach ($allAcls as $io => $each) {
-                    if ($each['login'] == $login AND $each['cameraid'] == $cameraId) {
+                    if ($each['user'] == $login AND $each['cameraid'] == $cameraId) {
                         $aclDeletionId = $each['id'];
                     }
                 }
