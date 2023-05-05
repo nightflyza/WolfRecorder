@@ -63,6 +63,8 @@ class RestAPI {
                 'getcameras' => 'aclsGetCameras',
                 'assignchannel' => 'aclsAssignChannel',
                 'assigncamera' => 'aclsAssignCamera',
+                'deassignchannel' => 'aclsDeassignChannel',
+                'deassigncamera' => 'aclsDeassignCamera',
             ),
             'channels' => array(
                 'getall' => 'channelsGetAll',
@@ -716,6 +718,86 @@ class RestAPI {
                 $result = array('error' => 0, 'message' => __('Success'));
             } else {
                 $result = array('error' => 7, 'message' => $aclCreationResult);
+            }
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
+    /**
+     * Deletes ACL for some user by cameraId
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function aclsDeassignCamera($request) {
+        $result = array();
+        $requiredFields = array('login', 'cameraid');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $login = $request['login'];
+            $cameraId = $request['cameraid'];
+            $aclDeletionId = 0;
+            $acl = new ACL();
+            $allAcls = $acl->getAllAclsData();
+            if (!empty($allAcls)) {
+                foreach ($allAcls as $io => $each) {
+                    if ($each['login'] == $login AND $each['cameraid'] == $cameraId) {
+                        $aclDeletionId = $each['id'];
+                    }
+                }
+            }
+
+            if ($aclDeletionId) {
+                $aclDeletionResult = $acl->delete($aclDeletionId);
+                if (empty($aclDeletionResult)) {
+                    $result = array('error' => 0, 'message' => __('Success'));
+                } else {
+                    $result = array('error' => 7, 'message' => $aclDeletionResult);
+                }
+            } else {
+                $result = array('error' => 0, 'message' => __('ACL') . ' ' . __('not exists'));
+            }
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
+    /**
+     * Deletes ACL for some user by channelId
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function aclsDeassignChannel($request) {
+        $result = array();
+        $requiredFields = array('login', 'channelid');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $login = $request['login'];
+            $channelId = $request['channelid'];
+            $aclDeletionId = 0;
+            $acl = new ACL();
+            $allAcls = $acl->getAllAclsData();
+            if (!empty($allAcls)) {
+                foreach ($allAcls as $io => $each) {
+                    if ($each['login'] == $login AND $each['channelid'] == $channelId) {
+                        $aclDeletionId = $each['id'];
+                    }
+                }
+            }
+
+            if ($aclDeletionId) {
+                $aclDeletionResult = $acl->delete($aclDeletionId);
+                if (empty($aclDeletionResult)) {
+                    $result = array('error' => 0, 'message' => __('Success'));
+                } else {
+                    $result = array('error' => 7, 'message' => $aclDeletionResult);
+                }
+            } else {
+                $result = array('error' => 0, 'message' => __('ACL') . ' ' . __('not exists'));
             }
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
