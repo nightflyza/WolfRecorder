@@ -125,6 +125,8 @@ class UserManager {
             //flushing ACLs
             $acl = new ACL();
             $acl->flushUser($userName);
+            //flushing user records
+            $this->flushUserRecords($userName);
             //deleting user
             unlink(USERS_PATH . $userName);
             log_register('USER DELETE {' . $userName . '}');
@@ -174,6 +176,52 @@ class UserManager {
     }
 
     /**
+     * Returns bytes count allocated by users saved records
+     * 
+     * @param string $userLogin
+     * 
+     * @return int
+     */
+    protected function getUserSize($userLogin) {
+        $result = 0;
+        if (!empty($userLogin)) {
+            $basePath = Export::PATH_RECORDS;
+            if (file_exists($basePath)) {
+                $userRecPath = $basePath . $userLogin . '/';
+                if (file_exists($userRecPath)) {
+                    $allFiles = rcms_scandir($userRecPath, '*' . Export::RECORDS_EXT);
+                    if (!empty($allFiles)) {
+                        foreach ($allFiles as $io => $each) {
+                            $result += filesize($userRecPath . $each);
+                        }
+                    }
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Flushes all user saved records
+     * 
+     * @param string $userName
+     * 
+     * @return void
+     */
+    protected function flushUserRecords($userName) {
+        if (!empty($userName)) {
+            $basePath = Export::PATH_RECORDS;
+            if (file_exists($basePath)) {
+                $userRecPath = $basePath . $userName . '/';
+                if (file_exists($userRecPath)) {
+                    rcms_delete_files($userRecPath, true);
+                    log_register('USER FLUSH RECORDS {' . $userName . '}');
+                }
+            }
+        }
+    }
+
+    /**
      * Renders list of available users with some controls
      * 
      * @return string
@@ -183,11 +231,13 @@ class UserManager {
         $allUsers = rcms_scandir(USERS_PATH);
         if (!empty($allUsers)) {
             $cells = wf_TableCell(__('User'));
+            $cells .= wf_TableCell(__('Size'));
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
             foreach ($allUsers as $index => $eachUser) {
                 $cells = wf_TableCell($eachUser);
                 $actControls = '';
+                $cells .= wf_TableCell(wr_convertSize($this->getUserSize($eachUser)));
                 $actControls = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DELETE . '=' . $eachUser, web_delete_icon(), $this->messages->getDeleteAlert()) . ' ';
                 $actControls .= wf_JSAlert(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $eachUser, wf_img('skins/icon_key.gif', __('Edit user')), $this->messages->getEditAlert()) . ' ';
                 $actControls .= wf_Link(self::URL_ME . '&' . self::ROUTE_PERMISSIONS . '=' . $eachUser, web_edit_icon(__('Permissions')), $this->messages->getEditAlert());
