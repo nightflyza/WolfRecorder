@@ -139,6 +139,11 @@ class RestAPI {
                                 'message' => __('Method not exists')
                             );
                         }
+                    } else {
+                        $result = array(
+                            'error' => 2,
+                            'message' => __('Method not exists')
+                        );
                     }
                 }
             }
