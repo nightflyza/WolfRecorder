@@ -888,6 +888,26 @@ class RestAPI {
         return($result);
     }
 
+    /**
+     * Returns channel live pseudo stream HLS URL
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function channelsGetLiveStream($request) {
+        $result = array();
+        $requiredFields = array('channelid');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $channelId = $request['channelid'];
+            $url = LiveCams::URL_PSEUDOSTREAM . '&' . LiveCams::ROUTE_PSEUDOLIVE . '=' . $channelId;
+            $result = array('error' => 0, 'livestream' => $url);
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return($result);
+    }
+
     ///////////////////////
     // Recorders methods //
     ///////////////////////

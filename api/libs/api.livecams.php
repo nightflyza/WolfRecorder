@@ -96,7 +96,9 @@ class LiveCams {
     const STREAMS_SUBDIR = 'livestreams/';
     const STREAM_PLAYLIST = 'stream.m3u8';
     const URL_ME = '?module=livecams';
+    const URL_PSEUDOSTREAM = '?module=pseudostream';
     const ROUTE_VIEW = 'livechannel';
+    const ROUTE_PSEUDOLIVE = 'live';
     const WRAPPER = '/bin/wrapi';
 
     public function __construct() {
@@ -398,7 +400,7 @@ class LiveCams {
      * 
      * @return string
      */
-    protected function getStreamUrl($channelId) {
+    public function getStreamUrl($channelId) {
         $result = '';
         $streamPath = $this->allocateStreamPath($channelId);
         if ($streamPath) {
@@ -493,6 +495,40 @@ class LiveCams {
 
         $result .= wf_delimiter();
         $result .= $cameraControls;
+        return($result);
+    }
+
+    /**
+     * Returns pseudo-live stream HLS playlist
+     * 
+     * @param string $channelId
+     * 
+     * @return string
+     */
+    public function getPseudoStream($channelId) {
+        $result = '';
+        $streamUrl = $this->getStreamUrl($channelId);
+        if (!empty($streamUrl)) {
+            $cameraId = $this->cameras->getCameraIdByChannel($channelId);
+            $playlistBody = file_get_contents($streamUrl);
+            $prefix = Storages::PATH_HOWL . self::STREAMS_SUBDIR . $channelId . '/';
+            if (!empty($playlistBody)) {
+                $playlistBody = explodeRows($playlistBody);
+                foreach ($playlistBody as $io => $eachLine) {
+                    if (!empty($eachLine)) {
+                        if (!ispos($eachLine, '#')) {
+                            $eachLine = $prefix . $eachLine;
+                        }
+                        $result .= $eachLine . PHP_EOL;
+                    }
+                }
+                //keeping stream alive
+                if ($cameraId) {
+                    $streamDog = new StreamDog();
+                    $streamDog->keepAlive($cameraId);
+                }
+            }
+        }
         return($result);
     }
 
