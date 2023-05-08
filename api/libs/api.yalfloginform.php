@@ -8,12 +8,12 @@ class YalfLoginForm {
     protected $form = '';
     protected $loginPreset = '';
     protected $passwordPreset = '';
-    protected $breaks=true;
-    protected $container=true;
+    protected $breaks = true;
+    protected $container = true;
     protected $inputSize = 20;
 
-    public function __construct($br=true,$container=true) {
-        $this->loadForm($br,$container);
+    public function __construct($br = true, $container = true) {
+        $this->loadForm($br, $container);
     }
 
     /**
@@ -24,27 +24,35 @@ class YalfLoginForm {
      * 
      * @return void
      */
-    protected function loadForm($br,$container) {
-        $this->breaks=$br;
-        $this->container=$container;
-        
+    protected function loadForm($br, $container) {
+        $this->breaks = $br;
+        $this->container = $container;
+
         if (file_exists('DEMO_MODE')) {
             $this->loginPreset = 'admin';
             $this->passwordPreset = 'demo';
         }
-        
+
+        if (ubRouting::checkGet('authprefill')) {
+            $prefillRaw = explode('|', ubRouting::get('authprefill'));
+            if (isset($prefillRaw[1])) {
+                $this->loginPreset = trim($prefillRaw[0]);
+                $this->passwordPreset = trim($prefillRaw[1]);
+            }
+        }
+
         if ($this->container) {
-            $this->form.=wf_tag('div', false, 'ubLoginContainer');
+            $this->form .= wf_tag('div', false, 'ubLoginContainer');
         }
 
         $inputs = wf_HiddenInput('login_form', '1');
-        $inputs.= wf_TextInput('username', __('Login'), $this->loginPreset, $this->breaks, $this->inputSize);
-        $inputs.= wf_PasswordInput('password', __('Password'), $this->passwordPreset, $this->breaks, $this->inputSize);
-        $inputs.= wf_Submit(__('Log in'));
-        $this->form.= wf_Form("", 'POST', $inputs, 'loginform');
-        
+        $inputs .= wf_TextInput('username', __('Login'), $this->loginPreset, $this->breaks, $this->inputSize);
+        $inputs .= wf_PasswordInput('password', __('Password'), $this->passwordPreset, $this->breaks, $this->inputSize);
+        $inputs .= wf_Submit(__('Log in'));
+        $this->form .= wf_Form("", 'POST', $inputs, 'loginform');
+
         if ($this->container) {
-            $this->form.=wf_tag('div',true);
+            $this->form .= wf_tag('div', true);
         }
     }
 
