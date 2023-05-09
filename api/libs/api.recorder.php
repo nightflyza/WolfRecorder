@@ -221,7 +221,15 @@ class Recorder {
                                         if ($this->debugFlag) {
                                             file_put_contents(self::DEBUG_LOG, curdatetime() . ' START: ' . $fullCommand . PHP_EOL, FILE_APPEND);
                                         }
-                                        shell_exec($fullCommand); //locks process till end
+
+                                        //locks process till it finishes
+                                        if ($this->debugFlag) {
+                                            $recorderOutput = shell_exec($fullCommand);
+                                            file_put_contents(self::DEBUG_LOG, curdatetime() . ' SHUTDOWN: ' . $recorderOutput . PHP_EOL, FILE_APPEND);
+                                        } else {
+                                            shell_exec($fullCommand);
+                                        }
+
                                         $this->stardust->stop();
                                     }
                                 } else {
