@@ -201,19 +201,24 @@ class Rotator {
      * @param array $chunksList
      * @param int $expectedSize
      * 
-     * @return void/int
+     * @return array
      */
     protected function flushChunksBySize($chunksList, $expectedSize) {
         $bytesFree = 0;
+        $chunksDeleted = 0;
+
         if ((!empty($chunksList)) AND ( $expectedSize > 0)) {
             foreach ($chunksList as $eachTimeStamp => $chunksData) {
                 if ($bytesFree < $expectedSize) {
                     unlink($chunksData['path']);
+                    $chunksDeleted++;
                     $bytesFree += $chunksData['size'];
                 }
             }
         }
-        return($bytesFree);
+
+        $result = array('count' => $chunksDeleted, 'free' => $bytesFree);
+        return($result);
     }
 
     /**
@@ -265,7 +270,7 @@ class Rotator {
                                             $requiredToFree = $eachChannelSize - $maxChannelAllocSize;
                                             $cleanResult = $this->flushChunksBySize($eachChannelChunksAlloc, $requiredToFree);
                                             if ($this->debugFlag) {
-                                                file_put_contents(self::DEBUG_LOG, curdatetime() . ' ' . wr_convertSize($cleanResult) . ' CLEANED IN ' . $eachChannel . PHP_EOL, FILE_APPEND);
+                                                file_put_contents(self::DEBUG_LOG, curdatetime() . ' ' . wr_convertSize($cleanResult['free']) . ' CLEANED IN ' . $eachChannel . ' DELETED ' . $cleanResult['count'] . ' CHUNKS' . PHP_EOL, FILE_APPEND);
                                             }
                                         } else {
                                             //and there some rotation skips logging
