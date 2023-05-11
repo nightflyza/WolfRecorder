@@ -425,6 +425,47 @@ class Storages {
     }
 
     /**
+     * Returns all chunks stored in some channel with their allocated space as timestamp=>path/size
+     * 
+     * @param int $storageId
+     * @param string $channel
+     * 
+     * @return array
+     */
+    public function getChunksAllocSpaces($storageId, $channel) {
+        $result = array();
+        $storageId = ubRouting::filters($storageId, 'int');
+        $channel = ubRouting::filters($channel, 'mres');
+        if ($storageId AND $channel) {
+            $channelChunks = $this->getChannelChunks($storageId, $channel);
+            if (!empty($channelChunks)) {
+                foreach ($channelChunks as $chunkTimeStamp => $eachChunkPath) {
+                    $result[$chunkTimeStamp]['path'] = $eachChunkPath;
+                    $result[$chunkTimeStamp]['size'] = filesize($eachChunkPath);
+                }
+            }
+        }
+        return($result);
+    }
+
+    /**
+     * Returns total size of all chunks in getChunksAllocSpaces data
+     * 
+     * @param array $chunksListAlloc
+     * 
+     * @return int 
+     */
+    public function calcChunksListSize($chunksListAlloc) {
+        $result = 0;
+        if (!empty($chunksListAlloc)) {
+            foreach ($chunksListAlloc as $timeStamp => $chunksData) {
+                $result += $chunksData['size'];
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Returns bytes count that some channel currently stores
      * 
      * @param int $storageId

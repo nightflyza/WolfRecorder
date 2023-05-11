@@ -252,7 +252,7 @@ class UserManager {
 
         $result .= wf_delimiter();
 
-        $result .= wf_Link(self::URL_ME . '&' . self::ROUTE_NEWUSER . '=true', web_add_icon() . ' ' . __('Register new user'), false, 'ubButton');
+        $result .= wf_Link(self::URL_ME . '&' . self::ROUTE_NEWUSER . '=true', web_icon_create() . ' ' . __('Register new user'), false, 'ubButton');
         return($result);
     }
 
