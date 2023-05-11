@@ -224,8 +224,8 @@ class Recorder {
 
                                         //locks process till it finishes
                                         if ($this->debugFlag) {
-                                            $recorderOutput = shell_exec($fullCommand);
-                                            file_put_contents(self::DEBUG_LOG, curdatetime() . ' SHUTDOWN: ' . $recorderOutput . PHP_EOL, FILE_APPEND);
+                                            $fullCommand .= ' 2>> /tmp/recorder_' . $cameraId . '.log';
+                                            shell_exec($fullCommand);
                                         } else {
                                             shell_exec($fullCommand);
                                         }
