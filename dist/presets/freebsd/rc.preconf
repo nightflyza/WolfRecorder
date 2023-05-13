@@ -20,6 +20,9 @@ firewall_script="/etc/firewall.conf"
 memcached_enable="YES"
 memcached_flags="-l 127.0.0.1 -m 256 -I 16M"
 
+#ZFS support
+zfs_enable="YES"
+
 # FS check options
 fsck_y_enable="YES"
 background_fsck="NO"
