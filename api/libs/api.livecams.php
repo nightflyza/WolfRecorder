@@ -139,7 +139,6 @@ class LiveCams {
      */
     protected function setOptions() {
         $this->ffmpgPath = $this->binPaths['FFMPG_PATH'];
-        $this->cdPath = $this->binPaths['CD'];
         $this->liveOptsPrefix = '-stimeout 5000000 -loglevel error -rtsp_transport tcp -f rtsp -i';
         $this->liveOptsSuffix = '-strict -2 -vcodec copy -hls_wrap 10';
         $this->streamsPath = Storages::PATH_HOWL . self::STREAMS_SUBDIR;
