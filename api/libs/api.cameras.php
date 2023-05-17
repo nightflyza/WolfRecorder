@@ -511,7 +511,7 @@ class Cameras {
                 $result .= __('You cant delete camera which is now active');
             }
         } else {
-            $result .= __('Camera not exists') . ' [' . $cameraId . ']';
+            $result .= __('Camera') . ' [' . $cameraId . '] '.__('not exists');
         }
 
         return($result);
