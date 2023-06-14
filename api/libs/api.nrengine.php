@@ -35,7 +35,7 @@ class NREngine {
      *
      * @var int
      */
-    protected $confidence = 50;
+    protected $confidence = 40;
 
     /**
      * some predefined stuff
