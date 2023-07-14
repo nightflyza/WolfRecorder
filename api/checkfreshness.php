@@ -12,7 +12,7 @@ if (ubRouting::optionCliCheck('run', false)) {
     $ubillingLibsPath = __DIR__ . '/../../ubilling/api/libs/';
     $yalfLibsPath = __DIR__ . '/libs/';
 
-    $ignoreList = array('api.compat.php', 'api.ubconfig.php', 'api.mysql.php', 'api.eventview.php', 'api.processmon.php', 'api.taskbar.php', 'api.apachezen.php'); //that libs may be different
+    $ignoreList = array('api.compat.php', 'api.ubconfig.php', 'api.mysql.php', 'api.eventview.php', 'api.processmon.php', 'api.taskbar.php', 'api.apachezen.php', 'api.backups.php'); //that libs may be different
     $ignoreList = array_flip($ignoreList);
 
     $allYalfLibs = rcms_scandir($yalfLibsPath, '*.php');
