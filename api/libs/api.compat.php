@@ -687,7 +687,7 @@ function zb_DownloadFile($filePath, $contentType = '') {
  */
 function zb_ParseTagData($openTag, $closeTag, $stringToParse = '', $mutipleResults = false) {
     $result = '';
-    if (!empty($openTag) AND ! empty($closeTag) AND ! empty($stringToParse)) {
+    if (!empty($openTag) AND !empty($closeTag) AND !empty($stringToParse)) {
         $replacements = array(
             '(' => '\(',
             ')' => '\)',
@@ -734,9 +734,9 @@ function zb_ParseTagData($openTag, $closeTag, $stringToParse = '', $mutipleResul
 function zb_formatTime($seconds) {
     $init = $seconds;
     $days = floor($seconds / 86400);
-    $hours = floor($seconds / 3600);
-    $minutes = floor(($seconds / 60) % 60);
-    $seconds = $seconds % 60;
+    $hours = floor(round($seconds / 3600));
+    $minutes = floor(round(($seconds / 60)) % 60);
+    $seconds = (round($seconds) % 60);
 
     if ($init < 3600) {
 //less than 1 hour
