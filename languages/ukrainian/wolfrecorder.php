@@ -223,6 +223,6 @@ $lang['def']['Passwords did not match'] = 'Паролі не зпівпадаю�
 $lang['def']['User already exists'] = 'Користувач вже існує';
 $lang['def']['Users and rights'] = 'Користувачі та привілеї';
 $lang['def']['Auto'] = 'Автоматично';
-$lang['def'][''] = '';
+$lang['def']['Creation date'] = 'Дата створення';
 $lang['def'][''] = '';
 
