@@ -4,3 +4,4 @@ exports/*
 !howl/index.html
 !howl/.htaccess
 howl/*
+DEMO_MODE

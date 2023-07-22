@@ -308,6 +308,30 @@ class Taskbar {
     }
 
     /**
+     * Checks for default password usage, etc.
+     * 
+     * @return void
+     */
+    protected function checkSecurity() {
+
+        if (isset($_COOKIE['yalf_user'])) {
+            if ($_COOKIE['yalf_user'] == 'admin:fe01ce2a7fbac8fafaed7c982a04e229') {
+                if (!file_exists('DEMO_MODE') AND !file_exists('exports/FIRST_INSTALL')) {
+                    $notice = __('You are using the default login and password') . '. ' . __('Dont do this') . '.';
+                    // ugly hack to prevent elements autofocusing
+                    $label = wf_TextInput('dontfocusonlinks', '', '', false, '', '', '', '', 'style="width: 0; height: 0; top: -100px; position: absolute;"');
+                    $label .= wf_tag('div', false, '', 'style="min-width:550px;"') . $this->messages->getStyledMessage($notice, 'error') . wf_tag('div', true);
+                    $label .= wf_tag('br');
+                    $label .= wf_tag('center') . wf_img_sized('skins/securitywolf.png', '', '', '300') . wf_tag('center' . true);
+                    $label .= wf_delimiter(1);
+                    $label .= wf_Link('?module=usermanager&edituserdata=admin', __('Change admin user password'), true, 'confirmagree');
+                    $this->currentAlerts .= wf_modalOpenedAuto(__('Danger') . '!', $label);
+                }
+            }
+        }
+    }
+
+    /**
      * Returns rendered taskbar elements and services content
      * 
      * @return string
@@ -315,13 +339,13 @@ class Taskbar {
     public function renderTaskbar() {
         $result = '';
         $this->taskbarContent = $this->loadAllCategories();
+        $this->checkSecurity();
         if (!empty($this->currentAlerts)) {
             $result .= $this->currentAlerts;
         }
         $result .= $this->taskbarContent;
         return ($result);
     }
-
 }
 
 /**
@@ -360,5 +384,4 @@ class TaskbarWidget {
         $result = 'EMPTY_WIDGET';
         return ($result);
     }
-
 }

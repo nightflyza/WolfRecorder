@@ -224,5 +224,13 @@ $lang['def']['User already exists'] = 'Користувач вже існує';
 $lang['def']['Users and rights'] = 'Користувачі та привілеї';
 $lang['def']['Auto'] = 'Автоматично';
 $lang['def']['Creation date'] = 'Дата створення';
+$lang['def']['File creation date'] = 'Дата створення файлу';
+$lang['def']['File modification date'] = 'Дата зміни файлу';
+$lang['def']['Wrong element format'] = 'Невірний формат елемента';
+$lang['def']['Danger'] = 'Небезпека';
+$lang['def']['You are using the default login and password'] = 'Ви використовуєте логін та пароль за замовчуванням';
+$lang['def']['Dont do this'] = 'Не робіть так';
+$lang['def']['Change admin user password'] = 'Змінити пароль адміністратора';
+$lang['def'][''] = '';
 $lang['def'][''] = '';
 
