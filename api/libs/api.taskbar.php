@@ -313,7 +313,6 @@ class Taskbar {
      * @return void
      */
     protected function checkSecurity() {
-
         if (isset($_COOKIE['yalf_user'])) {
             if ($_COOKIE['yalf_user'] == 'admin:fe01ce2a7fbac8fafaed7c982a04e229') {
                 if (!file_exists('DEMO_MODE') AND !file_exists('exports/FIRST_INSTALL')) {
