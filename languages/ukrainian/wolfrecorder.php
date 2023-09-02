@@ -231,6 +231,6 @@ $lang['def']['Danger'] = 'Небезпека';
 $lang['def']['You are using the default login and password'] = 'Ви використовуєте логін та пароль за замовчуванням';
 $lang['def']['Dont do this'] = 'Не робіть так';
 $lang['def']['Change admin user password'] = 'Змінити пароль адміністратора';
-$lang['def'][''] = '';
+$lang['def']['already exists'] = 'Вже існує';
 $lang['def'][''] = '';
 
