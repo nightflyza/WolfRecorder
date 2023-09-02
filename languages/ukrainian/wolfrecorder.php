@@ -232,5 +232,7 @@ $lang['def']['You are using the default login and password'] = 'Ви викор�
 $lang['def']['Dont do this'] = 'Не робіть так';
 $lang['def']['Change admin user password'] = 'Змінити пароль адміністратора';
 $lang['def']['already exists'] = 'Вже існує';
+$lang['def']['right to access all cameras'] = 'Право доступу до всіх камер';
+$lang['def']['Operator'] = 'Оператор';
 $lang['def'][''] = '';
 

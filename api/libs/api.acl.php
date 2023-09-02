@@ -298,7 +298,7 @@ class ACL {
      */
     public function haveCamsAssigned() {
         $result = false;
-        if (!cfr('ROOT')) {
+        if (!cfr('ROOT') AND !cfr('OPERATOR')) {
             if (!empty($this->myLogin)) {
                 if (!empty($this->allAcls)) {
                     if (isset($this->accessibleCameras[$this->myLogin])) {
@@ -321,7 +321,7 @@ class ACL {
      */
     public function isMyCamera($cameraId) {
         $result = false;
-        if (!cfr('ROOT')) {
+        if (!cfr('ROOT') AND !cfr('OPERATOR')) {
             if (!empty($this->myLogin)) {
                 if (!empty($this->allAcls)) {
                     if (isset($this->accessibleCameras[$this->myLogin])) {
@@ -332,7 +332,7 @@ class ACL {
                 }
             }
         } else {
-            //all cameras is accessible by ROOT users
+            //all cameras is accessible by ROOT and OPERATOR users
             $result = true;
         }
         return($result);
@@ -347,7 +347,7 @@ class ACL {
      */
     public function isMyChannel($channelId) {
         $result = false;
-        if (!cfr('ROOT')) {
+        if (!cfr('ROOT') AND !cfr('OPERATOR')) {
             if (!empty($this->myLogin)) {
                 if (!empty($this->allAcls)) {
                     if (isset($this->accessibleChannels[$this->myLogin])) {
@@ -358,7 +358,7 @@ class ACL {
                 }
             }
         } else {
-            //all cameras is accessible by ROOT users
+            //all cameras is accessible by ROOT and OPERATOR users
             $result = true;
         }
         return($result);
@@ -436,5 +436,4 @@ class ACL {
         }
         return($result);
     }
-
 }

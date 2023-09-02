@@ -59,7 +59,6 @@ class UserManager {
     /**
      * Creates new user manager instance
      */
-
     public function __construct() {
         $this->initMessages();
         $this->initSystemCore();
@@ -76,8 +75,8 @@ class UserManager {
         $this->userRoles = array(
             'LIMITED' => __('User'),
             'ADMINISTRATOR' => __('Administrator'),
+            'OPERATOR' => __('Operator'),
         );
-
 
         $limitedRights = $ubillingConfig->getAlterParam('LIMITED_RIGHTS');
         if (!empty($limitedRights)) {
@@ -87,6 +86,8 @@ class UserManager {
                 $rightsString .= '|' . $each . '|';
             }
             $this->rolesRights['LIMITED'] = $rightsString;
+            //operator have limited users rights + access to all cameras/channels
+            $this->rolesRights['OPERATOR'] = $rightsString . '|OPERATOR|';
         }
 
         $this->rolesRights['ADMINISTRATOR'] = '*';
@@ -559,5 +560,4 @@ class UserManager {
         }
         return($result);
     }
-
 }
