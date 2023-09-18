@@ -599,6 +599,16 @@ $DIALOG --infobox "Using WolfRecorder serial: ${NEW_WRSERIAL}" 4 60
 ;;
 esac
 
+if [ -n "$NEW_WRSERIAL" ];
+then
+echo "OK: new WolfRecorder serial ${NEW_WRSERIAL}" >> ${INSTALLER_LOG}  2>&1
+else
+$DIALOG --infobox "No new WolfRecorder serial generated: ${NEW_WRSERIAL}" 4 60
+echo "Installation failed and aborted. Empty WolfRecorder serial. Retry your attempt."
+echo "FATAL: empty new WolfRecorder serial" >> ${INSTALLER_LOG} 2>&1
+exit
+fi
+
 #loading default crontab preset
 crontab ./dist/crontab/crontab.preconf
 $DIALOG --infobox "Installing default crontab preset" 4 60
