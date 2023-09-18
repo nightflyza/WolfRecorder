@@ -580,6 +580,10 @@ $DIALOG --infobox "remote API wrapper installed" 4 60
 echo "User_Alias WOLFRECORDER = www-data" >> /etc/sudoers.d/wolfrecorder
 echo "WOLFRECORDER         ALL = NOPASSWD: ALL" >> /etc/sudoers.d/wolfrecorder
 
+#enabling required apache modules
+/usr/sbin/a2enmod headers
+/usr/sbin/a2enmod expires
+
 #restarting apache
 $DIALOG --infobox "Restarting web server.." 4 60
 ${APACHE_INIT_SCRIPT} restart >> ${INSTALLER_LOG} 2>&1
