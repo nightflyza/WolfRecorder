@@ -580,6 +580,10 @@ $DIALOG --infobox "remote API wrapper installed" 4 60
 echo "User_Alias WOLFRECORDER = www-data" >> /etc/sudoers.d/wolfrecorder
 echo "WOLFRECORDER         ALL = NOPASSWD: ALL" >> /etc/sudoers.d/wolfrecorder
 
+#restarting apache
+$DIALOG --infobox "Restarting web server.." 4 60
+${APACHE_INIT_SCRIPT} restart >> ${INSTALLER_LOG} 2>&1
+
 #initial crontab configuration
 cd ${APACHE_DATA_PATH}${WR_WEB_DIR}
 if [ -f ./dist/crontab/crontab.preconf ];
