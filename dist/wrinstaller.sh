@@ -588,6 +588,8 @@ then
 case $PASSW_MODE in
 NEW)
 /usr/bin/curl -o /dev/null "http://127.0.0.1/${WR_WEB_DIR}?module=remoteapi&action=identify&param=save" >> ${INSTALLER_LOG} 2>&1
+#waiting saving data
+sleep 3
 NEW_WRSERIAL=`cat ./exports/wrserial`
 $DIALOG --infobox "New WolfRecorder serial generated: ${NEW_WRSERIAL}" 4 60
 ;;
