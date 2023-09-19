@@ -3,7 +3,7 @@
 if (cfr('BACKUP')) {
     set_time_limit(0);
     $alterConf = $ubillingConfig->getAlter();
-    $binPathsConf=$ubillingConfig->getBinpaths();
+    $binPathsConf = $ubillingConfig->getBinpaths();
 
     if (!ubRouting::checkGet(array('restore'))) {
         if (ubRouting::post('createbackup')) {
@@ -107,6 +107,9 @@ if (cfr('BACKUP')) {
                         } else {
                             $restoreCommand = $binPathsConf['MYSQL_PATH'] . ' --host ' . $mysqlConf['server'] . ' -u ' . $mysqlConf['username'] . ' -p' . $mysqlConf['password'] . ' ' . $mysqlConf['db'] . ' --default-character-set=utf8 < ' . $restoreFilename . ' 2>&1';
                             $restoreResult = shell_exec($restoreCommand);
+                            if ($restoreResult === false) {
+                                $restoreResult = '';
+                            }
                             if (ispos($restoreResult, 'command line interface')) {
                                 $restoreResult = '';
                             }
