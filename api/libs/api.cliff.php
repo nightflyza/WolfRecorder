@@ -113,6 +113,8 @@ class CliFF {
             //stimeout option deprecated and replaced with timeout
             $this->transportTemplate = '-timeout 5000000 -loglevel error -rtsp_transport tcp -f rtsp -i';
             $this->liveOptsPrefix = '-timeout 5000000 -loglevel error -rtsp_transport tcp -f rtsp -i';
+            //hls_wrap option deprecated too
+            $this->liveOptsSuffix = '-strict -2 -vcodec copy -hls_flags delete_segments -hls_list_size 10 -segment_wrap 10';
         }
     }
 
