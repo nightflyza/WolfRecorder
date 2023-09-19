@@ -533,6 +533,7 @@ chmod -R 777 content/ config/ exports/ howl/
 # setting up config presets
 cp -R dist/presets/debian121/${APACHE_CONFIG_PRESET_NAME} ${APACHE_CONFIG_DIR}${APACHE_CONFIG_NAME}
 cp -R dist/presets/debian121/${PHP_CONFIG_PRESET} /etc/php/8.2/apache2/php.ini
+cp -R dist/presets/debian121/000-default.conf ${APACHE_CONFIG_DIR}sites-enabled/000-default.conf
 
 # setting up default web awesomeness
 cp -R dist/landing/index.html ${APACHE_DATA_PATH}/index.html
