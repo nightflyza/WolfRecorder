@@ -715,12 +715,12 @@ class YALFCore {
 
                 // If this cookie is invalid - we exiting destroying cookie and exiting with error
                 if (sizeof($cookie_data) != 2) {
-                    setcookie($this->cookie_user, null, time() - 3600);
+                    setcookie($this->cookie_user, '', time() - 3600);
                     return(false);
                 }
                 // Now we must validate user's data
                 if (!$this->checkUserData($cookie_data[0], $cookie_data[1], 'user_init', true, $this->user)) {
-                    setcookie($this->cookie_user, null, time() - 3600);
+                    setcookie($this->cookie_user, '', time() - 3600);
                     $this->loggedIn = false;
                     return(false);
                 }
@@ -729,7 +729,7 @@ class YALFCore {
             $userdata = $this->getUserData($cookie_data[0]);
             //failed to load user profile
             if ($userdata == false) {
-                setcookie($this->cookie_user, null, time() - 3600);
+                setcookie($this->cookie_user, '', time() - 3600);
                 $this->loggedIn = false;
                 return (false);
             }
