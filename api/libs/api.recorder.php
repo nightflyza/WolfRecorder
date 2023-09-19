@@ -55,13 +55,6 @@ class Recorder {
     protected $ffmpgPath = '';
 
     /**
-     * Contains cd command path
-     *
-     * @var string
-     */
-    protected $cdPath = '';
-
-    /**
      * System messages helper instance placeholder
      *
      * @var object
@@ -76,9 +69,15 @@ class Recorder {
     protected $debugFlag = false;
 
     /**
+     * CliFF instance placeholder
+     * 
+     * @var object
+     */
+    protected $cliff = '';
+
+    /**
      * some creepy params here
      */
-    protected $chunkTime = 60;
     protected $transportTemplate = '';
     protected $recordOpts = '';
     protected $audioCapture = '';
@@ -107,6 +106,7 @@ class Recorder {
     public function __construct() {
         $this->initMessages();
         $this->loadConfigs();
+        $this->initCliff();
         $this->setOptions();
         $this->initStardust();
         $this->initStorages();
@@ -133,17 +133,24 @@ class Recorder {
      */
     protected function setOptions() {
         $this->ffmpgPath = $this->binPaths['FFMPG_PATH'];
-        $this->cdPath = $this->binPaths['CD'];
-        $this->chunkTime = $this->altCfg['RECORDER_CHUNK_TIME'];
-        $this->transportTemplate = '-stimeout 5000000 -loglevel error -rtsp_transport tcp -f rtsp -i';
-        $this->recordOpts = '-strict -2 -vcodec copy -f segment -segment_time ' . $this->chunkTime . ' -strftime 1 -segment_atclocktime 1 -segment_clocktime_offset 30 -reset_timestamps 1 -segment_format mp4';
-        $this->audioCapture = '-acodec copy' . ' ';
+        $this->transportTemplate = $this->cliff->getTransportTemplate();
+        $this->recordOpts = $this->cliff->getRecordOpts();
+        $this->audioCapture = $this->cliff->getAudioCapture();
         $this->supressOutput = '';
         if (isset($this->altCfg['RECORDER_DEBUG'])) {
             if ($this->altCfg['RECORDER_DEBUG']) {
                 $this->debugFlag = true;
             }
         }
+    }
+
+    /**
+     * Inits ffmpeg CLI wrapper
+     * 
+     * @return void
+     */
+    protected function initCliff() {
+        $this->cliff = new CliFF();
     }
 
     /**
@@ -375,5 +382,4 @@ class Recorder {
             $captureProcess->stop();
         }
     }
-
 }

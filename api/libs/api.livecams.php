@@ -90,6 +90,13 @@ class LiveCams {
     protected $liveOptsSuffix = '';
 
     /**
+     * CliFF instance placeholder
+     * 
+     * @var object
+     */
+    protected $cliff = '';
+
+    /**
      * other predefined stuff like routes
      */
     const PID_PREFIX = 'LIVE_';
@@ -104,6 +111,7 @@ class LiveCams {
     public function __construct() {
         $this->initMessages();
         $this->loadConfigs();
+        $this->initCliff();
         $this->setOptions();
         $this->initCameras();
         $this->initChanshots();
@@ -118,6 +126,15 @@ class LiveCams {
      */
     protected function initMessages() {
         $this->messages = new UbillingMessageHelper();
+    }
+
+    /**
+     * Inits ffmpeg CLI wrapper
+     * 
+     * @return void
+     */
+    protected function initCliff() {
+        $this->cliff = new CliFF();
     }
 
     /**
@@ -139,8 +156,8 @@ class LiveCams {
      */
     protected function setOptions() {
         $this->ffmpgPath = $this->binPaths['FFMPG_PATH'];
-        $this->liveOptsPrefix = '-stimeout 5000000 -loglevel error -rtsp_transport tcp -f rtsp -i';
-        $this->liveOptsSuffix = '-strict -2 -vcodec copy -hls_wrap 10';
+        $this->liveOptsPrefix = $this->cliff->getLiveOptsPrefix();
+        $this->liveOptsSuffix = $this->cliff->getLiveOptsSuffix();
         $this->streamsPath = Storages::PATH_HOWL . self::STREAMS_SUBDIR;
     }
 
@@ -530,5 +547,4 @@ class LiveCams {
         }
         return($result);
     }
-
 }
