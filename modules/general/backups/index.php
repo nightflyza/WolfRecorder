@@ -107,11 +107,10 @@ if (cfr('BACKUP')) {
                         } else {
                             $restoreCommand = $binPathsConf['MYSQL_PATH'] . ' --host ' . $mysqlConf['server'] . ' -u ' . $mysqlConf['username'] . ' -p' . $mysqlConf['password'] . ' ' . $mysqlConf['db'] . ' --default-character-set=utf8 < ' . $restoreFilename . ' 2>&1';
                             $restoreResult = shell_exec($restoreCommand);
-                            if ($restoreResult === false) {
-                                $restoreResult = '';
-                            }
-                            if (ispos($restoreResult, 'command line interface')) {
-                                $restoreResult = '';
+                            if ($restoreResult) {
+                                if (ispos($restoreResult, 'command line interface')) {
+                                    $restoreResult = '';
+                                }
                             }
                             if (empty($restoreResult)) {
                                 show_success(__('Success') . '! ' . __('Database') . ' ' . $mysqlConf['db'] . ' ' . __('is restored to server') . ' ' . $mysqlConf['server']);

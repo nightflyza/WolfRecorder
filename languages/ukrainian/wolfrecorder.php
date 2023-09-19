@@ -234,5 +234,6 @@ $lang['def']['Change admin user password'] = 'Змінити пароль адм
 $lang['def']['already exists'] = 'Вже існує';
 $lang['def']['right to access all cameras'] = 'Право доступу до всіх камер';
 $lang['def']['Operator'] = 'Оператор';
+$lang['def']['Result'] = 'Результат';
 $lang['def'][''] = '';
 
