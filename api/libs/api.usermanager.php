@@ -236,9 +236,10 @@ class UserManager {
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
             foreach ($allUsers as $index => $eachUser) {
+                $userExportsSize = $this->getUserSize($eachUser);
                 $cells = wf_TableCell($eachUser);
                 $actControls = '';
-                $cells .= wf_TableCell(wr_convertSize($this->getUserSize($eachUser)));
+                $cells .= wf_TableCell(wr_convertSize($userExportsSize), '', '', 'sorttable_customkey="' . $userExportsSize . '"');
                 $actControls = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DELETE . '=' . $eachUser, web_delete_icon(), $this->messages->getDeleteAlert()) . ' ';
                 $actControls .= wf_JSAlert(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $eachUser, wf_img('skins/icon_key.gif', __('Edit user')), $this->messages->getEditAlert()) . ' ';
                 $actControls .= wf_Link(self::URL_ME . '&' . self::ROUTE_PERMISSIONS . '=' . $eachUser, web_edit_icon(__('Permissions')), $this->messages->getEditAlert());
