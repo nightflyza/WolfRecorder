@@ -59,6 +59,7 @@ class Cameras {
      */
     const DATA_TABLE = 'cameras';
     const URL_ME = '?module=cameras';
+    const AJ_ARCHSTATS = 'archivestatscontainer';
     const PROUTE_NEWMODEL = 'newcameramodelid';
     const PROUTE_NEWIP = 'newcameraip';
     const PROUTE_NEWLOGIN = 'newcameralogin';
@@ -79,6 +80,7 @@ class Cameras {
     const ROUTE_EDIT = 'editcameraid';
     const ROUTE_ACTIVATE = 'activatecameraid';
     const ROUTE_DEACTIVATE = 'deactivatecameraid';
+    const ROUTE_AJ_ARCHSTATS = 'renderarchivestats';
     const CHANNEL_ID_LEN = 11; // 4.738 * 10^18
 
     /**
@@ -91,7 +93,6 @@ class Cameras {
      * I wish that the world could see
      * The dinosaurs are a part of me
      */
-
     public function __construct() {
         $this->initMessages();
         $this->loadConfigs();
@@ -216,7 +217,7 @@ class Cameras {
                     if ($storagePathValid) {
                         if (isset($allModels[$modelId])) {
                             if (zb_isIPValid($ipF)) {
-                                if (!empty($loginF) AND ! empty($passwordF)) {
+                                if (!empty($loginF) AND !empty($passwordF)) {
                                     //storage migration?
                                     if ($cameraData['storageid'] != $storageId) {
                                         $this->storages->migrateChannel($storageId, $cameraData['channel']);
@@ -364,7 +365,7 @@ class Cameras {
                 if (isset($allModels[$modelId])) {
                     if (zb_isIPValid($ipF)) {
                         if (!$this->isCameraIpUsed($ipF)) {
-                            if (!empty($loginF) AND ! empty($passwordF)) {
+                            if (!empty($loginF) AND !empty($passwordF)) {
                                 $this->camerasDb->data('modelid', $modelId);
                                 $this->camerasDb->data('ip', $ipF);
                                 $this->camerasDb->data('login', $loginF);
@@ -811,6 +812,54 @@ class Cameras {
     }
 
     /**
+     * Renders camera archive stats, like depth, bitrate, size...
+     * 
+     * @param array $cameraId
+     * 
+     * @return string
+     */
+    public function renderCameraArchiveStats($cameraId) {
+        $result = '';
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        if (isset($this->allCameras[$cameraId])) {
+            $cameraData = $this->allCameras[$cameraId];
+            $rows = '';
+            //some channel data collecting
+            $channelChunks = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
+            $chunksCount = sizeof($channelChunks);
+            $archiveDepth = '-';
+            $archiveSeconds = 0;
+            if ($chunksCount > 0) {
+                $archiveSeconds = $this->altCfg['RECORDER_CHUNK_TIME'] * $chunksCount;
+                $archiveDepth = wr_formatTimeArchive($archiveSeconds);
+            }
+
+            $chanSizeRaw = $this->storages->getChannelChunksSize($channelChunks);
+            $chanSizeLabel = wr_convertSize($chanSizeRaw);
+
+            $chanBitrateLabel = '-';
+            if ($archiveSeconds AND $chanSizeRaw) {
+                $chanBitrate = ($chanSizeRaw * 8) / $archiveSeconds / 1024; // in kbits
+                $chanBitrateLabel = round(($chanBitrate / 1024), 2) . ' ' . __('Mbit/s');
+            }
+
+            $cells = wf_TableCell(__('Archive depth'), '40%', 'row2');
+            $cells .= wf_TableCell($archiveDepth);
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Average bitrate'), '', 'row2');
+            $cells .= wf_TableCell($chanBitrateLabel);
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Size'), '', 'row2');
+            $cells .= wf_TableCell($chanSizeLabel);
+            $rows .= wf_TableRow($cells, 'row3');
+            $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
+        }
+        return($result);
+    }
+
+    /**
      * Renders camera profile
      * 
      * @param int $cameraId
@@ -834,23 +883,10 @@ class Cameras {
             $allRunningLiveStreams = $this->getRunningStreams();
             $liveStreamFlag = (isset($allRunningLiveStreams[$cameraId])) ? 1 : 0;
 
-            //some channel data collecting
-            $channelChunks = $this->storages->getChannelChunks($cameraData['storageid'], $cameraData['channel']);
-            $chunksCount = sizeof($channelChunks);
-            $archiveDepth = '-';
-            $archiveSeconds = 0;
-            if ($chunksCount > 0) {
-                $archiveSeconds = $this->altCfg['RECORDER_CHUNK_TIME'] * $chunksCount;
-                $archiveDepth = wr_formatTimeArchive($archiveSeconds);
-            }
-
-            $chanSizeRaw = $this->storages->getChannelChunksSize($channelChunks);
-            $chanSizeLabel = wr_convertSize($chanSizeRaw);
-
-            $chanBitrateLabel = '-';
-            if ($archiveSeconds AND $chanSizeRaw) {
-                $chanBitrate = ($chanSizeRaw * 8) / $archiveSeconds / 1024; // in kbits
-                $chanBitrateLabel = round(($chanBitrate / 1024), 2) . ' ' . __('Mbit/s');
+            $ajaxArchiveStatsUrl = self::URL_ME . '&' . self::ROUTE_AJ_ARCHSTATS . '=' . $cameraId;
+            $channelLabel = $cameraData['channel'];
+            if (cfr('ARCHIVE')) {
+                $channelLabel = wf_AjaxLink($ajaxArchiveStatsUrl, $cameraData['channel'], self::AJ_ARCHSTATS);
             }
 
             //camera profile here
@@ -891,28 +927,16 @@ class Cameras {
             $rows .= wf_TableRow($cells, 'row3');
 
             $cells = wf_TableCell(__('Channel'), '', 'row2');
-            $cells .= wf_TableCell($cameraData['channel']);
+            $cells .= wf_TableCell($channelLabel);
             $rows .= wf_TableRow($cells, 'row3');
-
-            $cells = wf_TableCell(__('Archive depth'), '', 'row2');
-            $cells .= wf_TableCell($archiveDepth);
-            $rows .= wf_TableRow($cells, 'row3');
-
-            $cells = wf_TableCell(__('Average bitrate'), '', 'row2');
-            $cells .= wf_TableCell($chanBitrateLabel);
-            $rows .= wf_TableRow($cells, 'row3');
-
-            $cells = wf_TableCell(__('Size'), '', 'row2');
-            $cells .= wf_TableCell($chanSizeLabel);
-            $rows .= wf_TableRow($cells, 'row3');
-
-
 
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
 
+            //archive stats container here
+            $result .= wf_AjaxLoader();
+            $result .= wf_AjaxContainer(self::AJ_ARCHSTATS);
+
             //some controls here
-
-
             if ($cameraData['active']) {
                 $deactUrl = self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $cameraData['id'] . '&' . self::ROUTE_DEACTIVATE . '=' . $cameraData['id'];
                 $cameraControls .= wf_Link($deactUrl, web_bool_led(0) . ' ' . __('Disable'), false, 'ubButton') . ' ';
@@ -932,6 +956,10 @@ class Cameras {
 
             if (cfr('EXPORT')) {
                 $cameraControls .= wf_Link(Export::URL_ME . '&' . Export::ROUTE_CHANNEL . '=' . $cameraData['channel'], wf_img('skins/icon_export.png') . ' ' . __('Save record'), false, 'ubButton');
+            }
+
+            if (cfr('ARCHIVE')) {
+                $cameraControls .= wf_AjaxLink($ajaxArchiveStatsUrl, wf_img('skins/icon_charts.png') . ' ' . __('Archive'), self::AJ_ARCHSTATS, false, 'ubButton');
             }
 
             if (!$cameraData['active']) {
@@ -961,5 +989,4 @@ class Cameras {
         $result .= $cameraControls;
         return($result);
     }
-
 }

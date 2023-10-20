@@ -70,6 +70,11 @@ if (cfr('CAMERAS')) {
         }
     }
 
+    //camera archive ajax stats
+    if (ubRouting::checkGet($cameras::ROUTE_AJ_ARCHSTATS)) {
+        die($cameras->renderCameraArchiveStats(ubRouting::get($cameras::ROUTE_AJ_ARCHSTATS)));
+    }
+
 
     if (!ubRouting::checkGet($cameras::ROUTE_EDIT)) {
         show_window(__('Available cameras'), $cameras->renderList());
