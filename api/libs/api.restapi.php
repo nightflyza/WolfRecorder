@@ -408,6 +408,7 @@ class RestAPI {
             'channels_online' => 0,
             'uptime' => 0,
             'loadavg' => 0,
+            'os' => '',
         );
 
         //storages diag
@@ -454,6 +455,11 @@ class RestAPI {
         //system load
         $loadAvg = sys_getloadavg();
         $result['loadavg'] = round($loadAvg[0], 2);
+
+        //system name
+        $command = '/usr/bin/uname -opr';
+        $sysName = shell_exec($command);
+        $result['os'] = 'OS: ' . trim($sysName) . ' PHP: ' . phpversion();
         return($result);
     }
 
@@ -583,7 +589,7 @@ class RestAPI {
         if ($this->checkRequestFields($requiredFields, $request)) {
             $login = $request['login'];
             $password = $request['password'];
-            if (!empty($login) AND ! empty($password)) {
+            if (!empty($login) AND !empty($password)) {
                 $userManager = new UserManager();
                 $allUsersData = $userManager->getAllUsersData();
                 if (isset($allUsersData[$login])) {
@@ -944,5 +950,4 @@ class RestAPI {
         }
         return($result);
     }
-
 }
