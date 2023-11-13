@@ -6,6 +6,13 @@
 class NeuralObjSearch {
 
     /**
+     * binpaths config as key=>value
+     * 
+     * @var array
+     */
+    protected $binpaths = array();
+
+    /**
      * Base WR web URL
      * 
      * @var string
@@ -46,10 +53,31 @@ class NeuralObjSearch {
      * @var object
      */
     protected $messages = '';
+
+    /**
+     * Contains default screenshot options
+     *
+     * @var string
+     */
+    protected $screenshotOpts = '-loglevel error -frames:v 1 -q:v 15';
+
+    /**
+     * Contains ffmpeg binary path
+     *
+     * @var string
+     */
+    protected $ffmpgPath = '';
+
+    /**
+     * Default chunk time offset to screenshot
+     *
+     * @var string
+     */
+    protected $timeOffset = '00:00:01';
     //some props that may be configurable in future
     protected $confidenceThreshold = 42;
     protected $timeLimit = 1200;
-    protected $cachePath = 'howl/nd/';
+    protected $cachePath = 'howl/nd';
 
     //some predefined stuff here
     const AJAX_CONTAINER = 'neuralobjectssearchcontainer';
@@ -69,6 +97,9 @@ class NeuralObjSearch {
      * @return void
      */
     protected function setOptions() {
+        global $ubillingConfig;
+        $this->binPaths = $ubillingConfig->getBinpaths();
+        $this->ffmpgPath = $this->binPaths['FFMPG_PATH'];
         $webPath = pathinfo($_SERVER['REQUEST_URI']);
         $webPath = $webPath['dirname'];
         $proto = 'http://';
@@ -213,7 +244,17 @@ class NeuralObjSearch {
 
                     $filteredChunks = array();
                     $detectionsTmp = array();
+
                     if (!empty($chunksList)) {
+                        //cache alloc 
+                        if (!file_exists($this->cachePath)) {
+                            mkdir($this->cachePath, 0777);
+                        }
+                        if (!file_exists($this->cachePath . '/' . $channelId)) {
+                            mkdir($this->cachePath . '/' . $channelId, 0777);
+                        }
+
+                        //per chunk hell
                         foreach ($chunksList as $chunkTimeStamp => $chunkPath) {
 
                             if (zb_isTimeStampBetween($dateFromTs, $dateToTs, $chunkTimeStamp)) {
@@ -227,10 +268,17 @@ class NeuralObjSearch {
                         }
 
                         if (!empty($filteredChunks)) {
-                            foreach ($filteredChunks as $eachChunk => $eachUrl) {
-                                $fsCacheName = $this->cachePath . $channelId . '_' . $eachChunk . '.ndobj';
+                            foreach ($filteredChunks as $eachChunk => $eachChunkPath) {
+                                $fsCacheDir = $this->cachePath . '/' . $channelId . '/';
+                                $fsCacheName = $fsCacheDir . $eachChunk . '.ndobj';
+                                $chunkScreenName = $fsCacheDir . $eachChunk . '.jpg';
                                 if (!file_exists($fsCacheName)) {
-                                    print($eachUrl.'<br>');
+                                    //print($eachChunkPath . '<br>');
+                                    if (!file_exists($chunkScreenName)) {
+                                        $command = $this->ffmpgPath . ' -ss ' . $this->timeOffset . ' -i ' . $chunkPath . ' ' . $this->screenshotOpts . ' ' . $chunkScreenName;
+                                        print($command.'<br>');
+                                      //  shell_exec($command);
+                                    }
 //                                    $chunkDetections = $this->detector->detectObjects($eachUrl);
 //                                    if (isset($chunkDetections['detections'])) {
 //                                        if (!empty($chunkDetections['detections'])) {
