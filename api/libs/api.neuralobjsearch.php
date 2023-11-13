@@ -49,7 +49,7 @@ class NeuralObjSearch {
     //some props that may be configurable in future
     protected $confidenceThreshold = 42;
     protected $timeLimit = 1200;
-    protected $cachePath = 'exports/';
+    protected $cachePath = 'howl/nd/';
 
     //some predefined stuff here
     const AJAX_CONTAINER = 'neuralobjectssearchcontainer';
@@ -164,7 +164,7 @@ class NeuralObjSearch {
 
                 $cells = wf_TableCell(wf_Link($viewUrl, $chunkTime, false, 'camlink'));
                 $cells .= wf_TableCell($objectsList);
-                $rows .= wf_TableRow($cells,'row5');
+                $rows .= wf_TableRow($cells, 'row5');
             }
 
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
@@ -221,7 +221,7 @@ class NeuralObjSearch {
                                 $howlChunkFullPath = str_replace('//', '/', $howlChunkFullPath);
                                 //excluding last minute chunk - it may be unfinished now
                                 if ($chunkTimeStamp < $minuteBetweenNow) {
-                                    $filteredChunks[$chunkTimeStamp] = $this->baseUrl . $howlChunkFullPath;
+                                    $filteredChunks[$chunkTimeStamp] = $howlChunkFullPath;
                                 }
                             }
                         }
@@ -230,26 +230,27 @@ class NeuralObjSearch {
                             foreach ($filteredChunks as $eachChunk => $eachUrl) {
                                 $fsCacheName = $this->cachePath . $channelId . '_' . $eachChunk . '.ndobj';
                                 if (!file_exists($fsCacheName)) {
-                                    $chunkDetections = $this->detector->detectObjects($eachUrl);
-                                    if (isset($chunkDetections['detections'])) {
-                                        if (!empty($chunkDetections['detections'])) {
-                                            foreach ($chunkDetections as $io => $each) {
-                                                $chunkDatetime = date("Y-m-d H:i:s", $eachChunk);
-                                                $objectsList = array();
-                                                foreach ($chunkDetections['detections'] as $io => $each) {
-                                                    if ($each['confidence'] >= $this->confidenceThreshold) {
-                                                        $objectsList [] = $each['label'];
-                                                    }
-                                                }
-
-                                                if (!empty($objectsList)) {
-                                                    $detectionsTmp[$eachChunk] = $objectsList;
-                                                }
-                                                //filling chunk cache
-                                                file_put_contents($fsCacheName, json_encode($objectsList));
-                                            }
-                                        }
-                                    }
+                                    print($eachUrl.'<br>');
+//                                    $chunkDetections = $this->detector->detectObjects($eachUrl);
+//                                    if (isset($chunkDetections['detections'])) {
+//                                        if (!empty($chunkDetections['detections'])) {
+//                                            foreach ($chunkDetections as $io => $each) {
+//                                                $chunkDatetime = date("Y-m-d H:i:s", $eachChunk);
+//                                                $objectsList = array();
+//                                                foreach ($chunkDetections['detections'] as $io => $each) {
+//                                                    if ($each['confidence'] >= $this->confidenceThreshold) {
+//                                                        $objectsList [] = $each['label'];
+//                                                    }
+//                                                }
+//
+//                                                if (!empty($objectsList)) {
+//                                                    $detectionsTmp[$eachChunk] = $objectsList;
+//                                                }
+//                                                //filling chunk cache
+//                                                file_put_contents($fsCacheName, json_encode($objectsList));
+//                                            }
+//                                        }
+//                                    }
                                 } else {
                                     //reading from cache
                                     $rawObjList = file_get_contents($fsCacheName);
