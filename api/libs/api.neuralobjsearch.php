@@ -162,9 +162,9 @@ class NeuralObjSearch {
                 $objectsList = rtrim($objectsList, $delimiter);
                 $viewUrl = $chanUrl . '&' . Archive::ROUTE_SHOWDATE . '=' . $chunkDate . '&' . Archive::ROUTE_TIMESEGMENT . '=' . $chunkTime;
 
-                $cells = wf_TableCell(wf_Link($viewUrl, $chunkTime));
+                $cells = wf_TableCell(wf_Link($viewUrl, $chunkTime, false, 'camlink'));
                 $cells .= wf_TableCell($objectsList);
-                $rows .= wf_TableRow($cells);
+                $rows .= wf_TableRow($cells,'row5');
             }
 
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
