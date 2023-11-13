@@ -2,6 +2,17 @@
 
 if (cfr('ARCHIVE')) {
     $archive = new Archive();
+    //neura search ajax background
+    if (ubRouting::checkGet(NeuralObjSearch::ROUTE_CHAN_DETECT)) {
+        $acl = new ACL();
+        if ($acl->isMyChannel(ubRouting::get(NeuralObjSearch::ROUTE_CHAN_DETECT))) {
+            $neuraObj = new NeuralObjSearch();
+            $neuraObj->renderObjectDetector(ubRouting::get(NeuralObjSearch::ROUTE_CHAN_DETECT), ubRouting::get(NeuralObjSearch::ROUTE_DATE));
+        } else {
+            $messages = new UbillingMessageHelper();
+            die($messages->getStyledMessage(__('Access denied'), 'error') . wf_delimiter());
+        }
+    }
 
     //archive lookup by channel ID
     if (ubRouting::checkGet($archive::ROUTE_VIEW)) {

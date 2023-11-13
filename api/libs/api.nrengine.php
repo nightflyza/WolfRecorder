@@ -165,9 +165,15 @@ class NREngine {
         return($result);
     }
 
+    /**
+     * Returns mjpeg detection stream
+     * 
+     * @param string $url
+     * 
+     * @return stream
+     */
     public function detectStream($url) {
         $result = $this->requestStreamDetection($url);
         return($result);
     }
-
 }

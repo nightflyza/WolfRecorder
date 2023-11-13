@@ -334,13 +334,18 @@ class Archive {
                 if (!isset($datesTmp[$chunkDate])) {
                     $datesTmp[$chunkDate] = 1;
                 } else {
-                    $datesTmp[$chunkDate] ++;
+                    $datesTmp[$chunkDate]++;
                 }
             }
 
             if (!empty($datesTmp)) {
+                //day timeline here
                 $result .= $this->renderDayRecordsAvailTimeline($chunksList, $dayPointer);
-
+                //optional neural fast objects search
+                if ($this->altCfg['NEURAL_ENABLED']) {
+                    $nobjSearch = new NeuralObjSearch();
+                    $result .= $nobjSearch->renderContainer();
+                }
                 $chunkTime = $this->altCfg['RECORDER_CHUNK_TIME'];
                 foreach ($datesTmp as $eachDate => $chunksCount) {
                     $justDay = date("d", strtotime($eachDate));
@@ -452,6 +457,7 @@ class Archive {
                         $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
                         $result .= wf_delimiter(0);
                     }
+
                     //some timeline here
                     $result .= $this->renderDaysTimeline($channelId, $chunksList);
                 } else {
@@ -465,19 +471,24 @@ class Archive {
         }
         $result .= wf_delimiter(1);
         $result .= wf_BackLink(self::URL_ME);
-        
+
         if (cfr('CAMERAS')) {
             if ($cameraId) {
                 $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, wf_img('skins/icon_camera_small.png') . ' ' . __('Camera'), false, 'ubButton');
             }
         }
-        
+
         if (cfr('LIVECAMS')) {
             $result .= wf_Link(LiveCams::URL_ME . '&' . LiveCams::ROUTE_VIEW . '=' . $channelId, wf_img('skins/icon_live_small.png') . ' ' . __('Live'), false, 'ubButton');
         }
-        
+
         if (cfr('EXPORT')) {
             $result .= wf_Link(Export::URL_ME . '&' . Export::ROUTE_CHANNEL . '=' . $channelId, wf_img('skins/icon_export.png') . ' ' . __('Save record'), false, 'ubButton');
+        }
+
+        if ($this->altCfg['NEURAL_ENABLED']) {
+            $neurSearchUrl = self::URL_ME . '&' . NeuralObjSearch::ROUTE_CHAN_DETECT . '=' . $channelId . '&' . NeuralObjSearch::ROUTE_DATE . '=' . $showDate;
+            $result .= wf_AjaxLink($neurSearchUrl, web_icon_search() . ' ' . __('Objects search'), NeuralObjSearch::AJAX_CONTAINER, false, 'ubButton') . ' ';
         }
         return($result);
     }
@@ -496,5 +507,4 @@ class Archive {
         }
         return($result);
     }
-
 }

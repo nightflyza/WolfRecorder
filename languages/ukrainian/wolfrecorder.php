@@ -235,5 +235,8 @@ $lang['def']['already exists'] = 'Вже існує';
 $lang['def']['right to access all cameras'] = 'Право доступу до всіх камер';
 $lang['def']['Operator'] = 'Оператор';
 $lang['def']['Result'] = 'Результат';
+$lang['def']['Objects search'] = 'Пошук об`єктів';
+$lang['def']['Neural network is busy at this moment'] = 'Нейромережа наразі надто зайнята, спробуйте трішки пізніше';
+$lang['def']['Objects'] = 'Об`єкти';
 $lang['def'][''] = '';
 
