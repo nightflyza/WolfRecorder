@@ -43,6 +43,7 @@ class NREngine {
     const ROUTE_DETECT = '/detect';
     const ROUTE_IMAGE = '/image';
     const ROUTE_STREAM = '/stream';
+    const ROUTE_DETECTORS = '/detectors';
 
     public function __construct() {
         $this->loadConfigs();
@@ -132,8 +133,37 @@ class NREngine {
         $requestJson = $this->getRequest($url);
         //$this->api->dataHeader('Content-Type', 'application/json;charset=UTF-8');
         $requestUrl = $this->baseApiUrl . self::ROUTE_STREAM . '?detect_request=' . urlencode($requestJson);
-        deb($requestUrl);
         $result = $this->api->response($requestUrl);
+        return($result);
+    }
+
+    /**
+     * Returns available detectors 
+     * 
+     * @return array
+     */
+    public function getDetectors() {
+        $result = array();
+        $rawResult = $this->api->response($this->baseApiUrl . self::ROUTE_DETECTORS);
+        if (!empty($rawResult)) {
+            $result = @json_decode($rawResult, true);
+        }
+        return($result);
+    }
+
+    /**
+     * Check is neural detection service alive or not
+     * 
+     * @return bool
+     */
+    public function isAlive() {
+        $detectors = $this->getDetectors();
+        $result = false;
+        if (is_array($detectors)) {
+            if (isset($detectors['detectors'])) {
+                $result = true;
+            }
+        }
         return($result);
     }
 

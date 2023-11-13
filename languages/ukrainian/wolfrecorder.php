@@ -238,5 +238,6 @@ $lang['def']['Result'] = 'Результат';
 $lang['def']['Objects search'] = 'Пошук об`єктів';
 $lang['def']['Neural network is busy at this moment'] = 'Нейромережа наразі надто зайнята, спробуйте трішки пізніше';
 $lang['def']['Objects'] = 'Об`єкти';
+$lang['def']['Neural object recognition service now is offline'] = 'Сервіс нейронного розпізнавання зараз оффлайн';
 $lang['def'][''] = '';
 
