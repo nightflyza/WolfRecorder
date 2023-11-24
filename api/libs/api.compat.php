@@ -151,6 +151,73 @@ if (!function_exists('ispos')) {
 
 }
 
+if (!function_exists('zb_convertSize')) {
+
+    /**
+     * Converts bytes into human-readable values like Kb, Mb, Gb...
+     * 
+     * @param int $fs
+     * @param string $traffsize
+     * 
+     * @return string
+     */
+    function zb_convertSize($fs, $traffsize = 'float') {
+        if ($traffsize == 'float') {
+            if ($fs >= (1073741824 * 1024))
+                $fs = round($fs / (1073741824 * 1024) * 100) / 100 . ' ' . __('Tb');
+            elseif ($fs >= 1073741824)
+                $fs = round($fs / 1073741824 * 100) / 100 . ' ' . __('Gb');
+            elseif ($fs >= 1048576)
+                $fs = round($fs / 1048576 * 100) / 100 . ' ' . __('Mb');
+            elseif ($fs >= 1024)
+                $fs = round($fs / 1024 * 100) / 100 . ' ' . __('Kb');
+            else
+                $fs = $fs . ' ' . __('b');
+            return ($fs);
+        }
+
+        if ($traffsize == 'b') {
+            return ($fs);
+        }
+
+        if ($traffsize == 'Kb') {
+            $fs = round($fs / 1024 * 100) / 100 . ' ' . __('Kb');
+            return ($fs);
+        }
+
+        if ($traffsize == 'Mb') {
+            $fs = round($fs / 1048576 * 100) / 100 . ' ' . __('Mb');
+            return ($fs);
+        }
+        if ($traffsize == 'Gb') {
+            $fs = round($fs / 1073741824 * 100) / 100 . ' ' . __('Gb');
+            return ($fs);
+        }
+
+        if ($traffsize == 'Tb') {
+            $fs = round($fs / (1073741824 * 1024) * 100) / 100 . ' ' . __('Tb');
+            return ($fs);
+        }
+    }
+
+}
+
+if (!function_exists('zb_TraffToGb')) {
+
+    /**
+     * Convert bytes to human-readable Gb values. Much faster than stg_convert_size()/zb_convertSize()
+     * 
+     * @param int $fs
+     * 
+     * @return string
+     */
+    function zb_TraffToGb($fs) {
+        $fs = round($fs / 1073741824, 2) . ' Gb';
+        return ($fs);
+    }
+
+}
+
 /**
  * Advanced php5 scandir analog wit some filters
  * 
