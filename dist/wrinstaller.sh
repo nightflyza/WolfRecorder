@@ -47,8 +47,9 @@ $DIALOG --menu "Type of WolfRecorder installation" 10 75 8 \
 clear
 
 $DIALOG --menu "Choose FreeBSD version and architecture" 16 50 8 \
+                   140_6K "FreeBSD 14.0 amd64"\
                    132_6E "FreeBSD 13.2 amd64"\
-		   131_6T "FreeBSD 13.1 amd64"\
+		     131_6T "FreeBSD 13.1 amd64"\
                    131_3T "FreeBSD 13.1 i386"\
                    124_6T "FreeBSD 12.4 amd64"\
                    124_6E "FreeBSD 12.4 amd64"\
@@ -119,6 +120,12 @@ APACHE_CONFIG_PRESET_NAME="httpd24f8.conf"
 132_6E)
 #13.2E contains PHP 8.2 binaries
 APACHE_CONFIG_PRESET_NAME="httpd24f8.conf"
+;;
+
+140_6K)
+#14.0K contains PHP 8.3 binaries
+APACHE_CONFIG_PRESET_NAME="httpd24f8.conf"
+PHP_CONFIG_PRESET="php8.ini"
 ;;
 esac
 
@@ -191,6 +198,15 @@ chmod a+x /etc/firewall.conf
 # setting up default web awesomeness
 cp -R dist/landing/index.html ${APACHE_DATA_PATH}/index.html
 cp -R dist/landing/bg.gif ${APACHE_DATA_PATH}/
+
+# database specific issues handling
+case $ARCH in
+140_6K)
+# MySQL 8.0 requires custom config
+cp -R dist/presets/freebsd/80_my.cnf /usr/local/etc/mysql/my.cnf 
+$DIALOG --infobox "MySQL 8.0 config replaced" 4 60
+;;
+esac
 
 # start reqired services
 $DIALOG --infobox "Starting web server.." 4 60
