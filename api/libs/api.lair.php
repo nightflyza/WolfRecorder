@@ -278,7 +278,7 @@ class Avarice {
      * @return void
      */
     protected function getSerial() {
-        $this->serial= wr_SerialGet();
+        $this->serial = wr_SerialGet();
     }
 
     /**
@@ -328,13 +328,13 @@ class Avarice {
      * @return bool
      */
     protected function checkLicenseValidity($key) {
-        $result=false;
-        if (@strpos($key,strrev('CCgmN'),0)!==false) {
+        $result = false;
+        if (@strpos($key, strrev('CCgmN'), 0) !== false) {
             @$key = $this->unpack($key);
             @$key = $this->xoror($key, $this->serial);
             @$key = unserialize($key);
             if (!empty($key)) {
-                $result=true;
+                $result = true;
             }
         }
         return($result);

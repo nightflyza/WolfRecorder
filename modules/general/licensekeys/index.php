@@ -37,12 +37,10 @@ if (cfr('ROOT')) {
         wr_LicenseLister();
     }
 
-
-    
     wr_Stats();
 } else {
     show_error(__('Access denied'));
 }
-?>
+
 
 
