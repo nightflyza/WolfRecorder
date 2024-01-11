@@ -239,5 +239,11 @@ $lang['def']['Objects search'] = 'Поиск объектов';
 $lang['def']['Neural network is busy at this moment'] = 'Нейросеть сейчас слишком занята, попробуйте чуть позже';
 $lang['def']['Objects'] = 'Объекты';
 $lang['def']['Neural object recognition service now is offline'] = 'Сервис нейронного распознавания сейчас оффлайн';
-$lang['def'][''] = '';
+$lang['def']['License keys'] = 'Ключи лицензий';
+$lang['def']['License key'] = 'Лицензионный ключ';
+$lang['def']['Installed license keys'] = 'Установленные ключи лицензий';
+$lang['def']['Use this WolfRecorder serial for license keys purchase'] = 'Используйте этот серийный номер WolfRecorder для приобретения ключей лицензий';
+$lang['def']['You do not have any license keys installed. So how are you going to live like this?'] = 'У вас не установлено ниодного ключа лицензий.';
+$lang['def']['Install license key'] = 'Установить ключ лицензии';
+$lang['def']['Unacceptable license key'] = 'Неверный ключ лицензии';
 

@@ -1,0 +1,1 @@
+ALTER TABLE `lair` CHANGE `value` `value` LONGTEXT NULL DEFAULT NULL;
