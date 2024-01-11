@@ -20,7 +20,7 @@ if (cfr('LIVECAMS')) {
         }
     } else {
         if (ubRouting::checkGet('wall')) {
-            show_window(__('My cameras'), $liveCams->renderLiveWall());
+            //show_window(__('My cameras'), $liveCams->renderLiveWall());
         } else {
             show_window(__('My cameras'), $liveCams->renderList());
         }
