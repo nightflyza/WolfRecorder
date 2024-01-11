@@ -240,6 +240,65 @@ class LiveCams {
     }
 
     /**
+     * Lists available cameras live-wall
+     * 
+     * @return string
+     */
+    public function renderLiveWall() {
+        $result = '';
+        if ($this->acl->haveCamsAssigned()) {
+            if (!empty($this->allCamerasData)) {
+                $style = 'style="float: left; margin: 5px; min-height:280px; min-width:400px; border: 0px solid blue;"';
+                $result .= wf_tag('div');
+                foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
+                    if ($this->acl->isMyCamera($eachCameraId)) {
+                        $viewableFlag = true;
+                        $cameraChannel = $eachCameraData['CAMERA']['channel'];
+                        $cameraId=$eachCameraData['CAMERA']['id'];
+                        $channelScreenshot = $this->chanshots->getChannelScreenShot($cameraChannel);
+                        $cameraLabel = $this->cameras->getCameraComment($cameraChannel);
+                        if (empty($channelScreenshot)) {
+                            $channelScreenshot = 'skins/nosignal.gif';
+                            $viewableFlag = false;
+                        }
+
+                        if (!$eachCameraData['CAMERA']['active']) {
+                            $channelScreenshot = 'skins/chanblock.gif';
+                            $viewableFlag = false;
+                        }
+                        $result .= wf_tag('div', false, '', $style);
+                        if ($viewableFlag) {
+                            $streamUrl = $this->getStreamUrl($cameraChannel);
+                            if ($streamUrl) {
+                                //seems live stream now live
+                                $playerId = 'liveplayer_' . $cameraChannel;
+                                $player = new Player('400px', true);
+                                $player->setPlayerLib('w5');
+                                $result .= $player->renderLivePlayer($streamUrl, $playerId);
+                                $result .= $this->renderKeepAliveCallback($cameraId);
+                            } else {
+                                $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such live stream'), 'error');
+                            }
+                        } else {
+                            $channelUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $cameraChannel;
+                            $channelImage = wf_img($channelScreenshot, $cameraLabel, 'width: 400px; height: 270px; object-fit: cover;');
+                            $channelLink = wf_Link($channelUrl, $channelImage);
+                            $result .= $channelLink;
+                        }
+                        $result .= wf_tag('div', true);
+                    }
+                }
+                $result .= wf_tag('div', true);
+            } else {
+                $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
+            }
+        } else {
+            $result .= $this->messages->getStyledMessage(__('No assigned cameras to show'), 'warning');
+        }
+        return($result);
+    }
+
+    /**
      * Returns all running livestreams real process PID-s array as pid=>processString
      * 
      * @return array

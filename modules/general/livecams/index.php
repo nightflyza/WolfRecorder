@@ -19,7 +19,12 @@ if (cfr('LIVECAMS')) {
             show_error(__('Access denied'));
         }
     } else {
-        show_window(__('My cameras'), $liveCams->renderList());
+        if (ubRouting::checkGet('wall')) {
+            show_window(__('My cameras'), $liveCams->renderLiveWall());
+        } else {
+            show_window(__('My cameras'), $liveCams->renderList());
+        }
+
         wr_Stats();
     }
 } else {

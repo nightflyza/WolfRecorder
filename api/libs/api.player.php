@@ -21,9 +21,10 @@ class Player {
      *
      * @var string
      */
-    protected $playerLib = 'modules/jsc/playerjs/w4_playerjs.js';
+    protected $playerLib = '';
 
     public function __construct($width = '', $autoPlay = false) {
+        $this->setPlayerLib();
         if ($width) {
             $this->setWidth($width);
         }
@@ -50,6 +51,18 @@ class Player {
      */
     protected function setAutoplay($state) {
         $this->autoPlayFlag = $state;
+    }
+    
+    
+    /**
+     * Sets player lib property
+     * 
+     * @param string $lib
+     * 
+     * @return void
+     */
+    public function setPlayerLib($lib='w4') {
+        $this->playerLib= 'modules/jsc/playerjs/'.$lib.'_playerjs.js';
     }
 
     /**
