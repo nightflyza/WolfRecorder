@@ -779,6 +779,9 @@ class Cameras {
         $result = '';
         if (!empty($this->allCameras)) {
             $totalCount = 0;
+            $enabledCount = 0;
+            $recorderCount = 0;
+            $liveCount = 0;
             $allRunningRecorders = $this->getRunningRecorders();
             $allLiveStreams = $this->getRunningStreams();
             $cells = wf_TableCell(__('ID'));
@@ -802,9 +805,22 @@ class Cameras {
                 $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
                 $totalCount++;
+                if ($each['active']) {
+                    $enabledCount++;
+                    if ($recordingFlag) {
+                        $recorderCount++;
+                    }
+                    if ($liveFlag) {
+                        $liveCount++;
+                    }
+                }
             }
             $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
             $result .= wf_tag('b') . __('Total') . ': ' . $totalCount . wf_tag('b', true);
+            if ($totalCount) {
+                $result.= wf_delimiter(0);
+                $result.= __('Enabled').'/'.__('Recording').'/'.__('Live').': ('.$enabledCount.'/'.$recorderCount.'/'.$liveCount.')';
+            }
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
         }

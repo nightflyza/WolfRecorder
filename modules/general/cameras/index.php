@@ -77,6 +77,7 @@ if (cfr('CAMERAS')) {
 
 
     if (!ubRouting::checkGet($cameras::ROUTE_EDIT)) {
+        //just listing available cameras list
         show_window(__('Available cameras'), $cameras->renderList());
         $cameraCreationDialog = wf_modalAuto(wf_img('skins/add_icon.png') . ' ' . __('Create new camera'), __('Create new camera'), $cameras->renderCreateForm(), 'ubButton');
         show_window('', $cameraCreationDialog);
