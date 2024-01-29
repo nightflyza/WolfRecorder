@@ -1,13 +1,18 @@
 <?php
 
 if (cfr('LIVECAMS')) {
-    //catching keep alive requests
+    //catching keepalive requests
     $streamDog = new StreamDog();
     if (ubRouting::checkGet($streamDog::ROUTE_KEEPALIVE)) {
         $streamDog->keepAlive(ubRouting::get($streamDog::ROUTE_KEEPALIVE));
         die();
     }
 
+    //or substream keepalive requests
+    if (ubRouting::checkGet($streamDog::ROUTE_KEEPSUBALIVE)) {
+        $streamDog->keepSubAlive(ubRouting::get($streamDog::ROUTE_KEEPSUBALIVE));
+        die();
+    }
 
     $liveCams = new LiveCams();
     if (ubRouting::checkGet($liveCams::ROUTE_VIEW)) {
@@ -20,7 +25,7 @@ if (cfr('LIVECAMS')) {
         }
     } else {
         if (ubRouting::checkGet('wall')) {
-            //show_window(__('My cameras'), $liveCams->renderLiveWall());
+            show_window(__('My cameras'), $liveCams->renderLiveWall());
         } else {
             show_window(__('My cameras'), $liveCams->renderList());
         }

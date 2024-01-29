@@ -17,7 +17,9 @@ class StreamDog {
      */
     const TIMEOUT = 60;
     const CACHE_KEY = 'KEEPALIVE_';
+    const CACHE_SUB = 'KEEPALIVE_';
     const ROUTE_KEEPALIVE = 'keepstreamalive';
+    const ROUTE_KEEPSUBALIVE = 'keepsubalive';
 
     public function __construct() {
         $this->initCache();
@@ -50,6 +52,23 @@ class StreamDog {
     }
 
     /**
+     * Sets camera sub-stream as alive
+     * 
+     * @param int $cameraId
+     * 
+     * @return void
+     */
+    public function keepSubAlive($cameraId) {
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        $cacheKey = self::CACHE_SUB . $cameraId;
+        $cachedData = $this->cache->get($cacheKey, self::TIMEOUT);
+        if (empty($cachedData)) {
+            $cachedData = time();
+        }
+        $this->cache->set($cacheKey, $cachedData, self::TIMEOUT);
+    }
+
+    /**
      * Checks is camera being watched by someone?
      * 
      * @param int $cameraId
@@ -64,7 +83,25 @@ class StreamDog {
         if (!empty($cachedData)) {
             $result = true;
         }
-        return($result);
+        return ($result);
+    }
+
+      /**
+     * Checks is camera being watched by someone?
+     * 
+     * @param int $cameraId
+     * 
+     * @return bool
+     */
+    public function isCameraSubInUse($cameraId) {
+        $result = false;
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        $cacheKey = self::CACHE_SUB . $cameraId;
+        $cachedData = $this->cache->get($cacheKey, self::TIMEOUT);
+        if (!empty($cachedData)) {
+            $result = true;
+        }
+        return ($result);
     }
 
     /**
@@ -90,7 +127,6 @@ class StreamDog {
         var timer = setInterval(keepAliveRequest, ' . $timeout . ');
         ';
         $result .= wf_tag('script', true);
-        return($result);
+        return ($result);
     }
-
 }

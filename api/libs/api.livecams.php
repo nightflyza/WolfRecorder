@@ -76,6 +76,13 @@ class LiveCams {
     protected $streamsPath = '';
 
     /**
+     * Contains sub-streams base path for each channel
+     *
+     * @var string
+     */
+    protected $subStreamsPath = '';
+
+    /**
      * Live stream basic options
      *
      * @var string
@@ -100,12 +107,16 @@ class LiveCams {
      * other predefined stuff like routes
      */
     const PID_PREFIX = 'LIVE_';
+    const SUB_PREFIX = 'LQ_';
     const STREAMS_SUBDIR = 'livestreams/';
+    const SUBSTREAMS_SUBDIR = 'livelq/';
     const STREAM_PLAYLIST = 'stream.m3u8';
+    const SUBSTREAM_PLAYLIST = 'livesub.m3u8';
     const URL_ME = '?module=livecams';
     const URL_PSEUDOSTREAM = '?module=pseudostream';
     const ROUTE_VIEW = 'livechannel';
     const ROUTE_PSEUDOLIVE = 'live';
+    const ROUTE_PSEUDOSUB = 'sublq';
     const WRAPPER = '/bin/wrapi';
 
     public function __construct() {
@@ -159,6 +170,7 @@ class LiveCams {
         $this->liveOptsPrefix = $this->cliff->getLiveOptsPrefix();
         $this->liveOptsSuffix = $this->cliff->getLiveOptsSuffix();
         $this->streamsPath = Storages::PATH_HOWL . self::STREAMS_SUBDIR;
+        $this->subStreamsPath = Storages::PATH_HOWL . self::SUBSTREAMS_SUBDIR;
     }
 
     /**
@@ -236,11 +248,11 @@ class LiveCams {
         } else {
             $result .= $this->messages->getStyledMessage(__('No assigned cameras to show'), 'warning');
         }
-        return($result);
+        return ($result);
     }
 
     /**
-     * Lists available cameras live-wall
+     * Lists available cameras live-wall with low-qual substreams
      * 
      * @return string
      */
@@ -254,7 +266,7 @@ class LiveCams {
                     if ($this->acl->isMyCamera($eachCameraId)) {
                         $viewableFlag = true;
                         $cameraChannel = $eachCameraData['CAMERA']['channel'];
-                        $cameraId=$eachCameraData['CAMERA']['id'];
+                        $cameraId = $eachCameraData['CAMERA']['id'];
                         $channelScreenshot = $this->chanshots->getChannelScreenShot($cameraChannel);
                         $cameraLabel = $this->cameras->getCameraComment($cameraChannel);
                         if (empty($channelScreenshot)) {
@@ -268,14 +280,14 @@ class LiveCams {
                         }
                         $result .= wf_tag('div', false, '', $style);
                         if ($viewableFlag) {
-                            $streamUrl = $this->getStreamUrl($cameraChannel);
+                            $streamUrl = $this->getSubStreamUrl($cameraChannel);
                             if ($streamUrl) {
                                 //seems live stream now live
-                                $playerId = 'liveplayer_' . $cameraChannel;
+                                $playerId = 'lqplayer_' . $cameraChannel;
                                 $player = new Player('400px', true);
                                 $player->setPlayerLib('w5');
                                 $result .= $player->renderLivePlayer($streamUrl, $playerId);
-                                $result .= $this->renderKeepAliveCallback($cameraId);
+                                $result .= $this->renderSubKeepAliveCallback($cameraId);
                             } else {
                                 $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such live stream'), 'error');
                             }
@@ -295,7 +307,7 @@ class LiveCams {
         } else {
             $result .= $this->messages->getStyledMessage(__('No assigned cameras to show'), 'warning');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -317,14 +329,66 @@ class LiveCams {
                     $eachPid = $eachLine[0];
                     if (is_numeric($eachPid)) {
                         //is this really live stream process?
-                        if (ispos($rawLine, $this->liveOptsSuffix) AND ispos($rawLine, self::STREAM_PLAYLIST)) {
+                        if (ispos($rawLine, $this->liveOptsSuffix) and ispos($rawLine, self::STREAM_PLAYLIST)) {
                             $result[$eachPid] = $rawLine;
                         }
                     }
                 }
             }
         }
-        return($result);
+        return ($result);
+    }
+
+    /**
+     * Returns all running live sub-streams real process PID-s array as pid=>processString
+     * 
+     * @return array
+     */
+    protected function getLiveSubStreamsPids() {
+        $result = array();
+        $command = $this->binPaths['PS'] . ' ax | ' . $this->binPaths['GREP'] . ' ' . $this->ffmpgPath . ' | ' . $this->binPaths['GREP'] . ' -v grep';
+        $rawResult = shell_exec($command);
+        if (!empty($rawResult)) {
+            $rawResult = explodeRows($rawResult);
+            foreach ($rawResult as $io => $eachLine) {
+                $eachLine = trim($eachLine);
+                $rawLine = $eachLine;
+                $eachLine = explode(' ', $eachLine);
+                if (isset($eachLine[0])) {
+                    $eachPid = $eachLine[0];
+                    if (is_numeric($eachPid)) {
+                        //is this really live stream process?
+                        if (ispos($rawLine, $this->liveOptsSuffix) and ispos($rawLine, self::SUBSTREAM_PLAYLIST)) {
+                            $result[$eachPid] = $rawLine;
+                        }
+                    }
+                }
+            }
+        }
+        return ($result);
+    }
+
+    /**
+     * Returns running cameras live sub-stream processes as cameraId=>realPid
+     * 
+     * @return array
+     */
+    public function getRunningSubStreams() {
+        $result = array();
+        if (!empty($this->allCamerasData)) {
+            $liveStreamPids = $this->getLiveSubStreamsPids();
+            if (!empty($liveStreamPids)) {
+                foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
+                    foreach ($liveStreamPids as $eachPid => $eachProcess) {
+                        //looks familiar?
+                        if (ispos($eachProcess, $eachCameraData['CAMERA']['ip']) and ispos($eachProcess, $eachCameraData['CAMERA']['login'])) {
+                            $result[$eachCameraId] = $eachPid;
+                        }
+                    }
+                }
+            }
+        }
+        return ($result);
     }
 
     /**
@@ -340,14 +404,14 @@ class LiveCams {
                 foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
                     foreach ($liveStreamPids as $eachPid => $eachProcess) {
                         //looks familiar?
-                        if (ispos($eachProcess, $eachCameraData['CAMERA']['ip']) AND ispos($eachProcess, $eachCameraData['CAMERA']['login'])) {
+                        if (ispos($eachProcess, $eachCameraData['CAMERA']['ip']) and ispos($eachProcess, $eachCameraData['CAMERA']['login'])) {
                             $result[$eachCameraId] = $eachPid;
                         }
                     }
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -362,7 +426,7 @@ class LiveCams {
         if ($channelId) {
             $result .= $this->cameras->getCameraComment($channelId);
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -390,7 +454,35 @@ class LiveCams {
                 $result = $livePath . '/';
             }
         }
-        return($result);
+        return ($result);
+    }
+
+    /**
+     * Allocates sub-streams path, returns it if its writable
+     * 
+     * @return string/void on error
+     */
+    protected function allocateSubStreamPath($channelId) {
+        $result = '';
+        if (!file_exists($this->subStreamsPath)) {
+            mkdir($this->subStreamsPath, 0777);
+            chmod($this->subStreamsPath, 0777);
+            log_register('SUBLIVE ALLOCATED `' . $this->subStreamsPath . '`');
+        }
+
+        if (file_exists($this->subStreamsPath)) {
+            if (is_writable($this->subStreamsPath)) {
+                $livePath = $this->subStreamsPath . $channelId;
+                if (!file_exists($livePath)) {
+                    mkdir($livePath, 0777);
+                    chmod($livePath, 0777);
+                    log_register('SUBLIVE ALLOCATED `' . $livePath . '`');
+                }
+
+                $result = $livePath . '/';
+            }
+        }
+        return ($result);
     }
 
     /**
@@ -416,7 +508,7 @@ class LiveCams {
                                 $streamDog->keepAlive($cameraId);
                                 //run live stream capture
                                 $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
-                                $streamType = $cameraData['TEMPLATE']['MAIN_STREAM']; //TODO: may be configurable in future?
+                                $streamType = $cameraData['TEMPLATE']['MAIN_STREAM'];
                                 $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $streamType;
                                 $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "'";
                                 $liveCommand = $this->ffmpgPath . ' ' . $this->liveOptsPrefix . ' ' . $captureFullUrl . ' ' . $this->liveOptsSuffix . ' ' . self::STREAM_PLAYLIST;
@@ -429,6 +521,49 @@ class LiveCams {
                     }
                 } else {
                     log_register('LIVECAMS NOTSTARTED [' . $cameraId . '] CAMERA DISABLED');
+                }
+            }
+
+            $this->stardust->stop();
+        }
+    }
+
+    /**
+     * Starts live sub-stream capture
+     * 
+     * @return void
+     */
+    public function runSubStream($cameraId) {
+        $this->stardust->setProcess(self::SUB_PREFIX . $cameraId);
+        if ($this->stardust->notRunning()) {
+            $this->stardust->start();
+            if (isset($this->allCamerasData[$cameraId])) {
+                $cameraData = $this->allCamerasData[$cameraId];
+                if ($cameraData['CAMERA']['active']) {
+                    $allRunningStreams = $this->getRunningSubStreams();
+                    if (!isset($allRunningStreams[$cameraId])) {
+                        if (zb_PingICMP($cameraData['CAMERA']['ip'])) {
+                            $channelId = $cameraData['CAMERA']['channel'];
+                            $streamPath = $this->allocateSubStreamPath($channelId);
+                            if ($cameraData['TEMPLATE']['PROTO'] == 'rtsp') {
+                                //set stream as alive
+                                $streamDog = new StreamDog();
+                                $streamDog->keepSubAlive($cameraId);
+                                //run live stream capture
+                                $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
+                                $streamType = $cameraData['TEMPLATE']['SUB_STREAM'];
+                                $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $streamType;
+                                $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "'";
+                                $liveCommand = $this->ffmpgPath . ' ' . $this->liveOptsPrefix . ' ' . $captureFullUrl . ' ' . $this->liveOptsSuffix . ' ' . self::SUBSTREAM_PLAYLIST;
+                                $fullCommand = 'cd ' . $streamPath . ' && ' . $liveCommand;
+                                shell_exec($fullCommand);
+                            }
+                        } else {
+                            log_register('LIVESUB NOTSTARTED [' . $cameraId . '] CAMERA NOT ACCESSIBLE');
+                        }
+                    }
+                } else {
+                    log_register('LIVESUB NOTSTARTED [' . $cameraId . '] CAMERA DISABLED');
                 }
             }
 
@@ -465,7 +600,39 @@ class LiveCams {
             }
             $result = true;
         }
-        return($result);
+        return ($result);
+    }
+
+    /**
+     * Destroys live sub-stream. Returns true if stream was alive.
+     * 
+     * @return bool
+     */
+    public function stopSubStream($cameraId) {
+        $result = false;
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        $allRunningStreams = $this->getRunningSubStreams();
+        //is camera live stream running?
+        if (isset($allRunningStreams[$cameraId])) {
+            //killing stream process
+            $streamPid = $allRunningStreams[$cameraId];
+            $command = $this->binPaths['SUDO'] . ' ' . $this->binPaths['KILL'] . ' -9 ' . $streamPid;
+            shell_exec($command);
+            //livestream location cleanup
+            if (isset($this->allCamerasData[$cameraId])) {
+                $cameraData = $this->allCamerasData[$cameraId];
+                $channelId = $cameraData['CAMERA']['channel'];
+                $streamPath = $this->allocateSubStreamPath($channelId);
+                if (file_exists($streamPath)) {
+                    $playListPath = $streamPath . self::SUBSTREAM_PLAYLIST;
+                    if (file_exists($playListPath)) {
+                        unlink($playListPath);
+                    }
+                }
+            }
+            $result = true;
+        }
+        return ($result);
     }
 
     /**
@@ -501,7 +668,43 @@ class LiveCams {
                 }
             }
         }
-        return($result);
+        return ($result);
+    }
+
+    /**
+     * Returns live sub-stream full URL
+     * 
+     * @param string $channelId
+     * 
+     * @return string
+     */
+    public function getSubStreamUrl($channelId) {
+        $result = '';
+        $streamPath = $this->allocateSubStreamPath($channelId);
+        if ($streamPath) {
+            $cameraId = $this->cameras->getCameraIdByChannel($channelId);
+            if ($cameraId) {
+                $this->stardust->setProcess(self::PID_PREFIX . $cameraId);
+                if ($this->stardust->notRunning()) {
+                    $this->stardust->runBackgroundProcess(self::WRAPPER . ' "subswarm&cameraid=' . $cameraId . '"', 1);
+                }
+
+                $fullStreamUrl = $streamPath . self::SUBSTREAM_PLAYLIST;
+                if (file_exists($fullStreamUrl)) {
+                    $result = $fullStreamUrl;
+                } else {
+                    $retries = 5;
+                    for ($i = 0; $i < $retries; $i++) {
+                        sleep(1);
+                        if (file_exists($fullStreamUrl)) {
+                            $result = $fullStreamUrl;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return ($result);
     }
 
     /**
@@ -520,7 +723,27 @@ class LiveCams {
         $streamDog->keepAlive($cameraId);
         //appending periodic requests code
         $result .= $streamDog->getKeepAliveCallback($keepAliveLink, $timeout);
-        return($result);
+        return ($result);
+    }
+
+
+    /**
+     * Renders camera sub-stream keep alive container
+     * 
+     * @param int $cameraId
+     * 
+     * @return string
+     */
+    protected function renderSubKeepAliveCallback($cameraId) {
+        $result = '';
+        $streamDog = new StreamDog();
+        $timeout = 10000; // in ms
+        $keepAliveLink = self::URL_ME . '&' . StreamDog::ROUTE_KEEPSUBALIVE . '=' . $cameraId;
+        //preventing stream destroy before first callback
+        $streamDog->keepAlive($cameraId);
+        //appending periodic requests code
+        $result .= $streamDog->getKeepAliveCallback($keepAliveLink, $timeout);
+        return ($result);
     }
 
     /**
@@ -570,7 +793,7 @@ class LiveCams {
 
         $result .= wf_delimiter();
         $result .= $cameraControls;
-        return($result);
+        return ($result);
     }
 
     /**
@@ -604,6 +827,6 @@ class LiveCams {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 }

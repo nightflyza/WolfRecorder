@@ -554,8 +554,12 @@ class Cameras {
             //shutdown camera live streams if it runs
             $liveCams = new LiveCams();
             $streamStopResult = $liveCams->stopStream($cameraId);
+            $subStreamStopResult = $liveCams->stopSubStream($cameraId);
             if ($streamStopResult) {
                 log_register('LIVESTREAM STOPPED [' . $cameraId . ']');
+            }
+            if ($streamStopResult) {
+                log_register('SUBSTREAM STOPPED [' . $cameraId . ']');
             }
             //disabling camera activity flag
             $this->camerasDb->where('id', '=', $cameraId);
