@@ -16,6 +16,7 @@ class StreamDog {
      * Predefined stuff here
      */
     const TIMEOUT = 60;
+    const SUB_TIMEOUT=600;
     const CACHE_KEY = 'KEEPALIVE_';
     const CACHE_SUB = 'KEEPALIVE_';
     const ROUTE_KEEPALIVE = 'keepstreamalive';
@@ -61,11 +62,11 @@ class StreamDog {
     public function keepSubAlive($cameraId) {
         $cameraId = ubRouting::filters($cameraId, 'int');
         $cacheKey = self::CACHE_SUB . $cameraId;
-        $cachedData = $this->cache->get($cacheKey, self::TIMEOUT);
+        $cachedData = $this->cache->get($cacheKey, self::SUB_TIMEOUT);
         if (empty($cachedData)) {
             $cachedData = time();
         }
-        $this->cache->set($cacheKey, $cachedData, self::TIMEOUT);
+        $this->cache->set($cacheKey, $cachedData, self::SUB_TIMEOUT);
     }
 
     /**
@@ -86,8 +87,8 @@ class StreamDog {
         return ($result);
     }
 
-      /**
-     * Checks is camera being watched by someone?
+    /**
+     * Checks is camera low quality stream being watched by someone?
      * 
      * @param int $cameraId
      * 
@@ -97,7 +98,7 @@ class StreamDog {
         $result = false;
         $cameraId = ubRouting::filters($cameraId, 'int');
         $cacheKey = self::CACHE_SUB . $cameraId;
-        $cachedData = $this->cache->get($cacheKey, self::TIMEOUT);
+        $cachedData = $this->cache->get($cacheKey, self::SUB_TIMEOUT);
         if (!empty($cachedData)) {
             $result = true;
         }

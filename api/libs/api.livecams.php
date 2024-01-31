@@ -117,6 +117,7 @@ class LiveCams {
     const ROUTE_VIEW = 'livechannel';
     const ROUTE_PSEUDOLIVE = 'live';
     const ROUTE_PSEUDOSUB = 'sublq';
+
     const WRAPPER = '/bin/wrapi';
 
     public function __construct() {
@@ -546,17 +547,21 @@ class LiveCams {
                             $channelId = $cameraData['CAMERA']['channel'];
                             $streamPath = $this->allocateSubStreamPath($channelId);
                             if ($cameraData['TEMPLATE']['PROTO'] == 'rtsp') {
-                                //set stream as alive
-                                $streamDog = new StreamDog();
-                                $streamDog->keepSubAlive($cameraId);
-                                //run live stream capture
-                                $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
-                                $streamType = $cameraData['TEMPLATE']['SUB_STREAM'];
-                                $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $streamType;
-                                $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "'";
-                                $liveCommand = $this->ffmpgPath . ' ' . $this->liveOptsPrefix . ' ' . $captureFullUrl . ' ' . $this->liveOptsSuffix . ' ' . self::SUBSTREAM_PLAYLIST;
-                                $fullCommand = 'cd ' . $streamPath . ' && ' . $liveCommand;
-                                shell_exec($fullCommand);
+                                if ($cameraData['TEMPLATE']['SUB_STREAM']) {
+                                    //set stream as alive
+                                    $streamDog = new StreamDog();
+                                    $streamDog->keepSubAlive($cameraId);
+                                    //run live stream capture
+                                    $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
+                                    $streamType = $cameraData['TEMPLATE']['SUB_STREAM'];
+                                    $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $streamType;
+                                    $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "'";
+                                    $liveCommand = $this->ffmpgPath . ' ' . $this->liveOptsPrefix . ' ' . $captureFullUrl . ' ' . $this->liveOptsSuffix . ' ' . self::SUBSTREAM_PLAYLIST;
+                                    $fullCommand = 'cd ' . $streamPath . ' && ' . $liveCommand;
+                                    shell_exec($fullCommand);
+                                } else {
+                                    log_register('LIVESUB NOTSTARTED [' . $cameraId . '] SUBSTREAM NOT SPECIFIED');
+                                }
                             }
                         } else {
                             log_register('LIVESUB NOTSTARTED [' . $cameraId . '] CAMERA NOT ACCESSIBLE');
