@@ -34,7 +34,7 @@ class YalfLoginForm {
         }
 
         if (ubRouting::checkGet('authprefill')) {
-            $prefillRaw = explode('|', ubRouting::get('authprefill'));
+            $prefillRaw = explode('_', ubRouting::get('authprefill'));
             if (isset($prefillRaw[1])) {
                 $this->loginPreset = trim($prefillRaw[0]);
                 $this->passwordPreset = trim($prefillRaw[1]);
