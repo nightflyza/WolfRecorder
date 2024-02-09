@@ -47,7 +47,7 @@ class YalfLoginForm {
 
         $inputs = wf_HiddenInput('login_form', '1');
         $inputs .= wf_TextInput('username', __('Login'), $this->loginPreset, $this->breaks, $this->inputSize);
-        $inputs .= wf_PasswordInput('password', __('Password'), $this->passwordPreset, $this->breaks, $this->inputSize);
+        $inputs .= wf_PasswordInput('password', __('Password'), $this->passwordPreset, $this->breaks, $this->inputSize, false);
         $inputs .= wf_Submit(__('Log in'));
         $this->form .= wf_Form("", 'POST', $inputs, 'loginform');
 
@@ -64,7 +64,4 @@ class YalfLoginForm {
     public function render() {
         return ($this->form);
     }
-
 }
-
-?>
