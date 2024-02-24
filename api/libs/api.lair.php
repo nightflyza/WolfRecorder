@@ -329,7 +329,7 @@ class Avarice {
      */
     protected function checkLicenseValidity($key) {
         $result = false;
-        if (@strpos($key, strrev('gmN'), 0) !== false) {
+        if (@strpos($key, strrev('mN'), 0) !== false) {
             @$key = $this->unpack($key);
             @$key = $this->xoror($key, $this->serial);
             @$key = unserialize($key);
