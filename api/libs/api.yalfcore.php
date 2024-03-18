@@ -319,6 +319,7 @@ class YALFCore {
 
                 //some custom locale already set
                 if (@$_COOKIE[$this->cookie_locale]) {
+                    if (is_string($_COOKIE[$this->cookie_locale])) {
                     $customLocale = preg_replace('/\0/s', '', $_COOKIE[$this->cookie_locale]);
                     $customLocale = preg_replace("#[^a-z0-9A-Z]#Uis", '', $customLocale);
                     if (!empty($customLocale)) {
@@ -326,6 +327,7 @@ class YALFCore {
                             $this->language = $customLocale;
                         }
                     }
+                }
                 }
             }
         }
@@ -710,7 +712,12 @@ class YALFCore {
             }
 
             // So we have a cookie, let's extract data from it
-            $cookie_data = explode(':', $_COOKIE[$this->cookie_user], 2);
+            if (is_string($_COOKIE[$this->cookie_user])) {
+                $cookie_data = explode(':', $_COOKIE[$this->cookie_user], 2);
+            } else {
+                $cookie_data =array();
+            }
+
             if (!$skipcheck) {
 
                 // If this cookie is invalid - we exiting destroying cookie and exiting with error
