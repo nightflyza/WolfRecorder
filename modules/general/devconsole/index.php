@@ -93,6 +93,7 @@ if ($system->getAuthEnabled()) {
 
                 if (!empty($query)) {
                     if (!extension_loaded('mysql')) {
+                        mysqli_report(0);
                         $resultRaw = mysqli_query($loginDB, $query);
                     } else {
                         $resultRaw = mysql_query($query);
