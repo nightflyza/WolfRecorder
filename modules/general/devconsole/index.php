@@ -169,7 +169,11 @@ if ($system->getAuthEnabled()) {
                 $stripcode = substr($code, 0, 70) . '..';
                 log_register('DEVCONSOLE ' . $stripcode);
                 ob_start();
-                eval($code);
+                try {
+                    eval($code);
+                } catch (ParseError $e) {
+                    show_error(__('Error') . ':' . $e);
+                }
                 $debugData = ob_get_contents();
                 ob_end_clean();
 
