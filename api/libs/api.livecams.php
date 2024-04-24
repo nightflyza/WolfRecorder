@@ -6,6 +6,13 @@
 class LiveCams {
 
     /**
+     * Contains alter config as key=>value
+     *
+     * @var array
+     */
+    protected $altCfg = array();
+
+    /**
      * Chanshots instance placeholder
      *
      * @var object
@@ -104,6 +111,13 @@ class LiveCams {
     protected $cliff = '';
 
     /**
+     * Is live-wall enabled flag?
+     *
+     * @var bool
+     */
+    protected $wallFlag = false;
+
+    /**
      * other predefined stuff like routes
      */
     const PID_PREFIX = 'LIVE_';
@@ -117,8 +131,10 @@ class LiveCams {
     const ROUTE_VIEW = 'livechannel';
     const ROUTE_PSEUDOLIVE = 'live';
     const ROUTE_PSEUDOSUB = 'sublq';
+    const ROUTE_LIVEWALL = 'wall';
 
     const WRAPPER = '/bin/wrapi';
+    const OPTION_WALL = 'LIVE_WALL';
 
     public function __construct() {
         $this->initMessages();
@@ -159,6 +175,7 @@ class LiveCams {
     protected function loadConfigs() {
         global $ubillingConfig;
         $this->binPaths = $ubillingConfig->getBinpaths();
+        $this->altCfg = $ubillingConfig->getAlter();
     }
 
     /**
@@ -172,6 +189,11 @@ class LiveCams {
         $this->liveOptsSuffix = $this->cliff->getLiveOptsSuffix();
         $this->streamsPath = Storages::PATH_HOWL . self::STREAMS_SUBDIR;
         $this->subStreamsPath = Storages::PATH_HOWL . self::SUBSTREAMS_SUBDIR;
+        if (isset($this->altCfg[self::OPTION_WALL])) {
+            if ($this->altCfg[self::OPTION_WALL]) {
+                $this->wallFlag = true;
+            }
+        }
     }
 
     /**
@@ -686,10 +708,10 @@ class LiveCams {
     public function getSubStreamUrl($channelId) {
         $result = '';
         $streamPath = $this->allocateSubStreamPath($channelId);
-        if ($streamPath) {
+        if ($streamPath) { 
             $cameraId = $this->cameras->getCameraIdByChannel($channelId);
-            if ($cameraId) {
-                $this->stardust->setProcess(self::PID_PREFIX . $cameraId);
+            if ($cameraId) { 
+                $this->stardust->setProcess(self::SUB_PREFIX . $cameraId);
                 if ($this->stardust->notRunning()) {
                     $this->stardust->runBackgroundProcess(self::WRAPPER . ' "subswarm&cameraid=' . $cameraId . '"', 1);
                 }
@@ -698,7 +720,7 @@ class LiveCams {
                 if (file_exists($fullStreamUrl)) {
                     $result = $fullStreamUrl;
                 } else {
-                    $retries = 5;
+                    $retries = 5; 
                     for ($i = 0; $i < $retries; $i++) {
                         sleep(1);
                         if (file_exists($fullStreamUrl)) {
@@ -830,6 +852,22 @@ class LiveCams {
                     $streamDog = new StreamDog();
                     $streamDog->keepAlive($cameraId);
                 }
+            }
+        }
+        return ($result);
+    }
+    /**
+     * Returns the title controls based on the livewall flag.
+     *
+     * @return string The title controls.
+     */
+    public function getTitleControls() {
+        $result = '';
+        if ($this->wallFlag) {
+            if (ubRouting::checkGet(self::ROUTE_LIVEWALL)) {
+                $result .= wf_Link(self::URL_ME, wf_img('skins/surveillance2_32.png',__('List')));
+            } else {
+                $result .= wf_Link(self::URL_ME . '&' . self::ROUTE_LIVEWALL . '=true', wf_img('skins/surveillance3_32.png',__('Live')));
             }
         }
         return ($result);

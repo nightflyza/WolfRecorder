@@ -246,7 +246,7 @@ $lang['def']['Use this WolfRecorder serial for license keys purchase'] = 'Вик
 $lang['def']['You do not have any license keys installed. So how are you going to live like this?'] = 'У вас не встановлено жодного ключа ліцензій. Ну, і як ви зібралися так жити далі?';
 $lang['def']['Install license key'] = 'Встановити ключ ліцензії';
 $lang['def']['Unacceptable license key'] = 'Невірний ключ ліцензії';
-$lang['def'][''] = '';
+$lang['def']['List'] = 'Список';
 $lang['def'][''] = '';
 
 
