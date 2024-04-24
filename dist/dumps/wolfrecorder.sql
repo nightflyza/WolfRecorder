@@ -70,3 +70,6 @@ CREATE TABLE IF NOT EXISTS `acl` (
   `channel` varchar(64) NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+-- 0.0.8 update
+ALTER TABLE `lair` CHANGE `value` `value` LONGTEXT NULL DEFAULT NULL;
