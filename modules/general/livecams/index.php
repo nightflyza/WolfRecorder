@@ -10,7 +10,7 @@ if (cfr('LIVECAMS')) {
 
     //or substream keepalive requests
     if (ubRouting::checkGet($streamDog::ROUTE_KEEPSUBALIVE)) {
-        if ($ubillingConfig->getAlterParam($liveCams::OPTION_WALL)) {
+        if ($ubillingConfig->getAlterParam(LiveCams::OPTION_WALL)) {
             $streamDog->keepSubAlive(ubRouting::get($streamDog::ROUTE_KEEPSUBALIVE));
             die();
         }
