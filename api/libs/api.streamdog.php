@@ -18,7 +18,7 @@ class StreamDog {
     const TIMEOUT = 60;
     const SUB_TIMEOUT=600;
     const CACHE_KEY = 'KEEPALIVE_';
-    const CACHE_SUB = 'KEEPALIVE_';
+    const CACHE_SUB = 'KEEPSUBALIVE_';
     const ROUTE_KEEPALIVE = 'keepstreamalive';
     const ROUTE_KEEPSUBALIVE = 'keepsubalive';
 

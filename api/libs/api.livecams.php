@@ -283,7 +283,8 @@ class LiveCams {
         $result = '';
         if ($this->acl->haveCamsAssigned()) {
             if (!empty($this->allCamerasData)) {
-                $style = 'style="float: left; margin: 5px; min-height:280px; min-width:400px; border: 0px solid blue;"';
+                $style = 'style="float: left; margin: 5px; min-height:240px; min-width:320px; border: 0px solid red;"';
+                $style .= ' id="livewallelement"';
                 $result .= wf_tag('div');
                 foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
                     if ($this->acl->isMyCamera($eachCameraId)) {
@@ -307,16 +308,18 @@ class LiveCams {
                             if ($streamUrl) {
                                 //seems live stream now live
                                 $playerId = 'lqplayer_' . $cameraChannel;
-                                $player = new Player('400px', true);
+                                $player = new Player('350px', true);
                                 $player->setPlayerLib('w5');
                                 $result .= $player->renderLivePlayer($streamUrl, $playerId);
                                 $result .= $this->renderSubKeepAliveCallback($cameraId);
                             } else {
-                                $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such live stream'), 'error');
+                                $viewableFlag = false;
+                                $result .= wf_img('skins/error.gif', $cameraLabel, 'width: 320px; height: 200px; object-fit: cover;');
+                                //$result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such live stream'), 'error');
                             }
                         } else {
                             $channelUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $cameraChannel;
-                            $channelImage = wf_img($channelScreenshot, $cameraLabel, 'width: 400px; height: 270px; object-fit: cover;');
+                            $channelImage = wf_img($channelScreenshot, $cameraLabel, 'width: 320px; height: 200px; object-fit: cover;');
                             $channelLink = wf_Link($channelUrl, $channelImage);
                             $result .= $channelLink;
                         }
@@ -708,9 +711,9 @@ class LiveCams {
     public function getSubStreamUrl($channelId) {
         $result = '';
         $streamPath = $this->allocateSubStreamPath($channelId);
-        if ($streamPath) { 
+        if ($streamPath) {
             $cameraId = $this->cameras->getCameraIdByChannel($channelId);
-            if ($cameraId) { 
+            if ($cameraId) {
                 $this->stardust->setProcess(self::SUB_PREFIX . $cameraId);
                 if ($this->stardust->notRunning()) {
                     $this->stardust->runBackgroundProcess(self::WRAPPER . ' "subswarm&cameraid=' . $cameraId . '"', 1);
@@ -720,7 +723,7 @@ class LiveCams {
                 if (file_exists($fullStreamUrl)) {
                     $result = $fullStreamUrl;
                 } else {
-                    $retries = 5; 
+                    $retries = 5;
                     for ($i = 0; $i < $retries; $i++) {
                         sleep(1);
                         if (file_exists($fullStreamUrl)) {
@@ -865,9 +868,9 @@ class LiveCams {
         $result = '';
         if ($this->wallFlag) {
             if (ubRouting::checkGet(self::ROUTE_LIVEWALL)) {
-                $result .= wf_Link(self::URL_ME, wf_img('skins/surveillance2_32.png',__('List')));
+                $result .= wf_Link(self::URL_ME, wf_img('skins/surveillance2_32.png', __('List')));
             } else {
-                $result .= wf_Link(self::URL_ME . '&' . self::ROUTE_LIVEWALL . '=true', wf_img('skins/surveillance3_32.png',__('Live')));
+                $result .= wf_Link(self::URL_ME . '&' . self::ROUTE_LIVEWALL . '=true', wf_img('skins/surveillance3_32.png', __('Live')));
             }
         }
         return ($result);
