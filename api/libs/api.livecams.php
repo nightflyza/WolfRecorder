@@ -313,9 +313,14 @@ class LiveCams {
                                 $result .= $player->renderLivePlayer($streamUrl, $playerId);
                                 $result .= $this->renderSubKeepAliveCallback($cameraId);
                             } else {
+                                /**
+                                 * У твоїх очах був цілий світ
+                                 * У твоїх очах тепер пустота
+                                 * У твоїх очах була неба синь
+                                 * А тепер лише моря печаль
+                                 */
                                 $viewableFlag = false;
                                 $result .= wf_img('skins/error.gif', $cameraLabel, 'width: 320px; height: 200px; object-fit: cover;');
-                                //$result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such live stream'), 'error');
                             }
                         } else {
                             $channelUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $cameraChannel;
