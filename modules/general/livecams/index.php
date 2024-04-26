@@ -10,9 +10,11 @@ if (cfr('LIVECAMS')) {
 
     //or substream keepalive requests
     if (ubRouting::checkGet($streamDog::ROUTE_KEEPSUBALIVE)) {
-        if ($ubillingConfig->getAlterParam(LiveCams::OPTION_WALL)) {
-            $streamDog->keepSubAlive(ubRouting::get($streamDog::ROUTE_KEEPSUBALIVE));
-            die();
+        if (cfr('WALL')) {
+            if ($ubillingConfig->getAlterParam(LiveCams::OPTION_WALL)) {
+                $streamDog->keepSubAlive(ubRouting::get($streamDog::ROUTE_KEEPSUBALIVE));
+                die();
+            }
         }
     }
 
@@ -28,9 +30,16 @@ if (cfr('LIVECAMS')) {
     } else {
         //optional live wall or default list?        
         if ($ubillingConfig->getAlterParam($liveCams::OPTION_WALL)) {
-            $titleControls = $liveCams->getTitleControls();
+            $titleControls = '';
+            if (cfr('WALL')) {
+                $titleControls = $liveCams->getTitleControls();
+            }
             if (ubRouting::checkGet($liveCams::ROUTE_LIVEWALL)) {
-                show_window(__('My cameras') . ' ' . $titleControls, $liveCams->renderLiveWall());
+                if (cfr('WALL')) {
+                    show_window(__('My cameras') . ' ' . $titleControls, $liveCams->renderLiveWall());
+                } else {
+                    show_error(__('Access denied'));
+                }
             } else {
                 show_window(__('My cameras') . ' ' . $titleControls, $liveCams->renderList());
             }

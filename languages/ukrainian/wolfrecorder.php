@@ -247,6 +247,7 @@ $lang['def']['You do not have any license keys installed. So how are you going t
 $lang['def']['Install license key'] = 'Встановити ключ ліцензії';
 $lang['def']['Unacceptable license key'] = 'Невірний ключ ліцензії';
 $lang['def']['List'] = 'Список';
+$lang['def']['right to use live wall'] = 'Право використовувати живу стіну';
 $lang['def'][''] = '';
 
 
