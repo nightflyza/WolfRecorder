@@ -485,6 +485,50 @@ class Cameras {
         return ($result);
     }
 
+      /**
+     * Returns running cameras live sub-stream processes as cameraId=>realPid
+     * 
+     * @return array
+     */
+    protected function getRunningSubStreams() {
+        $result = array();
+        $liveStreamsPids = array();
+        $command = $this->binPaths['PS'] . ' ax | ' . $this->binPaths['GREP'] . ' ' . $this->binPaths['FFMPG_PATH'] . ' | ' . $this->binPaths['GREP'] . ' -v grep';
+        $rawResult = shell_exec($command);
+
+        if (!empty($rawResult)) {
+            $rawResult = explodeRows($rawResult);
+            foreach ($rawResult as $io => $eachLine) {
+                $eachLine = trim($eachLine);
+                $rawLine = $eachLine;
+                $eachLine = explode(' ', $eachLine);
+                if (isset($eachLine[0])) {
+                    $eachPid = $eachLine[0];
+                    if (is_numeric($eachPid)) {
+                        //is this really live stream process?
+                        if (ispos($rawLine, 'hls') and ispos($rawLine, LiveCams::SUBSTREAM_PLAYLIST)) {
+                            $liveStreamsPids[$eachPid] = $rawLine;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!empty($this->allCameras)) {
+            if (!empty($liveStreamsPids)) {
+                foreach ($this->allCameras as $eachCameraId => $eachCameraData) {
+                    foreach ($liveStreamsPids as $eachPid => $eachProcess) {
+                        //looks familiar?
+                        if (ispos($eachProcess, $eachCameraData['ip']) and ispos($eachProcess, $eachCameraData['login'])) {
+                            $result[$eachCameraId] = $eachPid;
+                        }
+                    }
+                }
+            }
+        }
+        return ($result);
+    }
+
     /**
      * Deletes existing camera from database
      * 
@@ -904,6 +948,10 @@ class Cameras {
             $allRunningLiveStreams = $this->getRunningStreams();
             $liveStreamFlag = (isset($allRunningLiveStreams[$cameraId])) ? 1 : 0;
 
+            //live substreams live-well process is running?
+            $allRunningSubStreams=$this->getRunningSubStreams();
+            $subStreamFlag = (isset($allRunningSubStreams[$cameraId])) ? 1 : 0;
+
             $ajaxArchiveStatsUrl = self::URL_ME . '&' . self::ROUTE_AJ_ARCHSTATS . '=' . $cameraId;
             $channelLabel = $cameraData['channel'];
             if (cfr('ARCHIVE')) {
@@ -948,6 +996,10 @@ class Cameras {
 
             $cells = wf_TableCell(__('Live'), '', 'row2');
             $cells .= wf_TableCell(web_bool_led($liveStreamFlag));
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Substream'), '', 'row2');
+            $cells .= wf_TableCell(web_bool_led($subStreamFlag));
             $rows .= wf_TableRow($cells, 'row3');
 
             $cells = wf_TableCell(__('Description'), '', 'row2');

@@ -250,3 +250,5 @@ $lang['def']['List'] = 'Список';
 $lang['def']['right to use live wall'] = 'Право использовать живую стену';
 $lang['def']['Access'] = 'Доступ';
 $lang['def']['Users access'] = 'Доступ пользователей';
+$lang['def']['Live wall'] = 'Живая стена';
+$lang['def']['Substream'] = 'Подпоток';
