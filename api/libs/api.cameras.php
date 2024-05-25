@@ -919,6 +919,7 @@ class Cameras {
                     }
                 }
             }
+            $aclUsersList = (empty($aclUsersList)) ? '-' : $aclUsersList;
 
             //camera profile here
             $cells = wf_TableCell(__('Model'), '40%', 'row2');
