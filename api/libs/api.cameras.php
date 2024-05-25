@@ -181,7 +181,7 @@ class Cameras {
         } else {
             $result .= __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -217,7 +217,7 @@ class Cameras {
                     if ($storagePathValid) {
                         if (isset($allModels[$modelId])) {
                             if (zb_isIPValid($ipF)) {
-                                if (!empty($loginF) AND !empty($passwordF)) {
+                                if (!empty($loginF) and !empty($passwordF)) {
                                     //storage migration?
                                     if ($cameraData['storageid'] != $storageId) {
                                         $this->storages->migrateChannel($storageId, $cameraData['channel']);
@@ -253,7 +253,7 @@ class Cameras {
         } else {
             $result .= __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -275,7 +275,7 @@ class Cameras {
             $result = zb_rand_string(self::CHANNEL_ID_LEN);
         }
 
-        return($result);
+        return ($result);
     }
 
     /**
@@ -290,7 +290,7 @@ class Cameras {
                 $result[$each['channel']] = $each['id'];
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -306,7 +306,7 @@ class Cameras {
         if (isset($allCameraChannels[$channelId])) {
             $result = $allCameraChannels[$channelId];
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -325,7 +325,7 @@ class Cameras {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -365,7 +365,7 @@ class Cameras {
                 if (isset($allModels[$modelId])) {
                     if (zb_isIPValid($ipF)) {
                         if (!$this->isCameraIpUsed($ipF)) {
-                            if (!empty($loginF) AND !empty($passwordF)) {
+                            if (!empty($loginF) and !empty($passwordF)) {
                                 $this->camerasDb->data('modelid', $modelId);
                                 $this->camerasDb->data('ip', $ipF);
                                 $this->camerasDb->data('login', $loginF);
@@ -395,7 +395,7 @@ class Cameras {
         } else {
             $result .= __('Storage') . ' [' . $storageId . '] ' . __('not exists');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -418,7 +418,7 @@ class Cameras {
                     $eachPid = $eachLine[0];
                     if (is_numeric($eachPid)) {
                         //is this really capture process?
-                        if (ispos($rawLine, $this->binPaths['FFMPG_PATH']) AND ispos($rawLine, 'segment_format')) {
+                        if (ispos($rawLine, $this->binPaths['FFMPG_PATH']) and ispos($rawLine, 'segment_format')) {
                             $recorderPids[$eachPid] = $rawLine;
                         }
                     }
@@ -431,14 +431,14 @@ class Cameras {
                 foreach ($this->allCameras as $eachCameraId => $eachCameraData) {
                     foreach ($recorderPids as $eachPid => $eachProcess) {
                         //looks familiar?
-                        if (ispos($eachProcess, $eachCameraData['ip']) AND ispos($eachProcess, $eachCameraData['login'])) {
+                        if (ispos($eachProcess, $eachCameraData['ip']) and ispos($eachProcess, $eachCameraData['login'])) {
                             $result[$eachCameraId] = $eachPid;
                         }
                     }
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -462,7 +462,7 @@ class Cameras {
                     $eachPid = $eachLine[0];
                     if (is_numeric($eachPid)) {
                         //is this really live stream process?
-                        if (ispos($rawLine, 'hls') AND ispos($rawLine, LiveCams::STREAM_PLAYLIST)) {
+                        if (ispos($rawLine, 'hls') and ispos($rawLine, LiveCams::STREAM_PLAYLIST)) {
                             $liveStreamsPids[$eachPid] = $rawLine;
                         }
                     }
@@ -475,14 +475,14 @@ class Cameras {
                 foreach ($this->allCameras as $eachCameraId => $eachCameraData) {
                     foreach ($liveStreamsPids as $eachPid => $eachProcess) {
                         //looks familiar?
-                        if (ispos($eachProcess, $eachCameraData['ip']) AND ispos($eachProcess, $eachCameraData['login'])) {
+                        if (ispos($eachProcess, $eachCameraData['ip']) and ispos($eachProcess, $eachCameraData['login'])) {
                             $result[$eachCameraId] = $eachPid;
                         }
                     }
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -515,7 +515,7 @@ class Cameras {
             $result .= __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
         }
 
-        return($result);
+        return ($result);
     }
 
     /**
@@ -534,7 +534,7 @@ class Cameras {
                 $result[$each['id']]['STORAGE'] = $allStoragesData[$each['storageid']];
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -569,7 +569,7 @@ class Cameras {
         } else {
             $result = __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -598,7 +598,7 @@ class Cameras {
         } else {
             $result = __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -624,7 +624,7 @@ class Cameras {
         if (empty($result)) {
             $result = __('Lost');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -650,7 +650,7 @@ class Cameras {
         if (empty($result)) {
             $result = __('Lost');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -670,7 +670,7 @@ class Cameras {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -705,7 +705,7 @@ class Cameras {
         } else {
             $result .= $this->messages->getStyledMessage(__('Any storages exists'), 'error');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -747,7 +747,7 @@ class Cameras {
         } else {
             $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -771,7 +771,7 @@ class Cameras {
         } else {
             $result .= $this->messages->getStyledMessage(__('Camera') . ' [' . $cameraId . '] ' . __('not exists'), 'error');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -822,13 +822,13 @@ class Cameras {
             $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
             $result .= wf_tag('b') . __('Total') . ': ' . $totalCount . wf_tag('b', true);
             if ($totalCount) {
-                $result.= wf_delimiter(0);
-                $result.= __('Enabled').'/'.__('Recording').'/'.__('Live').': ('.$enabledCount.'/'.$recorderCount.'/'.$liveCount.')';
+                $result .= wf_delimiter(0);
+                $result .= __('Enabled') . '/' . __('Recording') . '/' . __('Live') . ': (' . $enabledCount . '/' . $recorderCount . '/' . $liveCount . ')';
             }
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -858,7 +858,7 @@ class Cameras {
             $chanSizeLabel = wr_convertSize($chanSizeRaw);
 
             $chanBitrateLabel = '-';
-            if ($archiveSeconds AND $chanSizeRaw) {
+            if ($archiveSeconds and $chanSizeRaw) {
                 $chanBitrate = ($chanSizeRaw * 8) / $archiveSeconds / 1024; // in kbits
                 $chanBitrateLabel = round(($chanBitrate / 1024), 2) . ' ' . __('Mbit/s');
             }
@@ -876,7 +876,7 @@ class Cameras {
             $rows .= wf_TableRow($cells, 'row3');
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -894,6 +894,7 @@ class Cameras {
             $allModels = $this->models->getAllModelNames();
             $allStorages = $this->storages->getAllStorageNames();
             $cameraData = $this->allCameras[$cameraId];
+            $acl = new ACL();
 
             //recorder process now is running?
             $allRunningRecorders = $this->getRunningRecorders();
@@ -907,6 +908,16 @@ class Cameras {
             $channelLabel = $cameraData['channel'];
             if (cfr('ARCHIVE')) {
                 $channelLabel = wf_AjaxLink($ajaxArchiveStatsUrl, $cameraData['channel'], self::AJ_ARCHSTATS);
+            }
+            //ACL users access
+            $aclUsersList = '';
+            $rawAcls = $acl->getAllCameraAclsData();
+            if (!empty($rawAcls)) {
+                foreach ($rawAcls as $eachUser => $accessibleCameras) {
+                    if (isset($accessibleCameras[$cameraId])) {
+                        $aclUsersList .= $eachUser . ' ';
+                    }
+                }
             }
 
             //camera profile here
@@ -948,6 +959,10 @@ class Cameras {
 
             $cells = wf_TableCell(__('Channel'), '', 'row2');
             $cells .= wf_TableCell($channelLabel);
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Users access'), '', 'row2');
+            $cells .= wf_TableCell($aclUsersList);
             $rows .= wf_TableRow($cells, 'row3');
 
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
@@ -1007,6 +1022,6 @@ class Cameras {
         $result .= wf_delimiter(0);
         $result .= wf_BackLink(self::URL_ME) . ' ';
         $result .= $cameraControls;
-        return($result);
+        return ($result);
     }
 }
