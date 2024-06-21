@@ -236,10 +236,15 @@ class Export {
                             $camPreview = '';
                             $chanShot = $screenshots->getChannelScreenShot($eachCamChannel);
                             if (empty($chanShot)) {
-                                $chanShot = 'skins/nosignal.gif';
+                                $chanShot = $screenshots::ERR_NOSIG;
+                            } else {
+                                $chanshotValid = $screenshots->isChannelScreenshotValid($chanShot);
+                                if (!$chanshotValid) {
+                                    $chanShot = $screenshots::ERR_CORRUPT;
+                                }
                             }
                             if (!$each['CAMERA']['active']) {
-                                $chanShot = 'skins/chanblock.gif';
+                                $chanShot = $screenshots::ERR_DISABLD;
                             }
                             $camPreview = $screenshots->renderListBox($eachCamChannel, $chanShot);
                             $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview . $eachCamDesc, false, 'camlink'));
@@ -258,7 +263,7 @@ class Export {
         } else {
             $result .= $this->messages->getStyledMessage(__('No assigned cameras to show'), 'warning');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -309,7 +314,7 @@ class Export {
             }
         }
 
-        return($result);
+        return ($result);
     }
 
     /**
@@ -382,7 +387,7 @@ class Export {
         $jsCode .= wf_tag('script', true);
 
         $result .= $jsCode;
-        return($result);
+        return ($result);
     }
 
     /**
@@ -438,7 +443,7 @@ class Export {
                 $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -479,13 +484,13 @@ class Export {
                 $result .= wf_Link(Cameras::URL_ME . '&' . Cameras::ROUTE_EDIT . '=' . $cameraId, wf_img('skins/icon_camera_small.png') . ' ' . __('Camera'), false, 'ubButton');
             }
         }
-         if (cfr('LIVECAMS')) {
+        if (cfr('LIVECAMS')) {
             $result .= wf_Link(LiveCams::URL_ME . '&' . LiveCams::ROUTE_VIEW . '=' . $channelId, wf_img('skins/icon_live_small.png') . ' ' . __('Live'), false, 'ubButton');
         }
         if (cfr('ARCHIVE')) {
             $result .= wf_Link(Archive::URL_ME . '&' . Archive::ROUTE_VIEW . '=' . $channelId, wf_img('skins/icon_archive_small.png') . ' ' . __('Video from camera'), false, 'ubButton');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -520,7 +525,7 @@ class Export {
                 $result = $fullUserPath . '/'; //with ending slash
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -540,7 +545,7 @@ class Export {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -554,7 +559,7 @@ class Export {
         if (!empty($allUsers)) {
             $result = sizeof($allUsers);
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -578,7 +583,7 @@ class Export {
         if ($usersCount > 0) {
             $result = $mustBeFree / $usersCount;
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -637,7 +642,7 @@ class Export {
         } else {
             $result .= __('Export process already running');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -661,7 +666,7 @@ class Export {
         $sizeForecastF = ubRouting::filters($sizeForecast, 'int');
         $allChannels = $this->cameras->getAllCamerasChannels();
         $cameraId = $allChannels[$channelId];
-        if ($userLoginF AND $channelId AND $dateFrom AND $dateTo AND $cameraId) {
+        if ($userLoginF and $channelId and $dateFrom and $dateTo and $cameraId) {
             $this->scheduleDb->data('date', $dateF);
             $this->scheduleDb->data('user', $userLogin);
             $this->scheduleDb->data('channel', $channelIdF);
@@ -674,7 +679,7 @@ class Export {
         } else {
             $result .= __('Something went wrong');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -698,7 +703,7 @@ class Export {
                 $dateTimeFromTs = strtotime($each['datetimefrom']);
                 $dateTimeToTs = strtotime($each['datetimeto']);
                 $chunksInRange = $this->storages->filterChunksTimeRange($allChannelChunks, $dateTimeFromTs, $dateTimeToTs);
-                if ($chunksInRange AND $userRecordingsDir) {
+                if ($chunksInRange and $userRecordingsDir) {
                     $this->exportChunksList($chunksInRange, $channelId, $userRecordingsDir, $userLogin);
                 }
                 //mark task as done
@@ -729,7 +734,7 @@ class Export {
             }
         }
 
-        return($result);
+        return ($result);
     }
 
     /**
@@ -795,7 +800,7 @@ class Export {
             $result .= __('Camera') . ' ' . __('with channel') . ' `' . $channelId . '` ' . __('not exists');
         }
 
-        return($result);
+        return ($result);
     }
 
     /**
@@ -818,7 +823,7 @@ class Export {
             $result['to'] = $to;
             $result['cameraid'] = $explodedName[2];
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -853,7 +858,7 @@ class Export {
                 $result .= wf_ConfirmDialog($deleteUrl, web_delete_icon(), $label, '', $cancelUrl, __('Delete') . ' ' . __('Recording') . '?');
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -875,7 +880,7 @@ class Export {
                 break;
         }
         $result = $this->scheduleDb->getAll();
-        return($result);
+        return ($result);
     }
 
     /**
@@ -914,7 +919,7 @@ class Export {
             }
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table sortable');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -930,7 +935,7 @@ class Export {
     protected function renderRecordPlayer($filePath, $width = '600px', $autoPlay = false, $playerId = '') {
         $player = new Player($width, $autoPlay);
         $result = $player->renderSinglePlayer($filePath, $playerId);
-        return($result);
+        return ($result);
     }
 
     /**
@@ -954,7 +959,7 @@ class Export {
 
         if (!empty($filePath)) {
             @$filePath = base64_decode($filePath);
-            if ($filePath AND file_exists($filePath)) {
+            if ($filePath and file_exists($filePath)) {
                 $webPlayer .= $this->renderRecordPlayer($filePath, '80%', true, $filePath);
                 $controls .= wf_Link($filePath, web_icon_download() . ' ' . __('Download'), false, 'ubButton');
             } else {
@@ -965,7 +970,7 @@ class Export {
         $result .= $webPlayer;
         $result .= wf_delimiter(0);
         $result .= $controls;
-        return($result);
+        return ($result);
     }
 
     /**
@@ -1044,7 +1049,7 @@ class Export {
         }
 
         $result .= $this->messages->getStyledMessage(__('Free space for saving your records') . ': ' . $spaceLabel, $notificationType);
-        return($result);
+        return ($result);
     }
 
     /**
@@ -1081,7 +1086,7 @@ class Export {
             $result .= __('Recording') . ' ' . __('is empty');
             log_register('EXPORT DELETE FAIL FILENAME EMPTY');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -1096,7 +1101,7 @@ class Export {
         if ($channelId) {
             $result .= $this->cameras->getCameraComment($channelId);
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -1118,7 +1123,6 @@ class Export {
         $notification .= wf_delimiter();
         $notification .= wf_tag('center') . wf_Link(self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $channelId, __('Got it') . '!', true, 'confirmagree') . wf_tag('center', true);
         $result .= wf_modalOpenedAuto(__('Success'), $notification);
-        return($result);
+        return ($result);
     }
-
 }

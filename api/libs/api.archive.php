@@ -187,10 +187,15 @@ class Archive {
                             $camPreview = '';
                             $chanShot = $screenshots->getChannelScreenShot($eachCamChannel);
                             if (empty($chanShot)) {
-                                $chanShot = 'skins/nosignal.gif';
+                                $chanShot = $screenshots::ERR_NOSIG;
+                            } else {
+                                $chanshotValid=$screenshots->isChannelScreenshotValid($chanShot);
+                                if (!$chanshotValid) {
+                                    $chanShot=$screenshots::ERR_CORRUPT;
+                                }
                             }
                             if (!$each['CAMERA']['active']) {
-                                $chanShot = 'skins/chanblock.gif';
+                                $chanShot = $screenshots::ERR_DISABLD;
                             }
                             $camPreview = $screenshots->renderListBox($eachCamChannel, $chanShot);
                             $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview . $eachCamDesc, false, 'camlink', 'id="camlink' . $eachCamChannel . '"'));

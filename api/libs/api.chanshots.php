@@ -82,8 +82,23 @@ class ChanShots {
      */
     protected $screenshotOpts = '-loglevel error -frames:v 1 -q:v 15';
 
+    /**
+     * PixelCraft instance for further chanshots processing
+     *
+     * @var object
+     */
+    protected $pixelCraft = '';
+
+    /**
+     * Channel screenshots validation flag
+     *
+     * @var bool
+     */
+    protected $shotsValidationFlag = false;
+
     public function __construct() {
         $this->loadConfigs();
+        $this->initPixelCraft();
     }
 
     /**
@@ -92,6 +107,12 @@ class ChanShots {
     const SHOTS_SUBDIR = 'chanshots/';
     const SHOTS_EXT = '.jpg';
     const CHANSHOTS_PID = 'CHANSHOTS';
+    /**
+     * predefined shots paths
+     */
+    const ERR_NOSIG='skins/nosignal.gif';
+    const ERR_CORRUPT='skins/error.gif';
+    const ERR_DISABLD='skins/chanblock.gif';
 
     /**
      * Loads some required configs
@@ -106,6 +127,16 @@ class ChanShots {
         $this->altCfg = $ubillingConfig->getAlter();
         $this->ffmpgPath = $this->binPaths['FFMPG_PATH'];
         $this->screenshotsPath = Storages::PATH_HOWL . self::SHOTS_SUBDIR;
+        $this->shotsValidationFlag = $ubillingConfig->getAlterParam('CHANSHOTS_VALIDATION');
+    }
+
+    /**
+     * Inits PixelCraft object instance
+     *
+     * @return void
+     */
+    protected function initPixelCraft() {
+        $this->pixelCraft = new PixelCraft();
     }
 
     /**
@@ -134,7 +165,27 @@ class ChanShots {
      * @return string
      */
     public function getScreenshotsPath() {
-        return($this->screenshotsPath);
+        return ($this->screenshotsPath);
+    }
+
+    /**
+     * Checks if a channel screenshot is valid.
+     *
+     * @param string $channelScreenshot The path to the channel screenshot file.
+     * @return bool Returns true if the channel screenshot is valid, false otherwise.
+     */
+    public function isChannelScreenshotValid($channelScreenshot) {
+        $result = true;
+        if ($this->shotsValidationFlag) {
+            $result = false;
+            if (file_exists($channelScreenshot)) {
+                $imageValid = $this->pixelCraft->isImageValid($channelScreenshot);
+                if ($imageValid) {
+                    $result = true;
+                }
+            }
+        }
+        return ($result);
     }
 
     /**
@@ -154,7 +205,7 @@ class ChanShots {
                 $result = $fullPath;
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -180,7 +231,7 @@ class ChanShots {
         } else {
             $result = $this->screenshotsPath;
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -210,7 +261,7 @@ class ChanShots {
      */
     protected function takeChunkScreenshot($chunkPath, $channel) {
         $result = '';
-        if (!empty($channel) AND file_exists($chunkPath)) {
+        if (!empty($channel) and file_exists($chunkPath)) {
             $fileName = $channel . self::SHOTS_EXT;
             $fullScreenShotPath = $this->screenshotsPath . $fileName;
             //old screenshot cleanup
@@ -219,7 +270,7 @@ class ChanShots {
             $command = $this->ffmpgPath . ' -ss ' . $this->timeOffset . ' -i ' . $chunkPath . ' ' . $this->screenshotOpts . ' ' . $fullScreenShotPath;
             $result = shell_exec($command);
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -289,7 +340,6 @@ class ChanShots {
         $result .= wf_tag('span', false, 'preview' . $channel);
         $result .= wf_tag('img', false, 'preview' . $channel, 'src="' . $screenshot . '" style="width:124px;"');
         $result .= wf_tag('span', true);
-        return($result);
+        return ($result);
     }
-
 }

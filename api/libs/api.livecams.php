@@ -250,12 +250,18 @@ class LiveCams {
                         $channelScreenshot = $this->chanshots->getChannelScreenShot($cameraChannel);
                         $cameraLabel = $this->cameras->getCameraComment($cameraChannel);
                         if (empty($channelScreenshot)) {
-                            $channelScreenshot = 'skins/nosignal.gif';
+                            $channelScreenshot = $this->chanshots::ERR_NOSIG;
+                        } else {
+                            $chanshotValid=$this->chanshots->isChannelScreenshotValid($channelScreenshot);
+                            if (!$chanshotValid) {
+                                $channelScreenshot=$this->chanshots::ERR_CORRUPT;
+                            }
                         }
 
                         if (!$eachCameraData['CAMERA']['active']) {
-                            $channelScreenshot = 'skins/chanblock.gif';
+                            $channelScreenshot =$this->chanshots::ERR_DISABLD;
                         }
+
                         $result .= wf_tag('div', false, '', $style);
                         $channelUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $cameraChannel;
                         $channelImage = wf_img($channelScreenshot, $cameraLabel, 'width: 480px; height: 270px;  object-fit: cover;');
@@ -294,12 +300,12 @@ class LiveCams {
                         $channelScreenshot = $this->chanshots->getChannelScreenShot($cameraChannel);
                         $cameraLabel = $this->cameras->getCameraComment($cameraChannel);
                         if (empty($channelScreenshot)) {
-                            $channelScreenshot = 'skins/nosignal.gif';
+                            $channelScreenshot = $this->chanshots::ERR_NOSIG;
                             $viewableFlag = false;
                         }
 
                         if (!$eachCameraData['CAMERA']['active']) {
-                            $channelScreenshot = 'skins/chanblock.gif';
+                            $channelScreenshot = $this->chanshots::ERR_DISABLD;
                             $viewableFlag = false;
                         }
                         $result .= wf_tag('div', false, '', $style);
