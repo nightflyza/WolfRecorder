@@ -13,7 +13,7 @@ if (ubRouting::optionCliCheck('run', false)) {
         $allYalfLibs = array_flip($allYalfLibs);
         foreach ($allYalfLibs as $eachYalfLib => $index) {
             $lintResult = shell_exec('php -l ' . $yalfLibsPath . $eachYalfLib.' 2>&1');
-            if (!ispos($lintResult, 'No syntax errors detected')) {
+            if (ispos($lintResult, 'PHP ')) {
                 $errorCount++;
                 print('FAILED: ' . $eachYalfLib . PHP_EOL);
                 print('=========================' . PHP_EOL);
