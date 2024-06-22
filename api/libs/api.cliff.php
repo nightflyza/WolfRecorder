@@ -107,6 +107,8 @@ class CliFF {
         $this->audioCapture = '-acodec copy' . ' ';
         $this->liveOptsPrefix = '-stimeout 5000000 -loglevel error -rtsp_transport tcp -f rtsp -i';
         $this->liveOptsSuffix = '-strict -2 -vcodec copy -hls_wrap 10';
+        // burn cpu burn! lol
+        //$this->liveOptsSuffix = '-strict -2 -vcodec libx264 -preset ultrafast -hls_wrap 10';
 
         //some ffmpeg >=5.0 opts
         if ($this->ffmpegVersion >= 500) {
