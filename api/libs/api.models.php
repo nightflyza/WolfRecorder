@@ -50,6 +50,7 @@ class Models {
     const PROUTE_ED_MODELTPL = 'editmodeltemplate';
     const ROUTE_DELMODEL = 'deletemodelid';
     const DATA_TABLE = 'models';
+    const ROUTE_CREATEMODEL = 'createnewmodel';
 
     public function __construct() {
         $this->initMessages();
@@ -141,7 +142,7 @@ class Models {
         } else {
             $result .= __('Model name is empty');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -155,7 +156,7 @@ class Models {
         $inputs .= wf_SelectorSearchable(self::PROUTE_NEWMODELTPL, $this->allTemplateNames, __('Template'), '', false) . ' ';
         $inputs .= wf_Submit(__('Create'));
         $result .= wf_Form('', 'POST', $inputs, 'glamour');
-        return($result);
+        return ($result);
     }
 
     /**
@@ -175,7 +176,27 @@ class Models {
         if (!$usedByCameras) {
             $result = false;
         }
-        return($result);
+        return ($result);
+    }
+
+    /**
+     * Checks is some template used by some models or not?
+     * 
+     * @param string $templateName just template name
+     * 
+     * @return bool
+     */
+    public function isTemplateProtected($templateName) {
+        $templateName = ubRouting::filters($templateName, 'mres');
+        $result = false;
+        if (!empty($this->allModels)) {
+            foreach ($this->allModels as $io => $each) {
+                if ($each['template'] == $templateName) {
+                    $result = true;
+                }
+            }
+        }
+        return ($result);
     }
 
     /**
@@ -199,7 +220,7 @@ class Models {
         } else {
             $result .= __('Model not exists') . ' [' . $modelId . ']';
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -224,7 +245,7 @@ class Models {
             $camerasDb->selectable('id');
             $usedByActiveCameras = $camerasDb->getAll();
             if (!$usedByActiveCameras) {
-                if ($modelId AND $modelNameF AND $templateF) {
+                if ($modelId and $modelNameF and $templateF) {
                     if (isset($this->allTemplatesData[$templateF])) {
                         $this->modelsDb->where('id', '=', $modelId);
                         $this->modelsDb->data('modelname', $modelNameF);
@@ -243,7 +264,7 @@ class Models {
         } else {
             $result .= __('Model') . ' [' . $modelId . '] ' . __('not exists');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -264,7 +285,7 @@ class Models {
             $inputs .= wf_Submit(__('Save'));
             $result .= wf_Form('', 'POST', $inputs, 'glamour');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -293,7 +314,7 @@ class Models {
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -308,7 +329,7 @@ class Models {
                 $result[$each['id']] = $each['modelname'];
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -317,7 +338,7 @@ class Models {
      * @return array
      */
     public function getAllModelData() {
-        return($this->allModels);
+        return ($this->allModels);
     }
 
     /**
@@ -334,7 +355,23 @@ class Models {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
+    /**
+     * Renders the module controls
+     *
+     * @return string
+     */
+    public function renderControls() {
+        $result = '';
+        if (ubRouting::checkGet(self::ROUTE_CREATEMODEL)) {
+            $result .= wf_BackLink(self::URL_ME);
+        } else {
+            $result .= wf_Link(self::URL_ME . '&' . self::ROUTE_CREATEMODEL . '=true', web_icon_create() . ' ' . __('Create new model'), false, 'ubButton') . ' ';
+            $result .= wf_Link(ModelCraft::URL_ME, web_icon_extended() . ' ' . __('Custom device templates'), false, 'ubButton') . ' ';
+        }
+
+        return ($result);
+    }
 }

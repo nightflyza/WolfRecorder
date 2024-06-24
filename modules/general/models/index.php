@@ -36,8 +36,14 @@ if (cfr('MODELS')) {
         }
     }
 
-    show_window(__('Create new model'), $models->renderCreationForm());
-    show_window(__('Available models'), $models->renderList());
+    //module controls here
+    show_window('',$models->renderControls());
+    //some interfaces
+    if (ubRouting::checkGet($models::ROUTE_CREATEMODEL)) {
+        show_window(__('Create new model'), $models->renderCreationForm());
+    } else {
+        show_window(__('Available models'), $models->renderList());
+    }
 } else {
     show_error(__('Access denied'));
 }
