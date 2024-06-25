@@ -52,6 +52,10 @@ class ModelCraft {
     const ROUTE_TPL_DEL = 'deletecusttpl';
     const CUSTOM_TEMPLATE_MARK = '_CUSTOM';
 
+    /**
+     * Spirits gathering around my dead coil
+     * Infernal baptism, hungry for blood
+     */
     public function __construct() {
         $this->initMessages();
         $this->initTemplatesDb();
@@ -170,6 +174,8 @@ class ModelCraft {
         $ptz = 0;
         if (!empty($deviceData)) {
             if (isset($deviceData['sources'])) {
+                $preselMain='';
+                $preselSub='';
                 foreach ($deviceData['sources'] as $io => $each) {
                     if (isset($each['profilename']) and isset($each['urldata'])) {
                         $profileLabel = $each['profilename'];
@@ -179,13 +185,19 @@ class ModelCraft {
                         }
                         $port = $each['urldata']['port'];
                         $proto = $each['urldata']['scheme'];
+                        if (empty($availableSources)) {
+                            $preselMain=$shortUrl; //first of available sources
+                        } else {
+                            $preselSub=$shortUrl; //last source
+                        }
                         $availableSources[$shortUrl] = $profileLabel . ' (' . $each['width'] . 'x' . $each['height'] . ')';
                     }
                 }
+         
                 //some form here
-                $inputs = wf_TextInput(self::PROUTE_TPLCREATE_DEV, __('Template name'), '', true, 16, '');
-                $inputs .= wf_Selector(self::PROUTE_TPLCREATE_MAIN, $availableSources, __('Mainstream'), '', true);
-                $inputs .= wf_Selector(self::PROUTE_TPLCREATE_SUB, $availableSources, __('Substream'), '', true);
+                $inputs = wf_TextInput(self::PROUTE_TPLCREATE_DEV, __('Template name'), '', true, 20, '');
+                $inputs .= wf_Selector(self::PROUTE_TPLCREATE_MAIN, $availableSources, __('Mainstream'), $preselMain, true);
+                $inputs .= wf_Selector(self::PROUTE_TPLCREATE_SUB, $availableSources, __('Substream'), $preselSub, true);
                 $inputs .= wf_CheckInput(self::PROUTE_TPLCREATE_SOUND, __('Sound'), true, false);
                 $inputs .= wf_CheckInput(self::PROUTE_TPLCREATE_PTZ, __('PTZ'), true, false);
                 $inputs .= wf_HiddenInput(self::PROUTE_TPLCREATE_PORT, $port);
