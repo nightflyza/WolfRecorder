@@ -592,18 +592,18 @@ class Export {
      * @param array $chunksList
      * @param string $channelId
      * @param string $directory
-     * @param string $userLogin
+     * @param int $taskId
      * 
      * @return void/string
      */
-    protected function exportChunksList($chunksList, $channelId, $directory, $userLogin) {
+    protected function exportChunksList($chunksList, $channelId, $directory, $taskId) {
         $result = '';
         $exportProcess = new StarDust(self::PID_EXPORT . $channelId);
         if ($exportProcess->notRunning()) {
             $exportProcess->start();
             $allChannels = $this->cameras->getAllCamerasChannels();
             $cameraId = $allChannels[$channelId];
-            log_register('EXPORT STARTED CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '`');
+            log_register('EXPORT STARTED [' . $taskId . '] CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '`');
             if (!empty($chunksList)) {
                 $firstTs = 0;
                 $lastTs = 0;
@@ -629,8 +629,14 @@ class Export {
                 if (!file_exists($fullRecordFilePath)) {
                     $command = $this->ffmpgPath . ' -loglevel error -f concat -safe 0 -i ' . $exportListPath . ' -c copy ' . $fullRecordFilePath;
                     shell_exec($command);
+                    
+                    //mark export schedule task as done
+                    $this->scheduleDb->where('id', '=', $taskId);
+                    $this->scheduleDb->data('done', 1);
+                    $this->scheduleDb->data('finishdate', curdatetime());
+                    $this->scheduleDb->save();
                 } else {
-                    log_register('EXPORT SKIPPED CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '` ALREADY EXISTS');
+                    log_register('EXPORT SKIPPED [' . $taskId . '] CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '` ALREADY EXISTS');
                 }
                 //cleanup export list
                 unlink($exportListPath);
@@ -638,7 +644,7 @@ class Export {
                 $result .= __('Something went wrong');
             }
             $exportProcess->stop();
-            log_register('EXPORT FINISHED CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '`');
+            log_register('EXPORT FINISHED [' . $taskId . '] CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '`');
         } else {
             $result .= __('Export process already running');
         }
@@ -666,6 +672,7 @@ class Export {
         $sizeForecastF = ubRouting::filters($sizeForecast, 'int');
         $allChannels = $this->cameras->getAllCamerasChannels();
         $cameraId = $allChannels[$channelId];
+
         if ($userLoginF and $channelId and $dateFrom and $dateTo and $cameraId) {
             $this->scheduleDb->data('date', $dateF);
             $this->scheduleDb->data('user', $userLogin);
@@ -675,7 +682,8 @@ class Export {
             $this->scheduleDb->data('sizeforecast', $sizeForecastF);
             $this->scheduleDb->data('done', 0);
             $this->scheduleDb->create();
-            log_register('EXPORT SCHEDULED CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '`');
+            $newSchedId = $this->scheduleDb->getLastId();
+            log_register('EXPORT SCHEDULED [' . $newSchedId . '] CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '` FROM `' . $dateFrom . '` TO `' . $dateTo . '`');
         } else {
             $result .= __('Something went wrong');
         }
@@ -704,13 +712,8 @@ class Export {
                 $dateTimeToTs = strtotime($each['datetimeto']);
                 $chunksInRange = $this->storages->filterChunksTimeRange($allChannelChunks, $dateTimeFromTs, $dateTimeToTs);
                 if ($chunksInRange and $userRecordingsDir) {
-                    $this->exportChunksList($chunksInRange, $channelId, $userRecordingsDir, $userLogin);
+                    $this->exportChunksList($chunksInRange, $channelId, $userRecordingsDir, $each['id']);
                 }
-                //mark task as done
-                $this->scheduleDb->where('id', '=', $each['id']);
-                $this->scheduleDb->data('done', 1);
-                $this->scheduleDb->data('finishdate', curdatetime());
-                $this->scheduleDb->save();
             }
         }
     }
