@@ -841,7 +841,7 @@ class Export {
         $currentModule = ubRouting::get('module');
         if (!empty($currentModule)) {
             if ($currentModule == 'export') {
-                $channelId = ubRouting::get(self::ROUTE_CHANNEL);
+                $channelId = ubRouting::get(self::ROUTE_CHANNEL,'gigasafe');
                 $deleteUrl = self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $channelId . '&' . self::ROUTE_DELETE . '=' . $fileName;
                 $cancelUrl = self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $channelId;
                 $label = wf_tag('center') . wf_img('skins/trash-bin.png') . wf_tag('center', true);
