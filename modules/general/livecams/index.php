@@ -2,16 +2,17 @@
 
 if (cfr('LIVECAMS')) {
     //catching keepalive requests
-    $streamDog = new StreamDog();
-    if (ubRouting::checkGet($streamDog::ROUTE_KEEPALIVE)) {
+    if (ubRouting::checkGet(StreamDog::ROUTE_KEEPALIVE)) {
+        $streamDog = new StreamDog();
         $streamDog->keepAlive(ubRouting::get($streamDog::ROUTE_KEEPALIVE));
         die();
     }
 
     //or substream keepalive requests
-    if (ubRouting::checkGet($streamDog::ROUTE_KEEPSUBALIVE)) {
+    if (ubRouting::checkGet(StreamDog::ROUTE_KEEPSUBALIVE)) {
         if (cfr('WALL')) {
             if ($ubillingConfig->getAlterParam(LiveCams::OPTION_WALL)) {
+                $streamDog = new StreamDog();
                 $streamDog->keepSubAlive(ubRouting::get($streamDog::ROUTE_KEEPSUBALIVE));
                 die();
             }
@@ -22,7 +23,7 @@ if (cfr('LIVECAMS')) {
     if (ubRouting::checkGet($liveCams::ROUTE_VIEW)) {
         $channelId = ubRouting::get($liveCams::ROUTE_VIEW, 'gigasafe');
         $acl = new ACL();
-        if ($acl->isMyChannel(ubRouting::get($channelId))) {
+        if ($acl->isMyChannel($channelId)) {
             $channelName = $liveCams->getCameraComment($channelId);
             show_window(__('Live') . ': ' . $channelName, $liveCams->renderLive($channelId));
         } else {
