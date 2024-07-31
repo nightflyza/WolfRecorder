@@ -341,14 +341,14 @@ apt install -y gnupg2 >> ${INSTALLER_LOG}  2>&1
 
 
 $DIALOG --menu "Choose your Linux distribution" 16 50 8 \
-                   DEB125 "Debian 12.5 Bookworm"\
+                   DEB126 "Debian 12.6 Bookworm"\
         2> /tmp/wrarch
 clear
 
 ARCH=`cat /tmp/wrarch`
 
 case $ARCH in 
-DEB125)
+DEB126)
 #some remote paths here
 FETCH="/usr/bin/wget"
 APACHE_VERSION="apache24"
@@ -657,7 +657,7 @@ $DIALOG --title "WolfRecorder installation has been completed" --msgbox "Now you
 # Finishing installation
 
 ;;
-#cancel installstion
+#cancel installation
 1)
 echo "Installation has been aborted"
 exit
@@ -665,7 +665,7 @@ exit
 esac
 
 #
-# End of Debian 12.5 script here
+# End of Debian 12.6 script here
 #
 ;;
 esac
