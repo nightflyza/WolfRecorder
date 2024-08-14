@@ -34,6 +34,9 @@ if (cfr('LIVECAMS')) {
         if ($ubillingConfig->getAlterParam($liveCams::OPTION_WALL)) {
             $titleControls = '';
             if (cfr('WALL')) {
+                if (ubRouting::checkGet($liveCams::ROUTE_DL_PLAYLIST)) {
+                    $liveCams->getLiveCamerasPlayList();
+                }
                 $titleControls = $liveCams->getTitleControls();
             }
             if (ubRouting::checkGet($liveCams::ROUTE_LIVEWALL)) {

@@ -272,4 +272,5 @@ $lang['def']['Template name'] = 'Ім`я шаблону';
 $lang['def']['Sound'] = 'Звук';
 $lang['def']['Custom device templates'] = 'Користувацькі шаблони пристроїв';
 $lang['def']['Template now is used'] = 'Шаблон зараз використовується';
+$lang['def']['Playlist'] = 'Плейлист';
 $lang['def'][''] = '';

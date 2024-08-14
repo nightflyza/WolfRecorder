@@ -126,12 +126,15 @@ class LiveCams {
     const SUBSTREAMS_SUBDIR = 'livelq/';
     const STREAM_PLAYLIST = 'stream.m3u8';
     const SUBSTREAM_PLAYLIST = 'livesub.m3u8';
+    const LIVECAMSDL_PLAYLIST = 'livecams.m3u8';
     const URL_ME = '?module=livecams';
     const URL_PSEUDOSTREAM = '?module=pseudostream';
     const ROUTE_VIEW = 'livechannel';
     const ROUTE_PSEUDOLIVE = 'live';
     const ROUTE_PSEUDOSUB = 'sublq';
     const ROUTE_LIVEWALL = 'wall';
+    const ROUTE_DL_PLAYLIST = 'downloadplaylist';
+
 
     const WRAPPER = '/bin/wrapi';
     const OPTION_WALL = 'LIVE_WALL';
@@ -234,7 +237,7 @@ class LiveCams {
     }
 
     /**
-     * Lists available cameras
+     * Lists available cameras as channels shots preview
      * 
      * @return string
      */
@@ -252,14 +255,14 @@ class LiveCams {
                         if (empty($channelScreenshot)) {
                             $channelScreenshot = $this->chanshots::ERR_NOSIG;
                         } else {
-                            $chanshotValid=$this->chanshots->isChannelScreenshotValid($channelScreenshot);
+                            $chanshotValid = $this->chanshots->isChannelScreenshotValid($channelScreenshot);
                             if (!$chanshotValid) {
-                                $channelScreenshot=$this->chanshots::ERR_CORRUPT;
+                                $channelScreenshot = $this->chanshots::ERR_CORRUPT;
                             }
                         }
 
                         if (!$eachCameraData['CAMERA']['active']) {
-                            $channelScreenshot =$this->chanshots::ERR_DISABLD;
+                            $channelScreenshot = $this->chanshots::ERR_DISABLD;
                         }
 
                         $result .= wf_tag('div', false, '', $style);
@@ -278,6 +281,43 @@ class LiveCams {
             $result .= $this->messages->getStyledMessage(__('No assigned cameras to show'), 'warning');
         }
         return ($result);
+    }
+
+    /**
+     * Retrives user assigned cameras pseudo-streams playlist
+     *
+     * @return void
+     */
+    public function getLiveCamerasPlayList() {
+        $playList = '';
+        $camCount = 0;
+        if ($this->acl->haveCamsAssigned()) {
+            if (!empty($this->allCamerasData)) {
+                $playList .= '#EXTM3U' . PHP_EOL;
+                $baseUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME'];
+                foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
+                    if ($this->acl->isMyCamera($eachCameraId)) {
+                        if ($eachCameraData['CAMERA']['active']) {
+                            $channelId = $eachCameraData['CAMERA']['channel'];
+                            $channelName = $eachCameraData['CAMERA']['comment'];
+                            $psUrl = $baseUrl . self::URL_PSEUDOSTREAM . '&' . self::ROUTE_PSEUDOLIVE . '=' . $channelId . '&file=' . self::STREAM_PLAYLIST;
+                            $playList .= '#EXTINF:0,' . $channelName . PHP_EOL;
+                            $playList .= $psUrl . PHP_EOL;
+                            $camCount++;
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($camCount > 0) {
+            header("Cache-Control: no-cache, must-revalidate");
+            header('Content-Type: application/vnd.apple.mpegurl');
+            header("Content-Transfer-Encoding: Binary");
+            header("Content-disposition: attachment; filename=\"" . self::LIVECAMSDL_PLAYLIST . "\"");
+            header("Content-Description: File Transfer");
+            die($playList);
+        }
     }
 
     /**
@@ -883,6 +923,7 @@ class LiveCams {
             } else {
                 $result .= wf_Link(self::URL_ME . '&' . self::ROUTE_LIVEWALL . '=true', wf_img('skins/surveillance3_32.png', __('Live')));
             }
+            $result .= wf_Link(self::URL_ME . '&' . self::ROUTE_DL_PLAYLIST . '=true', wf_img('skins/list32.png', __('Playlist')));
         }
         return ($result);
     }
