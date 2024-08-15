@@ -317,6 +317,11 @@ class LiveCams {
             header("Content-disposition: attachment; filename=\"" . self::LIVECAMSDL_PLAYLIST . "\"");
             header("Content-Description: File Transfer");
             die($playList);
+        } else {
+            $result = $this->messages->getStyledMessage(__('No assigned cameras to show'), 'warning');
+            $result .= wf_delimiter(0);
+            $result .= wf_BackLink(self::URL_ME);
+            show_window(__('Oh no'), $result);
         }
     }
 
@@ -646,7 +651,7 @@ class LiveCams {
                                     //run live stream capture
                                     $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
                                     $streamType = $cameraData['TEMPLATE']['SUB_STREAM'];
-                                    $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $rtspPort. $streamType;
+                                    $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $rtspPort . $streamType;
                                     $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "'";
                                     $liveCommand = $this->ffmpgPath . ' ' . $this->liveOptsPrefix . ' ' . $captureFullUrl . ' ' . $this->liveOptsSuffix . ' ' . self::SUBSTREAM_PLAYLIST;
                                     $fullCommand = 'cd ' . $streamPath . ' && ' . $liveCommand;
