@@ -216,10 +216,10 @@ class Recorder {
                                     //rtsp proto capture
                                     if ($cameraData['TEMPLATE']['PROTO'] == 'rtsp') {
                                         //custom rtsp port is here?
-                                        $rtspPort=$cameraData['TEMPLATE']['RTSP_PORT'];
+                                        $rtspPort = $cameraData['TEMPLATE']['RTSP_PORT'];
                                         if (isset($cameraData['OPTS'])) {
                                             if (!empty($cameraData['OPTS']['rtspport'])) {
-                                                $rtspPort=$cameraData['OPTS']['rtspport'];
+                                                $rtspPort = $cameraData['OPTS']['rtspport'];
                                             }
                                         }
                                         $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
@@ -297,7 +297,7 @@ class Recorder {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -312,15 +312,25 @@ class Recorder {
             if (!empty($recorderPids)) {
                 foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
                     foreach ($recorderPids as $eachPid => $eachProcess) {
+                        $camIp = $eachCameraData['CAMERA']['ip'];
+                        $camLogin = $eachCameraData['CAMERA']['login'];
+                        $camPass = $eachCameraData['CAMERA']['password'];
+                        $camPort = $eachCameraData['TEMPLATE']['RTSP_PORT'];
+                        if (isset($eachCameraData['OPTS'])) {
+                            if (!empty($eachCameraData['OPTS']['rtspport'])) {
+                                $camPort = $eachCameraData['OPTS']['rtspport'];
+                            }
+                        }
+
                         //looks familiar?
-                        if (ispos($eachProcess, $eachCameraData['CAMERA']['ip']) AND ispos($eachProcess, $eachCameraData['CAMERA']['login'])) {
+                        if (ispos($eachProcess, $camIp) and ispos($eachProcess, $camLogin) and ispos($eachProcess, $camPass) and ispos($eachProcess, $camPort)) {
                             $result[$eachCameraId] = $eachPid;
                         }
                     }
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**

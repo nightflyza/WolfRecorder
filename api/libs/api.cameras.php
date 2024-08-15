@@ -496,6 +496,7 @@ class Cameras {
     protected function getRunningRecorders() {
         $result = array();
         $recorderPids = array();
+
         $command = $this->binPaths['PS'] . ' ax | ' . $this->binPaths['GREP'] . ' ' . $this->binPaths['FFMPG_PATH'] . ' | ' . $this->binPaths['GREP'] . ' -v grep';
         $rawResult = shell_exec($command);
         if (!empty($rawResult)) {
@@ -518,10 +519,21 @@ class Cameras {
 
         if (!empty($this->allCameras)) {
             if (!empty($recorderPids)) {
-                foreach ($this->allCameras as $eachCameraId => $eachCameraData) {
+                $fullCamerasData = $this->getAllCamerasFullData();
+                foreach ($fullCamerasData as $eachCameraId => $eachCameraData) {
                     foreach ($recorderPids as $eachPid => $eachProcess) {
+                        $camIp = $eachCameraData['CAMERA']['ip'];
+                        $camLogin = $eachCameraData['CAMERA']['login'];
+                        $camPass = $eachCameraData['CAMERA']['password'];
+                        $camPort = $eachCameraData['TEMPLATE']['RTSP_PORT'];
+                        if (isset($eachCameraData['OPTS'])) {
+                            if (!empty($eachCameraData['OPTS']['rtspport'])) {
+                                $camPort = $eachCameraData['OPTS']['rtspport'];
+                            }
+                        }
+
                         //looks familiar?
-                        if (ispos($eachProcess, $eachCameraData['ip']) and ispos($eachProcess, $eachCameraData['login'])) {
+                        if (ispos($eachProcess, $camIp) and ispos($eachProcess, $camLogin) and ispos($eachProcess, $camPass) and ispos($eachProcess, $camPort)) {
                             $result[$eachCameraId] = $eachPid;
                         }
                     }
