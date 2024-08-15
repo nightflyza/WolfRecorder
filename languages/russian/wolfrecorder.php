@@ -275,3 +275,5 @@ $lang['def']['Template now is used'] = 'Шаблон сейчас использ
 $lang['def']['Playlist'] = 'Плейлист';
 $lang['def']['Custom RTSP port'] = 'Пользовательский RTSP порт';
 $lang['def']['Custom'] = 'Пользовательский';
+$lang['def']['For administrator'] = 'Для администратора';
+$lang['def']['a very fucked up password is used'] = 'используется очень хуевый пароль';

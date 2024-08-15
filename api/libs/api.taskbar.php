@@ -220,7 +220,7 @@ class Taskbar {
                     //run widget code
                     if (isset($elementData['CODEFILE'])) {
                         if (file_exists(self::WIDGETS_CODEPATH . $elementData['CODEFILE'])) {
-                            require_once (self::WIDGETS_CODEPATH . $elementData['CODEFILE']);
+                            require_once(self::WIDGETS_CODEPATH . $elementData['CODEFILE']);
                             if (class_exists($elementData['ID'])) {
                                 $widget = new $elementData['ID']();
                                 $result .= $widget->render();
@@ -256,7 +256,7 @@ class Taskbar {
             $categoryName = (isset($this->categories[$category])) ? $this->categories[$category] : '';
             foreach ($allElements as $io => $eachfilename) {
                 $elementData = parse_ini_file($elementsPath . $eachfilename);
-                if ((isset($elementData['TYPE'])) AND ( isset($elementData['ID']))) {
+                if ((isset($elementData['TYPE'])) and (isset($elementData['ID']))) {
                     if (!isset($this->loadedElements[$elementData['ID']])) {
                         $this->loadedElements[$elementData['ID']] = $elementData;
                         $categoryContent .= $this->buildElement($elementData);
@@ -313,18 +313,50 @@ class Taskbar {
      * @return void
      */
     protected function checkSecurity() {
+
+        global $system;
+        $controlLogin = 'admin';
+        $badPasswords = file_get_contents(DATA_PATH . 'shitpass.dat');
+        $badPasswords = trim($badPasswords);
+        $badPasswords = explodeRows($badPasswords);
+        $defaultPassOffset = 0;
+
         if (isset($_COOKIE['yalf_user'])) {
-            if ($_COOKIE['yalf_user'] == 'admin:fe01ce2a7fbac8fafaed7c982a04e229') {
-                if (!file_exists('DEMO_MODE')) {
+            if (!file_exists('DEMO_MODE')) {
+                //am i using default account?
+                if ($_COOKIE['yalf_user'] == $controlLogin . ':' . $badPasswords[$defaultPassOffset]) {
                     $notice = __('You are using the default login and password') . '. ' . __('Dont do this') . '.';
                     // ugly hack to prevent elements autofocusing
+                    $label = wf_TextInput('dontfocusonlinks', '', '', false, '', '', '', '', 'style="width: 0; height: 0; top: -100px; position: absolute;"');
+                    $label .= wf_tag('div', false, '', 'style="min-width:550px;"') . $this->messages->getStyledMessage($notice, 'error') . wf_tag('div', true);
+                    $label .= wf_tag('br');
                     $label = wf_TextInput('dontfocusonlinks', '', '', false, '', '', '', '', 'style="width: 0; height: 0; top: -100px; position: absolute;"');
                     $label .= wf_tag('div', false, '', 'style="min-width:600px;"') . $this->messages->getStyledMessage($notice, 'error') . wf_tag('div', true);
                     $label .= wf_tag('br');
                     $label .= wf_tag('center') . wf_img_sized('skins/securitywolf.png', '', '', '300') . wf_tag('center' . true);
                     $label .= wf_delimiter(1);
                     $label .= wf_Link('?module=usermanager&edituserdata=admin', __('Change admin user password'), true, 'confirmagree');
-                    $this->currentAlerts .= wf_modalOpenedAuto(__('Danger') . '!', $label);
+
+                    $this->currentAlerts .= wf_modalOpenedAuto(__('Oh no') . '!' . ' ' . __('Danger') . '!', $label);
+                } else {
+                    //ony administrators(?) should see that
+                    if (cfr('OPERATOR')) {
+                        //fast check for few shitty passwords
+                        if (file_exists(USERS_PATH . $controlLogin)) {
+                            $adminData = $system->getUserData($controlLogin);
+                            if (!empty($adminData)) {
+                                $adminHash = trim($adminData['password']);
+                                foreach ($badPasswords as $passIdx => $eachHash) {
+                                    if (!empty($eachHash)) {
+                                        $eachHash = trim($eachHash);
+                                        if (strpos($adminHash, $eachHash) !== false) {
+                                            $this->currentAlerts .= $this->messages->getStyledMessage(__('For administrator') . ' «' . $controlLogin . '» ' . __('a very fucked up password is used') . '. ' . __('Dont do this') . '.', 'error');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -356,7 +388,6 @@ class TaskbarWidget {
      * Creates new instance of taskbar widget
      */
     public function __construct() {
-        
     }
 
     /**
