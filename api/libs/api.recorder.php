@@ -215,8 +215,15 @@ class Recorder {
                                 if ($cameraData['TEMPLATE']['MAIN_STREAM']) {
                                     //rtsp proto capture
                                     if ($cameraData['TEMPLATE']['PROTO'] == 'rtsp') {
+                                        //custom rtsp port is here?
+                                        $rtspPort=$cameraData['TEMPLATE']['RTSP_PORT'];
+                                        if (isset($cameraData['OPTS'])) {
+                                            if (!empty($cameraData['OPTS']['rtspport'])) {
+                                                $rtspPort=$cameraData['OPTS']['rtspport'];
+                                            }
+                                        }
                                         $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
-                                        $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $cameraData['TEMPLATE']['MAIN_STREAM'];
+                                        $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $rtspPort . $cameraData['TEMPLATE']['MAIN_STREAM'];
                                         $audioOpts = ($cameraData['TEMPLATE']['SOUND']) ? $this->audioCapture : '';
                                         $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "' " . $audioOpts . $this->recordOpts . ' ' . self::CHUNKS_MASK . self::CHUNKS_EXT;
                                         $captureCommand = $this->ffmpgPath . ' ' . $this->transportTemplate . ' ' . $captureFullUrl . ' ' . $this->supressOutput;

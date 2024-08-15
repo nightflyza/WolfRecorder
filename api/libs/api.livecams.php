@@ -509,7 +509,7 @@ class LiveCams {
     /**
      * Allocates streams path, returns it if its writable
      * 
-     * @return string/void on error
+     * @return string|void on error
      */
     protected function allocateStreamPath($channelId) {
         $result = '';
@@ -537,7 +537,7 @@ class LiveCams {
     /**
      * Allocates sub-streams path, returns it if its writable
      * 
-     * @return string/void on error
+     * @return string|void on error
      */
     protected function allocateSubStreamPath($channelId) {
         $result = '';
@@ -583,10 +583,19 @@ class LiveCams {
                                 //set stream as alive
                                 $streamDog = new StreamDog();
                                 $streamDog->keepAlive($cameraId);
+
+                                //custom rtsp port is here?
+                                $rtspPort = $cameraData['TEMPLATE']['RTSP_PORT'];
+                                if (isset($cameraData['OPTS'])) {
+                                    if (!empty($cameraData['OPTS']['rtspport'])) {
+                                        $rtspPort = $cameraData['OPTS']['rtspport'];
+                                    }
+                                }
+
                                 //run live stream capture
                                 $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
                                 $streamType = $cameraData['TEMPLATE']['MAIN_STREAM'];
-                                $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $streamType;
+                                $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $rtspPort . $streamType;
                                 $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "'";
                                 $liveCommand = $this->ffmpgPath . ' ' . $this->liveOptsPrefix . ' ' . $captureFullUrl . ' ' . $this->liveOptsSuffix . ' ' . self::STREAM_PLAYLIST;
                                 $fullCommand = 'cd ' . $streamPath . ' && ' . $liveCommand;
@@ -627,10 +636,17 @@ class LiveCams {
                                     //set stream as alive
                                     $streamDog = new StreamDog();
                                     $streamDog->keepSubAlive($cameraId);
+                                    //custom rtsp port is here?
+                                    $rtspPort = $cameraData['TEMPLATE']['RTSP_PORT'];
+                                    if (isset($cameraData['OPTS'])) {
+                                        if (!empty($cameraData['OPTS']['rtspport'])) {
+                                            $rtspPort = $cameraData['OPTS']['rtspport'];
+                                        }
+                                    }
                                     //run live stream capture
                                     $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
                                     $streamType = $cameraData['TEMPLATE']['SUB_STREAM'];
-                                    $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $cameraData['TEMPLATE']['RTSP_PORT'] . $streamType;
+                                    $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $rtspPort. $streamType;
                                     $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "'";
                                     $liveCommand = $this->ffmpgPath . ' ' . $this->liveOptsPrefix . ' ' . $captureFullUrl . ' ' . $this->liveOptsSuffix . ' ' . self::SUBSTREAM_PLAYLIST;
                                     $fullCommand = 'cd ' . $streamPath . ' && ' . $liveCommand;

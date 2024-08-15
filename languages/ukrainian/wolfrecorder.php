@@ -273,4 +273,6 @@ $lang['def']['Sound'] = 'Звук';
 $lang['def']['Custom device templates'] = 'Користувацькі шаблони пристроїв';
 $lang['def']['Template now is used'] = 'Шаблон зараз використовується';
 $lang['def']['Playlist'] = 'Плейлист';
+$lang['def']['Custom RTSP port'] = 'Користувацький RTSP порт';
+$lang['def']['Custom'] = 'Користувацький';
 $lang['def'][''] = '';

@@ -273,3 +273,5 @@ $lang['def']['Sound'] = 'Звук';
 $lang['def']['Custom device templates'] = 'Пользовательские шаблоны устройств';
 $lang['def']['Template now is used'] = 'Шаблон сейчас используется';
 $lang['def']['Playlist'] = 'Плейлист';
+$lang['def']['Custom RTSP port'] = 'Пользовательский RTSP порт';
+$lang['def']['Custom'] = 'Пользовательский';

@@ -27,11 +27,26 @@ class Cameras {
     protected $camerasDb = '';
 
     /**
+     * Custom cameras options database abstraction layer placeholder
+     *
+     * @var object
+     */
+    protected $camoptsDb = '';
+
+    /**
      * Contains all available cameras as id=>cameraData
      *
      * @var array
      */
     protected $allCameras = array();
+
+    /**
+     * Contains all available cameras custom options as cameraid=>optsData
+     *
+     * @var array
+     */
+    protected $allCamOpts = array();
+
 
     /**
      * Camera models instnce placeholder
@@ -58,6 +73,7 @@ class Cameras {
      * some predefined stuff here
      */
     const DATA_TABLE = 'cameras';
+    const OPTS_TABLE = 'camopts';
     const URL_ME = '?module=cameras';
     const AJ_ARCHSTATS = 'archivestatscontainer';
     const PROUTE_NEWMODEL = 'newcameramodelid';
@@ -72,6 +88,7 @@ class Cameras {
     const PROUTE_ED_IP = 'editcameraip';
     const PROUTE_ED_LOGIN = 'editcameralogin';
     const PROUTE_ED_PASS = 'editcamerapassword';
+    const PROUTE_ED_CUSTPORT = 'editcamerartspport';
     const PROUTE_ED_STORAGE = 'editcamerastorageid';
     const PROUTE_ED_COMMENT = 'editcameracomment';
     const PROUTE_ED_CAMERAID_ACT = 'renamecameraid';
@@ -97,6 +114,8 @@ class Cameras {
         $this->initMessages();
         $this->loadConfigs();
         $this->initCamerasDb();
+        $this->initCamOptsDb();
+        $this->loadAllCamOpts();
         $this->initStorages();
         $this->initModels();
         $this->loadAllCameras();
@@ -143,12 +162,21 @@ class Cameras {
     }
 
     /**
-     * Inits database abstraction layer for further usage
+     * Inits cameras database abstraction layer for further usage
      * 
      * @return void
      */
     protected function initCamerasDb() {
         $this->camerasDb = new NyanORM(self::DATA_TABLE);
+    }
+
+    /**
+     * Inits camopts abstraction layer for further usage
+     * 
+     * @return void
+     */
+    protected function initCamOptsDb() {
+        $this->camoptsDb = new NyanORM(self::OPTS_TABLE);
     }
 
     /**
@@ -159,6 +187,15 @@ class Cameras {
     protected function loadAllCameras() {
         $this->camerasDb->orderBy('id', 'DESC');
         $this->allCameras = $this->camerasDb->getAll('id');
+    }
+
+    /**
+     * Loads all existing cameras custom options from database
+     * 
+     * @return void
+     */
+    protected function loadAllCamOpts() {
+        $this->allCamOpts = $this->camoptsDb->getAll('cameraid');
     }
 
     /**
@@ -254,6 +291,57 @@ class Cameras {
             $result .= __('Camera') . ' [' . $cameraId . '] ' . __('not exists');
         }
         return ($result);
+    }
+
+
+    /**
+     * Sets camera custom option value by its name
+     *
+     * @param int $cameraId
+     * @param string $key
+     * @param mixed $value
+     * 
+     * @return void
+     */
+    protected function setCamOptsValue($cameraId, $key, $value) {
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        $keyF = ubRouting::filters($key, 'mres');
+        $valueF = ubRouting::filters($value, 'mres');
+        if (isset($this->allCameras[$cameraId])) {
+            $camOpts = $this->getCamOpts($cameraId);
+            //no opts record exists?
+            if (empty($camOpts)) {
+                $this->createCamOpts($cameraId);
+            }
+
+            //setting new value
+            $this->camoptsDb->data($keyF, $valueF);
+            $this->camoptsDb->where('cameraid', '=', $cameraId);
+            $this->camoptsDb->save();
+            log_register('CAMOPTS CAMERA [' . $cameraId . '] SET `' . $key . '` ON `' . $value . '`');
+        } else {
+            log_register('CAMOPTS FAIL CAMERA [' . $cameraId . '] NOT EXISTS');
+        }
+    }
+
+
+    /**
+     * Sets camera custom RTSP port option
+     *
+     * @param int $cameraId
+     * @param int $port
+     * @return void
+     */
+    public function saveCamoptsRtspPort($cameraId, $port) {
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        $port = ubRouting::filters($port, 'int');
+        if (!is_numeric($port)) {
+            $port = 0;
+        }
+
+        if (isset($this->allCameras[$cameraId])) {
+            $this->setCamOptsValue($cameraId, 'rtspport', $port);
+        }
     }
 
     /**
@@ -377,6 +465,8 @@ class Cameras {
                                 $this->camerasDb->create();
                                 $newId = $this->camerasDb->getLastId();
                                 log_register('CAMERA CREATE [' . $newId . ']  MODEL [' . $modelId . '] IP `' . $ip . '` STORAGE [' . $storageId . '] COMMENT `' . $comment . '`');
+                                //custom options new empty record creation
+                                $this->createCamOpts($newId);
                             } else {
                                 $result .= __('Login or password is empty');
                             }
@@ -485,7 +575,7 @@ class Cameras {
         return ($result);
     }
 
-      /**
+    /**
      * Returns running cameras live sub-stream processes as cameraId=>realPid
      * 
      * @return array
@@ -530,6 +620,19 @@ class Cameras {
     }
 
     /**
+     * Flushes camera custom options database record
+     *
+     * @param int $cameraId
+     * @return void
+     */
+    protected function flushCamOpts($cameraId) {
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        $this->camoptsDb->where('cameraid', '=', $cameraId);
+        $this->camoptsDb->delete();
+        log_register('CAMOPTS FLUSH CAMERA [' . $cameraId . ']');
+    }
+
+    /**
      * Deletes existing camera from database
      * 
      * @param int $cameraId
@@ -552,6 +655,8 @@ class Cameras {
                 log_register('CAMERA DELETE [' . $cameraId . ']');
                 //flushing camera channel
                 $this->storages->flushChannel($cameraData['storageid'], $cameraData['channel']);
+                //flushing camera custom options
+                $this->flushCamOpts($cameraId);
             } else {
                 $result .= __('You cant delete camera which is now active');
             }
@@ -576,7 +681,23 @@ class Cameras {
                 $result[$each['id']]['CAMERA'] = $each;
                 $result[$each['id']]['TEMPLATE'] = $allModelsTemplates[$each['modelid']];
                 $result[$each['id']]['STORAGE'] = $allStoragesData[$each['storageid']];
+                $result[$each['id']]['OPTS'] = $this->getCamOpts($each['id']);
             }
+        }
+        return ($result);
+    }
+
+
+    /**
+     * Retrieves the camera options for a specific camera.
+     *
+     * @param int $cameraId The ID of the camera.
+     * @return array The camera options for the specified camera.
+     */
+    public function getCamOpts($cameraId) {
+        $result = array();
+        if (isset($this->allCamOpts[$cameraId])) {
+            $result = $this->allCamOpts[$cameraId];
         }
         return ($result);
     }
@@ -718,6 +839,22 @@ class Cameras {
     }
 
     /**
+     * Creates new empty custom camera options record
+     *
+     * @param int $cameraId
+     * 
+     * @return void
+     */
+    protected function createCamOpts($cameraId) {
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        if (!isset($this->allCamOpts[$cameraId])) {
+            $this->camoptsDb->data('cameraid', $cameraId);
+            $this->camoptsDb->create();
+            log_register('CAMOPTS CREATE [' . $cameraId . ']');
+        }
+    }
+
+    /**
      * Returns camera creation form
      * 
      * @return string
@@ -767,17 +904,21 @@ class Cameras {
 
         if (isset($this->allCameras[$cameraId])) {
             $cameraData = $this->allCameras[$cameraId];
+            $camOpts = $this->getCamOpts($cameraId);
+
             if (!empty($allStorages)) {
                 $storagesParams = array();
                 foreach ($allStorages as $eachStorageId => $eachStorageName) {
                     $storagesParams[$eachStorageId] = __($eachStorageName);
                 }
                 if (!empty($allModels)) {
+                    $custRtspPort = (!empty($camOpts['rtspport'])) ? $camOpts['rtspport'] : '';
                     $inputs = wf_HiddenInput(self::PROUTE_ED_CAMERAID, $cameraId);
                     $inputs .= wf_Selector(self::PROUTE_ED_MODEL, $allModels, __('Model'), $cameraData['modelid'], true) . ' ';
                     $inputs .= wf_TextInput(self::PROUTE_ED_IP, __('IP'), $cameraData['ip'], true, 12, 'ip') . ' ';
                     $inputs .= wf_TextInput(self::PROUTE_ED_LOGIN, __('Login'), $cameraData['login'], true, 14, 'alphanumeric') . ' ';
                     $inputs .= wf_PasswordInput(self::PROUTE_ED_PASS, __('Password'), $cameraData['password'], true, 14) . ' ';
+                    $inputs .= wf_TextInput(self::PROUTE_ED_CUSTPORT, __('Custom RTSP port'), $custRtspPort, true, 4, 'digits');
                     $inputs .= wf_Selector(self::PROUTE_ED_STORAGE, $storagesParams, __('Storage'), $cameraData['storageid'], true) . ' ';
                     $inputs .= wf_TextInput(self::PROUTE_ED_COMMENT, __('Description'), $cameraData['comment'], true, 18, '') . ' ';
                     $inputs .= wf_Submit(__('Save'));
@@ -923,6 +1064,7 @@ class Cameras {
         return ($result);
     }
 
+
     /**
      * Renders camera profile
      * 
@@ -935,10 +1077,25 @@ class Cameras {
         $cameraControls = '';
         $cameraId = ubRouting::filters($cameraId, 'int');
         if (isset($this->allCameras[$cameraId])) {
+            $cameraData = $this->allCameras[$cameraId];
             $allModels = $this->models->getAllModelNames();
             $allStorages = $this->storages->getAllStorageNames();
-            $cameraData = $this->allCameras[$cameraId];
+            $allTemplates = $this->models->getAllModelTemplates();
+            $camOpt = $this->getCamOpts($cameraId);
+            $cameraTemplate = $allTemplates[$cameraData['modelid']];
             $acl = new ACL();
+            $portLabel = '';
+
+            //model template rtsp port
+            $rtspPort = (!empty($cameraTemplate['RTSP_PORT'])) ? $cameraTemplate['RTSP_PORT'] : 554;
+
+            //is custom rtsp port used?
+            if (!empty($camOpt)) {
+                if ($camOpt['rtspport']) {
+                    $rtspPort = $camOpt['rtspport'];
+                    $portLabel = ' ⚙️';
+                }
+            }
 
             //recorder process now is running?
             $allRunningRecorders = $this->getRunningRecorders();
@@ -949,7 +1106,7 @@ class Cameras {
             $liveStreamFlag = (isset($allRunningLiveStreams[$cameraId])) ? 1 : 0;
 
             //live substreams live-well process is running?
-            $allRunningSubStreams=$this->getRunningSubStreams();
+            $allRunningSubStreams = $this->getRunningSubStreams();
             $subStreamFlag = (isset($allRunningSubStreams[$cameraId])) ? 1 : 0;
 
             $ajaxArchiveStatsUrl = self::URL_ME . '&' . self::ROUTE_AJ_ARCHSTATS . '=' . $cameraId;
@@ -957,6 +1114,7 @@ class Cameras {
             if (cfr('ARCHIVE')) {
                 $channelLabel = wf_AjaxLink($ajaxArchiveStatsUrl, $cameraData['channel'], self::AJ_ARCHSTATS);
             }
+
             //ACL users access
             $aclUsersList = '';
             $rawAcls = $acl->getAllCameraAclsData();
@@ -984,6 +1142,11 @@ class Cameras {
 
             $cells = wf_TableCell(__('Password'), '', 'row2');
             $cells .= wf_TableCell($cameraData['password']);
+            $rows .= wf_TableRow($cells, 'row3');
+
+
+            $cells = wf_TableCell(__('RTSP') . ' ' . __('Port'), '', 'row2');
+            $cells .= wf_TableCell($rtspPort . $portLabel);
             $rows .= wf_TableRow($cells, 'row3');
 
             $cells = wf_TableCell(__('Enabled'), '', 'row2');

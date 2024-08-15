@@ -60,9 +60,11 @@ if (cfr('CAMERAS')) {
         $edIp = ubRouting::post($cameras::PROUTE_ED_IP);
         $edLogin = ubRouting::post($cameras::PROUTE_ED_LOGIN);
         $edPass = ubRouting::post($cameras::PROUTE_ED_PASS);
+        $edPort = ubRouting::post($cameras::PROUTE_ED_CUSTPORT);
         $edStorageId = ubRouting::post($cameras::PROUTE_ED_STORAGE);
         $edComment = ubRouting::post($cameras::PROUTE_ED_COMMENT);
         $editingResult = $cameras->save($edCameraId, $edModelId, $edIp, $edLogin, $edPass, $edStorageId, $edComment);
+        $cameras->saveCamoptsRtspPort($edCameraId, $edPort);
         if ($editingResult) {
             show_error($editingResult);
         } else {
