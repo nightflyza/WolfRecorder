@@ -318,7 +318,7 @@ class Cameras {
             $this->camoptsDb->data($keyF, $valueF);
             $this->camoptsDb->where('cameraid', '=', $cameraId);
             $this->camoptsDb->save();
-            log_register('CAMOPTS CAMERA [' . $cameraId . '] SET `' . $key . '` ON `' . $value . '`');
+            log_register('CAMOPTS CAMERA [' . $cameraId . '] SET `' . strtoupper($key) . '` ON `' . $value . '`');
         } else {
             log_register('CAMOPTS FAIL CAMERA [' . $cameraId . '] NOT EXISTS');
         }
