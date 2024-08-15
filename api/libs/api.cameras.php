@@ -209,7 +209,7 @@ class Cameras {
     public function saveComment($cameraId, $comment) {
         $result = '';
         $cameraId = ubRouting::filters($cameraId, 'int');
-        $commentF = ubRouting::filters($comment, 'mres');
+        $commentF = ubRouting::filters($comment, 'safe');
         if (isset($this->allCameras[$cameraId])) {
             $this->camerasDb->where('id', '=', $cameraId);
             $this->camerasDb->data('comment', $commentF);
@@ -242,7 +242,7 @@ class Cameras {
         $loginF = ubRouting::filters($login, 'mres');
         $passwordF = ubRouting::filters($password, 'mres');
         $storageId = ubRouting::filters($storageId, 'int');
-        $commentF = ubRouting::filters($comment, 'mres');
+        $commentF = ubRouting::filters($comment, 'safe');
         if (isset($this->allCameras[$cameraId])) {
             $cameraData = $this->allCameras[$cameraId];
             if ($cameraData['active'] == 0) {
@@ -441,7 +441,7 @@ class Cameras {
         if ($storageId == 0) {
             $storageId = $this->storages->getLeastUsedStorage();
         }
-        $commentF = ubRouting::filters($comment, 'mres');
+        $commentF = ubRouting::filters($comment, 'safe');
         $channelId = $this->getChannelId();
 
         $allStorages = $this->storages->getAllStorageNames();
