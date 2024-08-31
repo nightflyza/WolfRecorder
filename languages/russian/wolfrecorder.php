@@ -277,3 +277,6 @@ $lang['def']['Custom RTSP port'] = 'Пользовательский RTSP пор
 $lang['def']['Custom'] = 'Пользовательский';
 $lang['def']['For administrator'] = 'Для администратора';
 $lang['def']['a very fucked up password is used'] = 'используется очень хуевый пароль';
+$lang['def']['on average'] = 'в середньому';
+$lang['def']['Cores'] = 'Ядер';
+$lang['def']['Uptime'] = 'Аптайм';

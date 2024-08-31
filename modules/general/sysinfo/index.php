@@ -9,7 +9,7 @@ if (cfr('SYSINFO')) {
     if (cfr('ROOT')) {
         $systemHealth .= $sysInfo->renderSerialInfo();
     }
-    $systemHealth .= $sysInfo->renderLA();
+    $systemHealth .= $sysInfo->renderSysLoad();
     $systemHealth .= $sysInfo->renderDisksCapacity();
 
     show_window(__('System health'), $systemHealth);
