@@ -196,7 +196,7 @@ class SystemInfo {
         $osLabel = $this->hwInfo->getOs() . ' ' . $this->hwInfo->getOsRelease() . ', ';
         $phpLabel = __('PHP') . ': ' . $this->hwInfo->getPhpVersion() . ', ';
         $memLabel = wr_convertSize($memTotal) . ' ' . __('RAM') . '.';
-        $uptimeLabel = __('Uptime') . ': ' . wr_formatTimeArchive($uptime);
+        $uptimeLabel = __('Uptime') . ': ' . zb_formatTime($uptime);
         $sysLabel = __('CPU') . ': ' . $cpuName . ', ' . $cpuCores . ' ' . __('Cores') . ', ' . $memLabel;
         $sysLabel .= ' ' . $osLabel . ' ' . $phpLabel . ' ' . $uptimeLabel;
         $result .= $this->messages->getStyledMessage(wf_tag('center') . $sysLabel . wf_tag('center', true), 'success');
