@@ -280,4 +280,5 @@ $lang['def']['a very fucked up password is used'] = 'використовуєт�
 $lang['def']['on average'] = 'в середньому';
 $lang['def']['Cores'] = 'Ядер';
 $lang['def']['Uptime'] = 'Аптайм';
+$lang['def']['of'] = 'з';
 $lang['def'][''] = '';

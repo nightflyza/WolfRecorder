@@ -160,7 +160,9 @@ class SystemInfo {
 
         if (!empty($usedSpaceArr)) {
             foreach ($usedSpaceArr as $mountPoint => $spaceStats) {
-                $partitionLabel = $mountPointNames[$mountPoint] . ' - ' . wr_convertSize($spaceStats['free']) . ' ' . __('Free');
+                $freeLabel = wr_convertSize($spaceStats['free']);
+                $totalLabel = wr_convertSize($spaceStats['total']);
+                $partitionLabel = $mountPointNames[$mountPoint] . ' - ' . $freeLabel . ' ' . __('of') . ' ' . $totalLabel . ' ' . __('Free');
                 $result .= wf_renderGauge(round($spaceStats['usedpercent']), $partitionLabel, '%', $opts, 280);
             }
         } else {
@@ -192,11 +194,11 @@ class SystemInfo {
         $memTotal = $this->hwInfo->getMemTotal();
         $uptime = $this->hwInfo->getUptime();
         $osLabel = $this->hwInfo->getOs() . ' ' . $this->hwInfo->getOsRelease() . ', ';
-        $phpLabel = __('PHP') . ': ' . $this->hwInfo->getPhpVersion().', ';
+        $phpLabel = __('PHP') . ': ' . $this->hwInfo->getPhpVersion() . ', ';
         $memLabel = wr_convertSize($memTotal) . ' ' . __('RAM') . '.';
         $uptimeLabel = __('Uptime') . ': ' . wr_formatTimeArchive($uptime);
         $sysLabel = __('CPU') . ': ' . $cpuName . ', ' . $cpuCores . ' ' . __('Cores') . ', ' . $memLabel;
-        $sysLabel .= ' ' . $osLabel.' '.$phpLabel . ' ' . $uptimeLabel;
+        $sysLabel .= ' ' . $osLabel . ' ' . $phpLabel . ' ' . $uptimeLabel;
         $result .= $this->messages->getStyledMessage(wf_tag('center') . $sysLabel . wf_tag('center', true), 'success');
 
         $result .= wf_delimiter(0);
