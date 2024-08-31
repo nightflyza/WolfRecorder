@@ -105,7 +105,7 @@ class SystemInfo {
              minorTicks: 5
                       ';
 
-        $result .= wf_renderGauge($this->hwInfo->getLoadPercent1(), ' ' . __('on average'), '%', $laOpts, 280);
+        $result .= wf_renderGauge($this->hwInfo->getloadAvgPercent(), ' ' . __('on average'), '%', $laOpts, 280);
         $result .= wf_renderGauge($this->hwInfo->getLoadPercent1(), '1' . ' ' . __('minutes'), '%', $laOpts, 280);
         $result .= wf_renderGauge($this->hwInfo->getLoadPercent5(), '5' . ' ' . __('minutes'), '%', $laOpts, 280);
         $result .= wf_renderGauge($this->hwInfo->getLoadPercent15(), '15' . ' ' . __('minutes'), '%', $laOpts, 280);
