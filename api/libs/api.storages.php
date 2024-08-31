@@ -84,7 +84,7 @@ class Storages {
         if (isset($this->allStorages[$storageId])) {
             $result = $this->allStorages[$storageId];
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -99,7 +99,7 @@ class Storages {
                 $result[$each['id']] = $each['name'];
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -114,7 +114,7 @@ class Storages {
                 $result[$each['id']] = __($each['name']);
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -123,7 +123,7 @@ class Storages {
      * @return array
      */
     public function getAllStoragesData() {
-        return($this->allStorages);
+        return ($this->allStorages);
     }
 
     /**
@@ -142,7 +142,7 @@ class Storages {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -157,7 +157,7 @@ class Storages {
         $result = '';
         $pathF = ubRouting::filters($path, 'mres');
         $nameF = ubRouting::filters($name, 'mres');
-        if (!empty($pathF) AND ! empty($nameF)) {
+        if (!empty($pathF) and ! empty($nameF)) {
             if ($this->isPathUnique($pathF)) {
                 if (file_exists($pathF)) {
                     if (is_dir($pathF)) {
@@ -182,7 +182,7 @@ class Storages {
         } else {
             $result = __('Storage path or name is empty');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -207,7 +207,7 @@ class Storages {
             $result = __('No such storage') . ' [' . $storageId . ']';
         }
 
-        return($result);
+        return ($result);
     }
 
     /**
@@ -221,7 +221,7 @@ class Storages {
         $inputs .= wf_TextInput(self::PROUTE_NAME, __('Name'), '', false, 20);
         $inputs .= wf_Submit(__('Create'));
         $result .= wf_Form('', 'POST', $inputs, 'glamour');
-        return($result);
+        return ($result);
     }
 
     /**
@@ -240,7 +240,7 @@ class Storages {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -259,7 +259,7 @@ class Storages {
             $inputs .= wf_Submit(__('Save'));
             $result .= wf_Form('', 'POST', $inputs, 'glamour');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -273,7 +273,7 @@ class Storages {
     public function saveName($storageId, $storageName) {
         $storageId = ubRouting::filters($storageId, 'int');
         $storageNameF = ubRouting::filters($storageName, 'mres');
-        if ($storageId AND $storageNameF) {
+        if ($storageId and $storageNameF) {
             if (isset($this->allStorages[$storageId])) {
                 $storagePath = $this->allStorages[$storageId]['path'];
                 $this->storagesDb->where('id', '=', $storageId);
@@ -290,6 +290,8 @@ class Storages {
      * @return string
      */
     public function renderList() {
+        $hwInfo = new SystemHwInfo();
+
         $result = '';
         if (!empty($this->allStorages)) {
             $allStoragesCams = $this->getAllStoragesCamerasCount();
@@ -303,17 +305,20 @@ class Storages {
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
             foreach ($this->allStorages as $io => $each) {
+                $storageSizeLabel =  '-';
+                $storageFreeLabel = '-';
                 $cells = wf_TableCell($each['id']);
                 $cells .= wf_TableCell($each['path']);
                 $cells .= wf_TableCell(__($each['name']));
                 $storageState = ($this->checkPath($each['path'])) ? true : false;
                 $stateIcon = web_bool_led($storageState);
+                if ($storageState) {
+                    $diskStats = $hwInfo->getDiskStat($each['path']);
+                    $storageSizeLabel =  wr_convertSize( $diskStats['total']);
+                    $storageFreeLabel =  wr_convertSize($diskStats['free']);
+                }
                 $cells .= wf_TableCell($stateIcon);
                 $cells .= wf_TableCell($allStoragesCams[$each['id']]);
-                $storageSize = @disk_total_space($each['path']);
-                $storageFree = @disk_free_space($each['path']);
-                $storageSizeLabel = ($storageState) ? wr_convertSize($storageSize) : '-';
-                $storageFreeLabel = ($storageState) ? wr_convertSize($storageFree) : '-';
                 $cells .= wf_TableCell($storageSizeLabel);
                 $cells .= wf_TableCell($storageFreeLabel);
                 $actControls = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert());
@@ -326,7 +331,7 @@ class Storages {
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -345,11 +350,11 @@ class Storages {
             $allCamerasStorages = $camerasDb->getAll();
             if (!empty($allCamerasStorages)) {
                 foreach ($allCamerasStorages as $io => $eachCam) {
-                    $result[$eachCam['storageid']] ++;
+                    $result[$eachCam['storageid']]++;
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -363,7 +368,7 @@ class Storages {
         if (!empty($allStoragesCamerasCount)) {
             $result = array_search(min($allStoragesCamerasCount), $allStoragesCamerasCount);
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -383,7 +388,7 @@ class Storages {
         if (!$usedByCameras) {
             $result = false;
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -398,7 +403,7 @@ class Storages {
         $result = array();
         $storageId = ubRouting::filters($storageId, 'int');
         $channel = ubRouting::filters($channel, 'mres');
-        if ($storageId AND $channel) {
+        if ($storageId and $channel) {
             if (isset($this->allStorages[$storageId])) {
                 $storagePath = $this->allStorages[$storageId]['path'];
                 $storageLastChar = substr($storagePath, -1);
@@ -411,7 +416,7 @@ class Storages {
                         $allChunksNames = scandir($storagePath . $channel);
                         if (!empty($allChunksNames)) {
                             foreach ($allChunksNames as $io => $eachFileName) {
-                                if ($eachFileName != '.' AND $eachFileName != '..') {
+                                if ($eachFileName != '.' and $eachFileName != '..') {
                                     $cleanChunkTimeStamp = str_replace($chunksExt, '', $eachFileName);
                                     $result[$cleanChunkTimeStamp] = $storagePath . $channel . '/' . $eachFileName;
                                 }
@@ -421,7 +426,7 @@ class Storages {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -436,7 +441,7 @@ class Storages {
         $result = array();
         $storageId = ubRouting::filters($storageId, 'int');
         $channel = ubRouting::filters($channel, 'mres');
-        if ($storageId AND $channel) {
+        if ($storageId and $channel) {
             $channelChunks = $this->getChannelChunks($storageId, $channel);
             if (!empty($channelChunks)) {
                 foreach ($channelChunks as $chunkTimeStamp => $eachChunkPath) {
@@ -445,7 +450,7 @@ class Storages {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -462,7 +467,7 @@ class Storages {
                 $result += $chunksData['size'];
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -477,7 +482,7 @@ class Storages {
         $result = 0;
         $storageId = ubRouting::filters($storageId, 'int');
         $channel = ubRouting::filters($channel, 'mres');
-        if ($storageId AND $channel) {
+        if ($storageId and $channel) {
             $channelChunks = $this->getChannelChunks($storageId, $channel);
             if (!empty($channelChunks)) {
                 foreach ($channelChunks as $io => $eachChunk) {
@@ -485,7 +490,7 @@ class Storages {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -502,7 +507,7 @@ class Storages {
                 $result += filesize($eachChunk);
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -518,12 +523,12 @@ class Storages {
         $result = array();
         if (!empty($chunksList)) {
             foreach ($chunksList as $eachTimestamp => $eachChunkPath) {
-                if (($eachTimestamp > $timeFrom) AND ( $eachTimestamp < $timeTo)) {
+                if (($eachTimestamp > $timeFrom) and ($eachTimestamp < $timeTo)) {
                     $result[$eachTimestamp] = $eachChunkPath;
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -542,7 +547,7 @@ class Storages {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -556,7 +561,7 @@ class Storages {
     protected function allocateChannel($storagePath, $channel) {
         $result = false;
         $delimiter = '';
-        if (!empty($storagePath) AND ! empty($channel)) {
+        if (!empty($storagePath) and ! empty($channel)) {
             if (file_exists($storagePath)) {
                 if (is_dir($storagePath)) {
                     if (is_writable($storagePath)) {
@@ -590,7 +595,7 @@ class Storages {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -635,7 +640,7 @@ class Storages {
             $storagePath = $this->allStorages[$storageId]['path'];
             $result = $this->allocateChannel($storagePath, $channel);
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -652,7 +657,7 @@ class Storages {
         if (isset($this->allStorages[$storageId])) {
             $storagePath = $this->allStorages[$storageId]['path'];
             $delimiter = '';
-            if (!empty($storagePath) AND ! empty($channel)) {
+            if (!empty($storagePath) and ! empty($channel)) {
                 if (file_exists($storagePath)) {
                     if (is_dir($storagePath)) {
                         if (is_writable($storagePath)) {
@@ -680,5 +685,4 @@ class Storages {
             }
         }
     }
-
 }

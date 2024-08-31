@@ -400,6 +400,7 @@ class RestAPI {
      */
     protected function systemGetHealth() {
         global $ubillingConfig;
+        $hwInfo=new SystemHwInfo();
         $result = array(
             'storages' => 1,
             'network' => 1,
@@ -408,6 +409,7 @@ class RestAPI {
             'channels_online' => 0,
             'uptime' => 0,
             'loadavg' => 0,
+            'cpuload' => 0,
             'os' => '',
         );
 
@@ -438,28 +440,21 @@ class RestAPI {
         }
 
         //system uptime
-        $binPaths = $ubillingConfig->getBinpaths();
-        $rawUptime = shell_exec($binPaths['UPTIME']);
-        $uptime = '';
-        if (!empty($rawUptime)) {
-            $rawUptime = explode(',', $rawUptime);
-            $uptime = trim($rawUptime[0]);
-            if (ispos($uptime, 'up')) {
-                $uptimeClean = explode('up', $uptime);
-                if (isset($uptimeClean[1])) {
-                    $uptime = trim($uptimeClean[1]);
-                }
-            }
-        }
+        $uptime = $hwInfo->getUptime();
         $result['uptime'] = $uptime;
+        //system load averaga
+        $loadAvg = $hwInfo->getLa1();
+        $result['loadavg'] = $loadAvg;
+
         //system load
-        $loadAvg = sys_getloadavg();
-        $result['loadavg'] = round($loadAvg[0], 2);
+        $cpuLoad=$hwInfo->getsystemLoadPercent();
+        $result['cpuload'] = $cpuLoad;
 
         //system name
-        $command = '/usr/bin/uname -opr';
-        $sysName = shell_exec($command);
-        $result['os'] = 'OS: ' . trim($sysName) . ' PHP: ' . phpversion();
+        $osName=$hwInfo->getOs();
+        $osRelease=$hwInfo->getOsRelease();
+        $phpVer=$hwInfo->getPhpVersion();
+        $result['os'] = 'OS: ' . $osName.' '.$osRelease . ' PHP: ' . $phpVer;
         return($result);
     }
 
