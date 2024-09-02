@@ -93,22 +93,24 @@ class SystemInfo {
      * @return string
      */
     public function renderSysLoad() {
+        $size=280;
+        $container=$size+20;
         $result = '';
         $result .= wf_tag('h3') . __('System load') . wf_tag('h3', true);
         $laOpts = '
              max: 100,
              min: 0,
-             width: ' . 260 . ', height: ' . 260 . ',
+             width: ' . $size . ', height: ' . $size . ',
              greenFrom: 0, greenTo: 40,
              yellowFrom:40, yellowTo: 70,
              redFrom: 70, redTo: 100,
              minorTicks: 5
                       ';
 
-        $result .= wf_renderGauge($this->hwInfo->getloadAvgPercent(), ' ' . __('on average'), '%', $laOpts, 280);
-        $result .= wf_renderGauge($this->hwInfo->getLoadPercent1(), '1' . ' ' . __('minutes'), '%', $laOpts, 280);
-        $result .= wf_renderGauge($this->hwInfo->getLoadPercent5(), '5' . ' ' . __('minutes'), '%', $laOpts, 280);
-        $result .= wf_renderGauge($this->hwInfo->getLoadPercent15(), '15' . ' ' . __('minutes'), '%', $laOpts, 280);
+        $result .= wf_renderGauge($this->hwInfo->getloadAvgPercent(), ' ' . __('on average'), '%', $laOpts, $container);
+        $result .= wf_renderGauge($this->hwInfo->getLoadPercent1(), '1' . ' ' . __('minutes'), '%', $laOpts, $container);
+        $result .= wf_renderGauge($this->hwInfo->getLoadPercent5(), '5' . ' ' . __('minutes'), '%', $laOpts, $container);
+        $result .= wf_renderGauge($this->hwInfo->getLoadPercent15(), '15' . ' ' . __('minutes'), '%', $laOpts, $container);
         $result .= wf_CleanDiv();
 
         return ($result);
@@ -120,11 +122,16 @@ class SystemInfo {
      * @return string
      */
     public function renderDisksCapacity() {
+        $size=280;
         $usedSpaceArr = array();
         $mountPoints = array();
         $mountPointNames = array();
         $availableStorages = $this->storages->getAllStoragesData();
         $allStorageNames = $this->storages->getAllStorageNamesLocalized();
+
+        //root fs
+        $mountPoints[0]='/';
+        $mountPointNames['/'] = __('System');
 
         if (!empty($availableStorages)) {
             foreach ($availableStorages as $storageId => $each) {
@@ -132,7 +139,7 @@ class SystemInfo {
                 $mountPointNames[$each['path']] =  $allStorageNames[$each['id']];
             }
         }
-
+        
         $this->hwInfo->setMountPoints($mountPoints);
         $usedSpaceArr = $this->hwInfo->getAllDiskStats();
 
@@ -151,7 +158,7 @@ class SystemInfo {
         $opts = '
              max: 100,
              min: 0,
-             width: ' . 260 . ', height: ' . 260 . ',
+             width: ' . $size . ', height: ' . $size . ',
              greenFrom:' . $greenFrom . ', greenTo: ' . $greenTo . ',
              yellowFrom:' . $yellowFrom . ', yellowTo: ' . $yellowTo . ',
              redFrom:' . $redFrom . ', redTo:' . $redTo . ',
@@ -163,7 +170,7 @@ class SystemInfo {
                 $freeLabel = wr_convertSize($spaceStats['free']);
                 $totalLabel = wr_convertSize($spaceStats['total']);
                 $partitionLabel = $mountPointNames[$mountPoint] . ' - ' . $freeLabel . ' ' . __('of') . ' ' . $totalLabel . ' ' . __('Free');
-                $result .= wf_renderGauge(round($spaceStats['usedpercent']), $partitionLabel, '%', $opts, 280);
+                $result .= wf_renderGauge(round($spaceStats['usedpercent']), $partitionLabel, '%', $opts, ($size+20));
             }
         } else {
             $result .= $this->messages->getStyledMessage(__('No storages available'), 'warning');
