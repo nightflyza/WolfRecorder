@@ -24,7 +24,7 @@ function wr_SerialGet() {
     } else {
         $result = $cachedKey;
     }
-    return($result);
+    return ($result);
 }
 
 /**
@@ -38,7 +38,7 @@ function wr_SerialInstall() {
     $lairDb->data('key', 'wrid');
     $lairDb->data('value', $randomid);
     $lairDb->create();
-    return($randomid);
+    return ($randomid);
 }
 
 /**
@@ -48,7 +48,7 @@ function wr_SerialInstall() {
  */
 function wr_getLocalSystemVersion() {
     $result = file_get_contents('RELEASE');
-    return($result);
+    return ($result);
 }
 
 /**
@@ -64,12 +64,15 @@ function wr_GetReleaseInfo($branch) {
     if ($branch == 'CURRENT') {
         $release_url = UpdateManager::URL_RELEASE_CURRENT;
     }
+    $wrVer = file_get_contents('RELEASE');
+    $agent = 'WolfRecorderUpdMgr/' . trim($wrVer);
     $remoteCallback = new OmaeUrl($release_url);
+    $remoteCallback->setUserAgent($agent);
     $releaseInfo = $remoteCallback->response();
     if ($releaseInfo) {
         $result = $releaseInfo;
     }
-    return($result);
+    return ($result);
 }
 
 /**
@@ -92,7 +95,7 @@ function wr_RenderUpdateInfo($version = '', $branch = 'STABLE') {
     } else {
         $result = __('Error checking updates');
     }
-    return($result);
+    return ($result);
 }
 
 /**
@@ -121,7 +124,6 @@ function wr_Stats($modOverride = '') {
                     $moduleClean = str_replace('x', '', ubRouting::get('module'));
                     $moduleStats = 'x' . $moduleClean;
                 } else {
-                    
                 }
             }
             $releaseinfo = file_get_contents('RELEASE');
@@ -149,7 +151,7 @@ function wr_Stats($modOverride = '') {
             $error = $collector->error();
             $httpCode = $collector->httpCode();
 
-            if (!$error AND $httpCode == 200) {
+            if (!$error and $httpCode == 200) {
                 $output = trim($output);
                 if (!empty($output)) {
                     if (ispos($output, $deployMark)) {
@@ -206,7 +208,7 @@ class Avarice {
                 @$result .= $data[$i] ^ $key[$j];
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -293,7 +295,7 @@ class Avarice {
             if (isset($this->data[$module])) {
                 return (true);
             } else {
-                return(false);
+                return (false);
             }
         }
     }
@@ -337,7 +339,7 @@ class Avarice {
                 $result = true;
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -369,7 +371,7 @@ class Avarice {
             $this->lairDb->data('value', $key);
             $this->lairDb->create();
             log_register('AVARICE INSTALL KEY `' . $keyname . '`');
-            return(true);
+            return (true);
         } else {
             log_register('AVARICE TRY INSTALL WRONG KEY');
             return (false);
@@ -385,7 +387,7 @@ class Avarice {
             $this->lairDb->where('key', '=', $index);
             $this->lairDb->save();
             log_register('AVARICE UPDATE KEY `' . $index . '`');
-            return(true);
+            return (true);
         } else {
             log_register('AVARICE TRY UPDATE WRONG KEY');
             return (false);
