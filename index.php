@@ -33,8 +33,8 @@ if (XHPROF) {
         $xhProfLibsPath = 'xhprof';
     }
     define("XHPROF_ROOT", __DIR__ . '/' . $xhProfLibsPath);
-    require_once (XHPROF_ROOT . '/xhprof_lib/utils/xhprof_lib.php');
-    require_once (XHPROF_ROOT . '/xhprof_lib/utils/xhprof_runs.php');
+    require_once(XHPROF_ROOT . '/xhprof_lib/utils/xhprof_lib.php');
+    require_once(XHPROF_ROOT . '/xhprof_lib/utils/xhprof_runs.php');
     //append XHPROF_FLAGS_NO_BUILTINS if your PHP instance crashes
     xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
 }
@@ -58,16 +58,18 @@ $query_counter = 0;
 /**
  * System initialization
  */
-require_once('api/autoloader.php'); //preloaging required libs
+require_once('api/autoloader.php'); //preloading required libs
 define('LOGGED_IN', $system->getLoggedInState()); //emulating RCMS LOGGED_IN state
-require_once ($system->getIndexModulePath()); //react to some module routes
+require_once($system->getIndexModulePath()); //react to some module routes
 
 
 if (XHPROF) {
     $xhprof_data = xhprof_disable();
     $xhprof_runs = new XHProfRuns_Default();
     $xhprof_run_id = $xhprof_runs->save_run($xhprof_data, "xhprof_yalf");
-    $xhprof_link = wf_modal(wf_img_sized('skins/xhprof.png', __('XHPROF'), 20), 'XHProf current page results', '<iframe src="' . $xhProfLibsPath . '/xhprof_html/index.php?run=' . $xhprof_run_id . '&source=xhprof_yalf" width="100%" height="750"></iframe>', '', '1024', '768');
+    $xhprof_run_url = $xhProfLibsPath . '/xhprof_html/index.php?run=' . $xhprof_run_id . '&source=xhprof_yalf';
+    $xhprof_frame = wf_tag('iframe', false, '', 'src="' . $xhprof_run_url . '" width="100%" height="750"') . wf_tag('iframe', true);
+    $xhprof_link = wf_modal(wf_img_sized('skins/xhprof.png', __('XHPROF'), 20), 'XHProf current page results', $xhprof_frame, '', '1024', '768');
 }
 
 
@@ -75,4 +77,3 @@ if (XHPROF) {
 if ($system->getRenderer() == 'WEB') {
     require_once($system->getSkinPath() . $system::SKIN_TEMPLATE_NAME);
 }
-
