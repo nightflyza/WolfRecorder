@@ -258,12 +258,20 @@ class LiveCams {
                             $chanshotValid = $this->chanshots->isChannelScreenshotValid($channelScreenshot);
                             if (!$chanshotValid) {
                                 $channelScreenshot = $this->chanshots::ERR_CORRUPT;
+                            } else {
+                                //replacing chanshot url with base64 encoded image
+                                $embedData = $this->chanshots->getLastCheckedShot();
+                                if (!empty($embedData)) {
+                                    $channelScreenshot = $embedData;
+                                }
                             }
                         }
 
                         if (!$eachCameraData['CAMERA']['active']) {
                             $channelScreenshot = $this->chanshots::ERR_DISABLD;
                         }
+
+
 
                         $result .= wf_tag('div', false, '', $style);
                         $channelUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $cameraChannel;

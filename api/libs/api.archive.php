@@ -189,9 +189,15 @@ class Archive {
                             if (empty($chanShot)) {
                                 $chanShot = $screenshots::ERR_NOSIG;
                             } else {
-                                $chanshotValid=$screenshots->isChannelScreenshotValid($chanShot);
+                                $chanshotValid = $screenshots->isChannelScreenshotValid($chanShot);
                                 if (!$chanshotValid) {
-                                    $chanShot=$screenshots::ERR_CORRUPT;
+                                    $chanShot = $screenshots::ERR_CORRUPT;
+                                } else {
+                                    //replacing chanshot url with base64 encoded image
+                                    $embedData = $screenshots->getLastCheckedShot();
+                                    if (!empty($embedData)) {
+                                        $chanShot = $embedData;
+                                    }
                                 }
                             }
                             if (!$each['CAMERA']['active']) {
@@ -214,7 +220,7 @@ class Archive {
         } else {
             $result .= $this->messages->getStyledMessage(__('No assigned cameras to show'), 'warning');
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -242,7 +248,7 @@ class Archive {
 
         $player = new Player($this->playerWidth, $autoPlay);
         $result = $player->renderPlaylistPlayer($playlistPath, $plStart, $playerId);
-        return($result);
+        return ($result);
     }
 
     /**
@@ -260,7 +266,7 @@ class Archive {
                 $result[$timeLabel] = 0;
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -317,7 +323,7 @@ class Archive {
             }
         }
 
-        return($result);
+        return ($result);
     }
 
     /**
@@ -362,7 +368,7 @@ class Archive {
                 $result .= wf_CleanDiv();
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -411,7 +417,7 @@ class Archive {
             }
 
 
-//generating playlist
+            //generating playlist
             if (!empty($filteredChunks)) {
                 $playListPath = Storages::PATH_HOWL . $cameraData['channel'] . self::PLAYLIST_MASK;
                 $segmentsCount = sizeof($filteredChunks);
@@ -432,7 +438,7 @@ class Archive {
                 $result = $playListPath;
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -495,7 +501,7 @@ class Archive {
             $neurSearchUrl = self::URL_ME . '&' . NeuralObjSearch::ROUTE_CHAN_DETECT . '=' . $channelId . '&' . NeuralObjSearch::ROUTE_DATE . '=' . $showDate;
             $result .= wf_AjaxLink($neurSearchUrl, web_icon_search() . ' ' . __('Objects search'), NeuralObjSearch::AJAX_CONTAINER, false, 'ubButton') . ' ';
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -510,6 +516,6 @@ class Archive {
         if ($channelId) {
             $result .= $this->cameras->getCameraComment($channelId);
         }
-        return($result);
+        return ($result);
     }
 }

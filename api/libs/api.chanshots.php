@@ -96,6 +96,27 @@ class ChanShots {
      */
     protected $shotsValidationFlag = false;
 
+    /**
+     * Channel screenshots embedding flag
+     *
+     * @var bool
+     */
+    protected $shotsEmbedFlag = false;
+
+    /**
+     * Contains base64 encoded latest checked channel shot
+     *
+     * @var string
+     */
+    protected $lastCheckedShot = '';
+
+     /**
+     * Contains embedded channel shots watermark path
+     *
+     * @var string
+     */
+    protected $shotsWatermarkPath = '';
+
     public function __construct() {
         $this->loadConfigs();
         $this->initPixelCraft();
@@ -110,9 +131,9 @@ class ChanShots {
     /**
      * predefined shots paths
      */
-    const ERR_NOSIG='skins/nosignal.gif';
-    const ERR_CORRUPT='skins/error.gif';
-    const ERR_DISABLD='skins/chanblock.gif';
+    const ERR_NOSIG = 'skins/nosignal.gif';
+    const ERR_CORRUPT = 'skins/error.gif';
+    const ERR_DISABLD = 'skins/chanblock.gif';
 
     /**
      * Loads some required configs
@@ -128,6 +149,8 @@ class ChanShots {
         $this->ffmpgPath = $this->binPaths['FFMPG_PATH'];
         $this->screenshotsPath = Storages::PATH_HOWL . self::SHOTS_SUBDIR;
         $this->shotsValidationFlag = $ubillingConfig->getAlterParam('CHANSHOTS_VALIDATION');
+        $this->shotsEmbedFlag = $ubillingConfig->getAlterParam('CHANSHOTS_EMBED');
+        $this->shotsWatermarkPath = $ubillingConfig->getAlterParam('CHANSHOTS_WATERMARK');
     }
 
     /**
@@ -137,6 +160,10 @@ class ChanShots {
      */
     protected function initPixelCraft() {
         $this->pixelCraft = new PixelCraft();
+        //loading watermark once
+        if (!empty($this->shotsWatermarkPath)) {
+            $this->pixelCraft->loadWatermark($this->shotsWatermarkPath);
+        }
     }
 
     /**
@@ -182,10 +209,43 @@ class ChanShots {
                 $imageValid = $this->pixelCraft->isImageValid($channelScreenshot);
                 if ($imageValid) {
                     $result = true;
+                    if ($this->shotsEmbedFlag) {
+                        $this->embedScreenshotProcessing($channelScreenshot);
+                    }
+                } else {
+                    if ($this->shotsEmbedFlag) {
+                        $this->lastCheckedShot = '';
+                    }
                 }
             }
         }
         return ($result);
+    }
+
+    /**
+     * Embedded channel screenshot processing
+     *
+     * @param string $channelScreenshot
+     * 
+     * @return void
+     */
+    protected function embedScreenshotProcessing($channelScreenshot) {
+        if ($this->shotsEmbedFlag) {
+            $this->pixelCraft->loadImage($channelScreenshot);
+            if (!empty($this->shotsWatermarkPath)) {
+                $this->pixelCraft->drawWatermark(false, 0, 0);
+            }
+            $this->lastCheckedShot = $this->pixelCraft->getImageBase('jpeg', true);
+        }
+    }
+
+    /**
+     * Returns lastCheckedShot property content
+     *
+     * @return string
+     */
+    public function getLastCheckedShot() {
+        return ($this->lastCheckedShot);
     }
 
     /**

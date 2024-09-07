@@ -241,6 +241,12 @@ class Export {
                                 $chanshotValid = $screenshots->isChannelScreenshotValid($chanShot);
                                 if (!$chanshotValid) {
                                     $chanShot = $screenshots::ERR_CORRUPT;
+                                } else {
+                                      //replacing chanshot url with base64 encoded image
+                                      $embedData = $screenshots->getLastCheckedShot();
+                                      if (!empty($embedData)) {
+                                          $chanShot = $embedData;
+                                      }
                                 }
                             }
                             if (!$each['CAMERA']['active']) {
