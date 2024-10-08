@@ -80,7 +80,7 @@ class MoDet {
                     $newFilePath = $this->getFilteredFileName($filePath);
                     if ($newFilePath) {
                         if (!file_exists($newFilePath)) {
-                            if (!ispos($newFilePath, '_' . self::FILTERED_MARK . Export::RECORDS_EXT)) {
+                            if (!ispos($filePath, '_' . self::FILTERED_MARK . Export::RECORDS_EXT)) {
                                 $this->process->start();
                                 log_register('MOTION FILTERING `' . $filePath . '` STARTED');
                                 $command = $this->cliFF->getFFmpegPath() . ' -i ' . $filePath . ' ' . $this->cliFF->getMoDetOpts() . ' ' . $newFilePath;
@@ -122,7 +122,7 @@ class MoDet {
                     $newFilePath = $this->getFilteredFileName($filePath);
                     if ($newFilePath) {
                         if (!file_exists($newFilePath)) {
-                            if (!ispos($newFilePath, '_' . self::FILTERED_MARK . Export::RECORDS_EXT)) {
+                            if (!ispos($filePath, '_' . self::FILTERED_MARK . Export::RECORDS_EXT)) {
                                 $this->process->runBackgroundProcess(self::WRAPPER . ' "modet&mdfp=' . $filePathEnc . '"', 0);
                             } else {
                                 $result .= __('Something went wrong') . ' - ' . __('already filtered');
