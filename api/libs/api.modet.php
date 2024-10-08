@@ -124,6 +124,7 @@ class MoDet {
                         if (!file_exists($newFilePath)) {
                             if (!ispos($filePath, '_' . self::FILTERED_MARK . Export::RECORDS_EXT)) {
                                 $this->process->runBackgroundProcess(self::WRAPPER . ' "modet&mdfp=' . $filePathEnc . '"', 0);
+                                log_register('MOTION FILTERING `' . $filePath . '` SCHEDULED');
                             } else {
                                 $result .= __('Something went wrong') . ' - ' . __('already filtered');
                             }
