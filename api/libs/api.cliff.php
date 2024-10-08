@@ -34,6 +34,27 @@ class CliFF {
     protected $chunkTime = 60;
 
     /**
+     * Contains motion detection threshold
+     *
+     * @var int
+     */
+    protected $moDetThreshold = 2;
+
+    /**
+     * Contains motion detection time scale
+     *
+     * @var int
+     */
+    protected $moDetTimeScale = 15;
+
+    /**
+     * Contains motion detection options string
+     *
+     * @var string
+     */
+    protected $moDetOpts = '';
+
+    /**
      * Some CLI option templates
      */
     protected $transportTemplate = '';
@@ -85,7 +106,7 @@ class CliFF {
             $rawResult = explodeRows($rawResult);
             if (isset($rawResult[0])) {
                 $firstLine = $rawResult[0];
-                if (!empty($firstLine) AND ispos($firstLine, 'ffmpeg version')) {
+                if (!empty($firstLine) and ispos($firstLine, 'ffmpeg version')) {
                     $rawVersion = substr($firstLine, 15, 5);
                     if (!empty($rawVersion)) {
                         $this->ffmpegVersion = ubRouting::filters($rawVersion, 'int');
@@ -107,6 +128,7 @@ class CliFF {
         $this->audioCapture = '-acodec copy' . ' ';
         $this->liveOptsPrefix = '-stimeout 5000000 -loglevel error -rtsp_transport tcp -f rtsp -i';
         $this->liveOptsSuffix = '-strict -2 -vcodec copy -hls_wrap 10';
+
         // burn cpu burn! lol
         //$this->liveOptsSuffix = '-strict -2 -vcodec libx264 -preset ultrafast -hls_wrap 10';
 
@@ -126,7 +148,7 @@ class CliFF {
      * @return string
      */
     public function getTransportTemplate() {
-        return($this->transportTemplate);
+        return ($this->transportTemplate);
     }
 
     /**
@@ -135,7 +157,7 @@ class CliFF {
      * @return string
      */
     public function getRecordOpts() {
-        return($this->recordOpts);
+        return ($this->recordOpts);
     }
 
     /**
@@ -163,5 +185,36 @@ class CliFF {
      */
     public function getLiveOptsSuffix() {
         return ($this->liveOptsSuffix);
+    }
+
+    /**
+     * Returns ffmpeg binary path
+     *
+     * @return string
+     */
+    public function getFFmpegPath() {
+        return ($this->ffmpgPath);
+    }
+
+    /**
+     * Sets alternate motion detection parameters
+     *
+     * @param int $threshold motion detection sensitivity 1..100
+     * @param int $timeScale Change the PTS of the input frames (x)
+     * @return void
+     */
+    public function setMoDetParams($threshold=2,$timeScale=15) {
+        $this->moDetThreshold=ubRouting::filters($threshold,'int');
+        $this->moDetTimeScale=ubRouting::filters($timeScale,'int');
+    }
+
+    /**
+     * Sets and returns motion detection options
+     *
+     * @return string
+     */
+    public function getMoDetOpts() {
+        $this->moDetOpts = '-loglevel error -vf "select=gt(scene\,' . round($this->moDetThreshold / 100, 3) . '),setpts=N/(' . $this->moDetTimeScale . '*TB)" ';
+        return ($this->moDetOpts);
     }
 }

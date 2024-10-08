@@ -92,6 +92,7 @@ class Export {
     const ROUTE_SHOWDATE = 'exportdatearchive';
     const ROUTE_DELETE = 'delrec';
     const ROUTE_PREVIEW = 'previewrecord';
+    const ROUTE_MODET = 'filtermotion';
     const ROUTE_SCHED_OK = 'scheduledsuccess';
     const ROUTE_BACK_EXPORT = 'chanback';
     const PROUTE_DATE_EXPORT = 'dateexport';
@@ -102,6 +103,7 @@ class Export {
     const PID_SCHEDULE = 'EXPORTSCHEDULE';
     const RECORDS_EXT = '.mp4';
     const TABLE_SCHED = 'schedule';
+    const OPTION_MODET='MODET_ENABLED';
 
     public function __construct() {
         $this->setLogin();
@@ -242,11 +244,11 @@ class Export {
                                 if (!$chanshotValid) {
                                     $chanShot = $screenshots::ERR_CORRUPT;
                                 } else {
-                                      //replacing chanshot url with base64 encoded image
-                                      $embedData = $screenshots->getLastCheckedShot();
-                                      if (!empty($embedData)) {
-                                          $chanShot = $embedData;
-                                      }
+                                    //replacing chanshot url with base64 encoded image
+                                    $embedData = $screenshots->getLastCheckedShot();
+                                    if (!empty($embedData)) {
+                                        $chanShot = $embedData;
+                                    }
                                 }
                             }
                             if (!$each['CAMERA']['active']) {
@@ -635,7 +637,7 @@ class Export {
                 if (!file_exists($fullRecordFilePath)) {
                     $command = $this->ffmpgPath . ' -loglevel error -f concat -safe 0 -i ' . $exportListPath . ' -c copy ' . $fullRecordFilePath;
                     shell_exec($command);
-                    
+
                     //mark export schedule task as done
                     $this->scheduleDb->where('id', '=', $taskId);
                     $this->scheduleDb->data('done', 1);
@@ -823,15 +825,14 @@ class Export {
         $result = array();
         $cleanName = str_replace(self::RECORDS_EXT, '', $fileName);
         $explodedName = explode('_', $cleanName);
-        if (sizeof($explodedName) == 3) {
-            $rawFrom = explode('-', $explodedName[0]);
-            $from = $rawFrom[0] . '-' . $rawFrom[1] . '-' . $rawFrom[2] . ' ' . $rawFrom[3] . ':' . $rawFrom[4] . ':' . $rawFrom[5];
-            $rawTo = explode('-', $explodedName[1]);
-            $to = $rawTo[0] . '-' . $rawTo[1] . '-' . $rawTo[2] . ' ' . $rawTo[3] . ':' . $rawTo[4] . ':' . $rawTo[5];
-            $result['from'] = $from;
-            $result['to'] = $to;
-            $result['cameraid'] = $explodedName[2];
-        }
+        $rawFrom = explode('-', $explodedName[0]);
+        $from = $rawFrom[0] . '-' . $rawFrom[1] . '-' . $rawFrom[2] . ' ' . $rawFrom[3] . ':' . $rawFrom[4] . ':' . $rawFrom[5];
+        $rawTo = explode('-', $explodedName[1]);
+        $to = $rawTo[0] . '-' . $rawTo[1] . '-' . $rawTo[2] . ' ' . $rawTo[3] . ':' . $rawTo[4] . ':' . $rawTo[5];
+        $result['from'] = $from;
+        $result['to'] = $to;
+        $result['cameraid'] = $explodedName[2];
+        $result['marker'] = @$explodedName[3];
         return ($result);
     }
 
@@ -847,7 +848,7 @@ class Export {
         $currentModule = ubRouting::get('module');
         if (!empty($currentModule)) {
             if ($currentModule == 'export') {
-                $channelId = ubRouting::get(self::ROUTE_CHANNEL,'gigasafe');
+                $channelId = ubRouting::get(self::ROUTE_CHANNEL, 'gigasafe');
                 $deleteUrl = self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $channelId . '&' . self::ROUTE_DELETE . '=' . $fileName;
                 $cancelUrl = self::URL_ME . '&' . self::ROUTE_CHANNEL . '=' . $channelId;
                 $label = wf_tag('center') . wf_img('skins/trash-bin.png') . wf_tag('center', true);
@@ -994,6 +995,7 @@ class Export {
         $userRecordingsDir = $this->prepareRecordingsDir();
         $recordsExtFilter = '*' . self::RECORDS_EXT;
         $allRecords = rcms_scandir($userRecordingsDir, $recordsExtFilter);
+        $moDetFlag = (@$this->altCfg[MoDet::OPTION_ENABLE]) ? true : false;
         //channel filter applied?
         if ($channelId) {
             if (!empty($allRecords)) {
@@ -1006,6 +1008,7 @@ class Export {
                 }
             }
         }
+
         if (!empty($allRecords)) {
             $cells = wf_TableCell(__('Camera'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('from'));
@@ -1014,23 +1017,38 @@ class Export {
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
             foreach ($allRecords as $io => $eachFile) {
+                $actLinks = '';
+                $moControls = '';
                 $fileNameParts = $this->parseRecordFileName($eachFile);
-                $cells = wf_TableCell($this->cameras->getCameraCommentById($fileNameParts['cameraid']));
-                $cells .= wf_TableCell($fileNameParts['from']);
-                $cells .= wf_TableCell($fileNameParts['to']);
-
                 $recordSize = filesize($userRecordingsDir . $eachFile);
                 $recordSizeLabel = wr_convertSize($recordSize);
-                $cells .= wf_TableCell($recordSizeLabel, '', '', 'sorttable_customkey="' . $recordSize . '"');
-                $actLinks = '';
                 $fileUrl = $userRecordingsDir . $eachFile;
                 $previewUrl = self::URL_RECORDS . '&' . self::ROUTE_PREVIEW . '=' . base64_encode($fileUrl);
+                $cameraComment = $this->cameras->getCameraCommentById($fileNameParts['cameraid']);
                 if ($channelId) {
                     $previewUrl .= '&' . self::ROUTE_BACK_EXPORT . '=' . $channelId;
                 }
+
+                if ($moDetFlag and empty($channelId)) {
+                    $fileMarker = $fileNameParts['marker'];
+                    if ($fileMarker == MoDet::FILTERED_MARK) {
+                        $cameraComment .= ' '.wf_img('skins/motion_filtered.png',__('Motion filtered'));
+                    } else {
+                        $modetUrl = self::URL_RECORDS . '&' . self::ROUTE_MODET . '=' . base64_encode($fileUrl);
+                        $moControls .= wf_Link($modetUrl, wf_img('skins/motion.png',__('Motion')));
+                    }
+                }
+
                 $actLinks .= wf_Link($previewUrl, wf_img('skins/icon_play_small.png', __('Show'))) . ' ';
+                $actLinks .= $moControls;
                 $actLinks .= wf_Link($fileUrl, web_icon_download()) . ' ';
                 $actLinks .= $this->renderRecDelDialog($eachFile) . ' ';
+
+                $cells = wf_TableCell($cameraComment);
+                $cells .= wf_TableCell($fileNameParts['from']);
+                $cells .= wf_TableCell($fileNameParts['to']);
+                $cells .= wf_TableCell($recordSizeLabel, '', '', 'sorttable_customkey="' . $recordSize . '"');
+
                 $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
             }

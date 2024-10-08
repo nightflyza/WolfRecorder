@@ -281,4 +281,14 @@ $lang['def']['on average'] = 'в середньому';
 $lang['def']['Cores'] = 'Ядер';
 $lang['def']['Uptime'] = 'Аптайм';
 $lang['def']['of'] = 'з';
+$lang['def']['Motion'] = 'Рух';
+$lang['def']['Motion filtered'] = 'Рух відфільтровано';
+$lang['def']['Motion filtering'] = 'Фільтрування руху';
+$lang['def']['Motion filtering for your video is running in the background. It may take some time.'] = 'Фільтрування руху для вашого відео запущено в фоновому режимі. Це може тривати деякий час.';
+$lang['def']['for this record'] = 'для цього запису';
+$lang['def']['already filtered'] = 'вже відфільтровано';
 $lang['def'][''] = '';
+
+
+
+

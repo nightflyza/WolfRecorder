@@ -281,3 +281,5 @@ $lang['def']['on average'] = 'в середньому';
 $lang['def']['Cores'] = 'Ядер';
 $lang['def']['Uptime'] = 'Аптайм';
 $lang['def']['of'] = 'из';
+$lang['def']['Motion'] = 'Движение';
+$lang['def']['Motion filtered'] = 'Движение отфильтровано';
