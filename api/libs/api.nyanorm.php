@@ -79,7 +79,7 @@ class NyanORM {
 
     /**
      * Contains JOIN expression.
-     * 
+     *
      * @var array
      */
     protected $join = array();
@@ -93,7 +93,7 @@ class NyanORM {
 
     /**
      * Contains default query limit offset
-     * 
+     *
      * @var int
      */
     protected $offset = 0;
@@ -119,7 +119,7 @@ class NyanORM {
 
     /**
      * Creates new model instance
-     * 
+     *
      * @param string $name table name
      */
     public function __construct($name = '') {
@@ -128,9 +128,9 @@ class NyanORM {
 
     /**
      * Table name automatic setter
-     * 
+     *
      * @param string $name table name to set
-     * 
+     *
      * @return void
      */
     protected function setTableName($name) {
@@ -143,10 +143,10 @@ class NyanORM {
 
     /**
      * Setter of fields list which will be optionally used in getAll
-     * 
+     *
      * @param array/string $fieldSet $fieldSet fields names to be selectable from model in array or as comma separated string
      * @param bool $escapeFields determines if there's a need to escape fields with backticks or not
-     * 
+     *
      * @return void
      */
     public function selectable($fieldSet = '', $escapeFields = false) {
@@ -175,14 +175,14 @@ class NyanORM {
 
     /**
      * Setter for join (with USING) list which used in getAll.
-     * 
+     *
      * @param string $joinExpression LEFT or RIGHT or whatever you need type of JOIN
      * @param string $tableName table name (for example switches)
      * @param string $using field to use for USING expression
      * @param bool $noTabNameEnclosure do not enclose table name with ``
      *
-     * @throws MEOW_JOIN_WRONG_TYPE 
-     * 
+     * @throws MEOW_JOIN_WRONG_TYPE
+     *
      * @return void
      */
     public function join($joinExpression = '', $tableName = '', $using = '', $noTabNameEnclosure = false) {
@@ -195,7 +195,7 @@ class NyanORM {
                     break;
                 case 'RIGHT':
                     break;
-                default :
+                default:
                     throw new Exception('MEOW_JOIN_WRONG_TYPE');
             }
             if (is_string($joinExpression) and is_string($tableName) and is_string($using)) {
@@ -212,14 +212,14 @@ class NyanORM {
 
     /**
      * Setter for join (with ON) list which used in getAll.
-     * 
+     *
      * @param string $joinExpression
      * @param string $tableName
      * @param string $on
      * @param bool $noTabNameEnclosure
      *
      * @throws MEOW_JOIN_WRONG_TYPE
-     * 
+     *
      * @return void
      */
     public function joinOn($joinExpression = '', $tableName = '', $on = '', $noTabNameEnclosure = false) {
@@ -232,7 +232,7 @@ class NyanORM {
                     break;
                 case 'RIGHT':
                     break;
-                default :
+                default:
                     throw new Exception('MEOW_JOIN_WRONG_TYPE');
             }
             if (is_string($joinExpression) and is_string($tableName) and is_string($on)) {
@@ -249,16 +249,16 @@ class NyanORM {
 
     /**
      * Appends some where expression to protected prop for further database queries. Cleans it if all params empty.
-     * 
+     *
      * @param string $field field name to apply expression
      * @param string $expression SQL expression. For example > = <, IS NOT, LIKE etc...
      * @param string $value expression parameter
-     * 
+     *
      * @return void
      */
     public function where($field = '', $expression = '', $value = '') {
-        if (!empty($field) AND ! empty($expression)) {
-            $value = ($value == 'NULL' OR $value == 'null') ? $value : "'" . $value . "'";
+        if (!empty($field) and ! empty($expression)) {
+            $value = ($value == 'NULL' or $value == 'null') ? $value : "'" . $value . "'";
             $this->where[] = $this->escapeField($field) . " " . $expression . " " . $value;
         } else {
             $this->flushWhere();
@@ -267,9 +267,9 @@ class NyanORM {
 
     /**
      * Appends some raw where expression into cumullative where array. Or cleanup all if empty. Yeah.
-     * 
+     *
      * @param string $expression raw SQL expression
-     * 
+     *
      * @return void
      */
     public function whereRaw($expression = '') {
@@ -282,7 +282,7 @@ class NyanORM {
 
     /**
      * Flushes all available cumulative structures in safety reasons.
-     * 
+     *
      * @return void
      */
     protected function destroyAllStructs() {
@@ -296,16 +296,16 @@ class NyanORM {
 
     /**
      * Appends some OR where expression to protected prop for further database queries. Cleans it if all params empty.
-     * 
+     *
      * @param string $field field name to apply expression
      * @param string $expression SQL expression. For example > = <, IS NOT, LIKE etc...
      * @param string $value expression parameter
-     * 
+     *
      * @return void
      */
     public function orWhere($field = '', $expression = '', $value = '') {
-        if (!empty($field) AND ! empty($expression)) {
-            $value = ($value == 'NULL' OR $value == 'null') ? $value : "'" . $value . "'";
+        if (!empty($field) and ! empty($expression)) {
+            $value = ($value == 'NULL' or $value == 'null') ? $value : "'" . $value . "'";
             $this->orWhere[] = $this->escapeField($field) . " " . $expression . " " . $value;
         } else {
             $this->flushWhere();
@@ -314,9 +314,9 @@ class NyanORM {
 
     /**
      * Appends some raw OR where expression into cumullative where array. Or cleanup all if empty.
-     * 
+     *
      * @param string $expression raw SQL expression
-     * 
+     *
      * @return void
      */
     public function orWhereRaw($expression = '') {
@@ -329,7 +329,7 @@ class NyanORM {
 
     /**
      * Flushes both where cumullative arrays
-     * 
+     *
      * @return void
      */
     protected function flushWhere() {
@@ -340,14 +340,14 @@ class NyanORM {
     /**
      * Appends some order by expression to protected prop
      * Can be either a one-field name string, a string of fields separated by coma or an array of field names
-     * 
+     *
      * @param string/array $fieldSet fields for ordering
      * @param string $order SQL order direction like ASC/DESC
      * @param bool $escapeFields determines if there's a need to escape fields with backticks or not
      * @param bool $orderWithinFields allows to put individual sort direction(ASC/DESC) for each field specified.
      *                                $fieldSet must be a RAW COMA-DELIMITED STRING value if using this parameter, as it's not processed in any way
      *                                Keep in mind that this option ignores $order and $escapeFields params and fields should be escaped manually, if needed
-     * 
+     *
      * @return void
      */
     public function orderBy($fieldSet = '', $order = '', $escapeFields = true, $orderWithinFields = false) {
@@ -369,18 +369,20 @@ class NyanORM {
 
                     foreach ($tmpArr as $eachField) {
                         if ($escapeFields) {
-                            $tmpStr.= $this->escapeField(trim($eachField)) . ", ";
+                            $tmpStr .= $this->escapeField(trim($eachField)) . ", ";
                         } else {
-                            $tmpStr.= $eachField . ", ";
+                            $tmpStr .= $eachField . ", ";
                         }
                     }
 
                     $tmpStr = trim(trim($tmpStr, ", "));
-                    $tmpStr.= " " . $order;
+                    $tmpStr .= " " . $order;
                 }
             }
-
-            $this->order[] = $tmpStr;
+            // can't use ternary here 'cause we need to avoid the array element creation
+            if (!empty($tmpStr)) {
+                $this->order[] = $tmpStr;
+            }
         } else {
             $this->flushOrder();
         }
@@ -420,7 +422,7 @@ class NyanORM {
 
     /**
      * Flushes order cumullative array
-     * 
+     *
      * @return void
      */
     protected function flushOrder() {
@@ -438,7 +440,7 @@ class NyanORM {
 
     /**
      * Flushes selectable cumullative struct
-     * 
+     *
      * @return void
      */
     protected function flushSelectable() {
@@ -447,7 +449,7 @@ class NyanORM {
 
     /**
      * Flushed join cumullative struct
-     * 
+     *
      * @return void
      */
     protected function flushJoin() {
@@ -456,9 +458,9 @@ class NyanORM {
 
     /**
      * Process some debugging data if required
-     * 
+     *
      * @param string $data now it just string that will be displayed in debug output
-     * 
+     *
      * @return void
      */
     protected function debugLog($data) {
@@ -481,7 +483,7 @@ class NyanORM {
 
     /**
      * Build join expression from protected join expressions array.
-     * 
+     *
      * @return string
      */
     protected function buildJoinString() {
@@ -496,7 +498,7 @@ class NyanORM {
 
     /**
      * Builds where string expression from protected where expressions array
-     * 
+     *
      * @return string
      */
     protected function buildWhereString() {
@@ -519,23 +521,24 @@ class NyanORM {
                 $result .= implode(' OR ', $this->orWhere);
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
      * Retruns order expressions as string
-     * 
+     *
      * @return string
      */
     protected function buildOrderString() {
         $result = '';
         if (!empty($this->order)) {
             if (is_array($this->order)) {
-                $result .= " ORDER BY ";
-                $result .= implode(' , ', $this->order);
+                $result = implode(' , ', $this->order);
             }
         }
-        return($result);
+        // trying to avoid possible empty-string elements arrays(particularly - an array with one empty-string element)
+        $result = empty($result) ? '' : " ORDER BY " . $result;
+        return ($result);
     }
 
     /**
@@ -547,19 +550,20 @@ class NyanORM {
         $result = '';
         if (!empty($this->groupby)) {
             if (is_array($this->groupby)) {
-                $result .= " GROUP BY ";
                 $result .= implode(',', $this->groupby);
             }
         }
-        return($result);
+        // trying to avoid possible empty-string elements arrays(particularly - an array with one empty-string element)
+        $result = empty($result) ? '' : " GROUP BY " . $result;
+        return ($result);
     }
 
     /**
      * Sets query limits with optional offset
-     * 
-     * @param int $limit results limit count 
+     *
+     * @param int $limit results limit count
      * @param int $offset results limit offset
-     * 
+     *
      * @return void
      */
     public function limit($limit = '', $offset = '') {
@@ -575,7 +579,7 @@ class NyanORM {
 
     /**
      * Flushes limits values for further queries. No limits anymore! Meow!
-     * 
+     *
      * @return void
      */
     protected function flushLimit() {
@@ -585,7 +589,7 @@ class NyanORM {
 
     /**
      * Builds SQL formatted limits string
-     * 
+     *
      * @return string
      */
     protected function buildLimitString() {
@@ -598,22 +602,22 @@ class NyanORM {
                 $result .= ' ' . $this->limit;
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
      * Constucts field names which will be optionally used for data getting
-     * 
+     *
      * @return string
      */
     protected function buildSelectableString() {
         $result = '';
         if (!empty($this->selectable)) {
-            $result.= implode(',', $this->selectable);
+            $result .= implode(',', $this->selectable);
         } else {
-            $result.= '*';
+            $result .= '*';
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -657,18 +661,18 @@ class NyanORM {
             //flush instance parameters for further queries
             $this->destroyAllStructs();
         }
-        return($result);
+        return ($result);
     }
 
     /**
      * Deletes record from database. Where must be not empty!
-     * 
+     *
      * @param bool  $flushParams flush all query parameters like where, order, limit and other after execution?
-     * 
+     *
      * @return void
      */
     public function delete($flushParams = true) {
-        if (!empty($this->where) OR ! empty($this->orWhere)) {
+        if (!empty($this->where) or ! empty($this->orWhere)) {
             $whereString = $this->buildWhereString();
             $limitString = $this->buildLimitString();
             if (!empty($whereString)) {
@@ -692,10 +696,10 @@ class NyanORM {
 
     /**
      * Puts some data into protected data property for furrrrther save()/create() operations.
-     * 
+     *
      * @param string $field record field name to push data
      * @param string $value field content to push
-     * 
+     *
      * @return void
      */
     public function data($field = '', $value = '') {
@@ -733,7 +737,7 @@ class NyanORM {
 
     /**
      * Flushes current instance data set
-     * 
+     *
      * @return void
      */
     protected function flushData() {
@@ -742,7 +746,7 @@ class NyanORM {
 
     /**
      * Saves current model data fields changes to database.
-     * 
+     *
      * @param bool $flushParams flush all query parameters like where, order, limit and other after execution?
      * @param bool $fieldsBatch gather all the fields together in a single query from $this->data structure
      *             before actually running the query to reduce the amount of subsequential DB queries for every table field
@@ -791,10 +795,10 @@ class NyanORM {
 
     /**
      * Creates new database record for current model instance.
-     * 
+     *
      * @param bool $autoAiId append default NULL autoincrementing primary key?
      * @param bool $flushParams flush all query parameters like where, order, limit and other after execution?
-     * 
+     *
      * @return void
      */
     public function create($autoAiId = true, $flushParams = true) {
@@ -827,7 +831,7 @@ class NyanORM {
 
     /**
      * Returns last ID key in table
-     * 
+     *
      * @return int
      */
     public function getLastId() {
@@ -838,10 +842,10 @@ class NyanORM {
 
     /**
      * Returns fields count in datatabase instance
-     * 
+     *
      * @param string $fieldsToCount field name to count results
      * @param bool  $flushParams flush all query parameters like where, order, limit and other after execution?
-     * 
+     *
      * @return int
      */
     public function getFieldsCount($fieldsToCount = 'id', $flushParams = true) {
@@ -851,15 +855,15 @@ class NyanORM {
             //flush instance parameters for further queries
             $this->destroyAllStructs();
         }
-        return($raw['result']);
+        return ($raw['result']);
     }
 
     /**
      * Returns fields sum in datatabase instance
-     * 
+     *
      * @param string $fieldsToSum field name to retrive its sum
      * @param bool  $flushParams flush all query parameters like where, order, limit and other after execution?
-     * 
+     *
      * @return int
      */
     public function getFieldsSum($fieldsToSum, $flushParams = true) {
@@ -870,7 +874,7 @@ class NyanORM {
                 //flush instance parameters for further queries
                 $this->destroyAllStructs();
             }
-            return($raw['result']);
+            return ($raw['result']);
         } else {
             throw new Exception('MEOW_NO_FIELD_NAME');
         }
@@ -878,10 +882,10 @@ class NyanORM {
 
     /**
      * Enables or disables debug flag
-     * 
+     *
      * @param bool $state object instance debug state
      * @param bool $deep deep debugging mode with full model dumps
-     * 
+     *
      * @return void
      */
     public function setDebug($state, $deep = false) {
@@ -893,9 +897,9 @@ class NyanORM {
 
     /**
      * Sets default primary key for model instance
-     * 
+     *
      * @param string $fieldName
-     * 
+     *
      * @return void
      */
     public function setDefaultPk($fieldName = 'id') {
@@ -904,9 +908,9 @@ class NyanORM {
 
     /**
      * Trying to correctly escape fields when using table_name.field_name.
-     * 
+     *
      * @param string $field
-     * 
+     *
      * @return string
      */
     protected function escapeField($field) {
@@ -999,8 +1003,13 @@ class NyanORM {
      *
      * @return array
      */
-    public function getTableStructure($fieldNamesOnly = false, $excludeIDField = false, $addLeadingTabName = false,
-                                      $makeFieldAliases = false, $fieldAliasSeparator = '') {
+    public function getTableStructure(
+        $fieldNamesOnly = false,
+        $excludeIDField = false,
+        $addLeadingTabName = false,
+        $makeFieldAliases = false,
+        $fieldAliasSeparator = ''
+    ) {
         $result = array();
         $query = 'DESCRIBE ' . $this->tableName;
         $tableStructure = simple_queryall($query);
