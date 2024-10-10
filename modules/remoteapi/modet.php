@@ -5,7 +5,9 @@ if (ubRouting::checkGet('action') == 'modet') {
         if (ubRouting::checkGet('mdfp')) {
             $filePathEnc = ubRouting::get('mdfp', 'mres');
             $motionDetector = new MoDet();
-            $motionDetector->startMotionFilteringProcess($filePathEnc);
+            $threshold = ubRouting::get('th', 'int');
+            $timeScale = ubRouting::get('ts', 'int');
+            $motionDetector->startMotionFilteringProcess($filePathEnc, $threshold, $timeScale);
             die('OK:MODET');
         }
     } else {

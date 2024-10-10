@@ -92,7 +92,9 @@ class Export {
     const ROUTE_SHOWDATE = 'exportdatearchive';
     const ROUTE_DELETE = 'delrec';
     const ROUTE_PREVIEW = 'previewrecord';
-    const ROUTE_MODET = 'filtermotion';
+    const PROUTE_MODET_RUN = 'filtermotion';
+    const PROUTE_MODET_SENS = 'motionsensitivity';
+    const PROUTE_MODET_TIMESCALE = 'motiontimescale';
     const ROUTE_SCHED_OK = 'scheduledsuccess';
     const ROUTE_BACK_EXPORT = 'chanback';
     const PROUTE_DATE_EXPORT = 'dateexport';
@@ -103,7 +105,8 @@ class Export {
     const PID_SCHEDULE = 'EXPORTSCHEDULE';
     const RECORDS_EXT = '.mp4';
     const TABLE_SCHED = 'schedule';
-    const OPTION_MODET='MODET_ENABLED';
+    const OPTION_MODET = 'MODET_ENABLED';
+    const LABEL_RUNNING = ' 🏁 ';
 
     public function __construct() {
         $this->setLogin();
@@ -916,7 +919,7 @@ class Export {
                 $runningLabel = '';
                 if (isset($allExportProcesses[$channelPid])) {
                     if (!$allExportProcesses[$channelPid]['finished']) {
-                        $runningLabel = ' 🏁 ';
+                        $runningLabel = self::LABEL_RUNNING;
                     }
                 }
 
@@ -951,12 +954,16 @@ class Export {
     /**
      * Renders recording preview with web-player
      * 
+     * @param string $fileName
+     * 
      * @return string
      */
-    public function renderRecordPreview($filePath) {
+    public function renderRecordPreview($fileName) {
         $result = '';
         $webPlayer = '';
         $controls = '';
+        $filePath = '';
+        $userRecordingsDir = $this->prepareRecordingsDir();
 
         if (ubRouting::checkGet(self::ROUTE_BACK_EXPORT)) {
             //back to channel export interface
@@ -967,8 +974,12 @@ class Export {
         }
 
 
-        if (!empty($filePath)) {
-            @$filePath = base64_decode($filePath);
+        if (!empty($fileName)) {
+            @$fileName = base64_decode($fileName);
+            if (!empty($fileName)) {
+                $filePath .= $userRecordingsDir . $fileName;
+            }
+
             if ($filePath and file_exists($filePath)) {
                 $webPlayer .= $this->renderRecordPlayer($filePath, '80%', true, $filePath);
                 $controls .= wf_Link($filePath, web_icon_download() . ' ' . __('Download'), false, 'ubButton');
@@ -984,6 +995,101 @@ class Export {
     }
 
     /**
+     * Renders motion detection filter schedule form
+     *
+     * @param string $fileName
+     * 
+     * @return string
+     */
+    public function renderMoDetScheduleForm($fileName) {
+        $result = '';
+        $fileNameEnc = base64_encode($fileName);
+        $sensParams = array(
+            'low' => __('Low'),
+            'normal' => __('Normal'),
+            'high' => __('High'),
+        );
+
+        $timeScaleParams = array(
+            'orig' => __('Original'),
+            'slow' => __('Slow'),
+            'fast' => __('Fast'),
+            'sonic' => __('Sonic'),
+        );
+
+        $result .= wf_tag('center');
+        $hint=__('With this tool, you can filter out only scenes with motion and save them as a new recording');
+        $result .= wf_img('skins/motion_big.png', $hint);
+        $result .= wf_tag('center', true);
+        $result .= wf_delimiter(0);
+
+        $inputs = wf_HiddenInput(self::PROUTE_MODET_RUN, $fileNameEnc);
+        $inputs .= wf_Selector(self::PROUTE_MODET_SENS, $sensParams, __('Sensitivity'), 'normal', true) . ' ';
+        $inputs .= wf_Selector(self::PROUTE_MODET_TIMESCALE, $timeScaleParams, __('Time scale'), 'fast', true) . ' ';
+        $inputs .= wf_delimiter(0);
+        $inputs .= wf_tag('center');
+        $inputs .= wf_SubmitClassed(__('Run motion filtering'), 'confirmagree', '', __('Run motion filtering')) . ' ';
+        $inputs .= wf_Link(self::URL_RECORDS, __('Cancel'), false, 'confirmcancel');
+        $inputs .= wf_tag('center', true);
+
+        $result .= wf_Form('', 'POST', $inputs, 'glamour');
+        return ($result);
+    }
+
+    /**
+     * Returns motion detection threshold value by its text alias
+     *
+     * @param string $sens
+     * 
+     * @return int
+     */
+    public function getMoDetParamSensitivity($sens = '') {
+        $result = 2;
+        if (!empty($sens)) {
+            switch ($sens) {
+                case 'low':
+                    $result = 4;
+                    break;
+                case 'normal':
+                    $result = 2;
+                    break;
+                case 'high':
+                    $result = 1;
+                    break;
+            }
+        }
+        return ($result);
+    }
+
+    /**
+     * Returns motion detection timescale value by its text alias
+     *
+     * @param string $tScale
+     * 
+     * @return int
+     */
+    public function getMoDetParamTimeScale($tScale = '') {
+        $result = 15;
+        if (!empty($tScale)) {
+            switch ($tScale) {
+                case 'orig':
+                    $result = 1;
+                    break;
+                case 'slow':
+                    $result = 10;
+                    break;
+                case 'fast':
+                    $result = 15;
+                    break;
+                case 'sonic':
+                    $result = 25;
+                    break;
+            }
+        }
+        return ($result);
+    }
+
+    /**
      * Returns list of available records
      * 
      * @param string $channelId
@@ -992,10 +1098,12 @@ class Export {
      */
     public function renderAvailableRecords($channelId = '') {
         $result = '';
+        $sysProc = new SysProc();
+        $moDet = new MoDet();
         $userRecordingsDir = $this->prepareRecordingsDir();
         $recordsExtFilter = '*' . self::RECORDS_EXT;
         $allRecords = rcms_scandir($userRecordingsDir, $recordsExtFilter);
-        $moDetFlag = (@$this->altCfg[MoDet::OPTION_ENABLE]) ? true : false;
+        $moDetFlag = (@$this->altCfg[$moDet::OPTION_ENABLE]) ? true : false;
         //channel filter applied?
         if ($channelId) {
             if (!empty($allRecords)) {
@@ -1011,6 +1119,7 @@ class Export {
 
         if (!empty($allRecords)) {
             $cells = wf_TableCell(__('Camera'));
+            $cells .= wf_TableCell(__('Date'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('from'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('to'));
             $cells .= wf_TableCell(__('Size'));
@@ -1022,20 +1131,26 @@ class Export {
                 $fileNameParts = $this->parseRecordFileName($eachFile);
                 $recordSize = filesize($userRecordingsDir . $eachFile);
                 $recordSizeLabel = wr_convertSize($recordSize);
+                $fileName = $eachFile;
                 $fileUrl = $userRecordingsDir . $eachFile;
-                $previewUrl = self::URL_RECORDS . '&' . self::ROUTE_PREVIEW . '=' . base64_encode($fileUrl);
+                $previewUrl = self::URL_RECORDS . '&' . self::ROUTE_PREVIEW . '=' . base64_encode($fileName);
                 $cameraComment = $this->cameras->getCameraCommentById($fileNameParts['cameraid']);
+                $recDate = date("Y-m-d", strtotime($fileNameParts['from']));
+                $recTimeFrom = date("H:i:s", strtotime($fileNameParts['from']));
+                $recTimeTo = date("H:i:s", strtotime($fileNameParts['to']));
+                $fileInUseFlag = $sysProc->isFileInUse($fileName);
+
                 if ($channelId) {
                     $previewUrl .= '&' . self::ROUTE_BACK_EXPORT . '=' . $channelId;
                 }
 
                 if ($moDetFlag and empty($channelId)) {
                     $fileMarker = $fileNameParts['marker'];
-                    if ($fileMarker == MoDet::FILTERED_MARK) {
-                        $cameraComment .= ' '.wf_img('skins/motion_filtered.png',__('Motion filtered'));
+                    if ($fileMarker == $moDet::FILTERED_MARK) {
+                        $cameraComment .= ' ' . wf_img('skins/motion_filtered.png', __('Motion filtered'));
                     } else {
-                        $modetUrl = self::URL_RECORDS . '&' . self::ROUTE_MODET . '=' . base64_encode($fileUrl);
-                        $moControls .= wf_Link($modetUrl, wf_img('skins/motion.png',__('Motion')));
+                        $modetForm = $this->renderMoDetScheduleForm($fileName);
+                        $moControls .= wf_modalAuto(wf_img('skins/motion.png', __('Motion')), __('Motion filtering'), $modetForm);
                     }
                 }
 
@@ -1044,9 +1159,15 @@ class Export {
                 $actLinks .= wf_Link($fileUrl, web_icon_download()) . ' ';
                 $actLinks .= $this->renderRecDelDialog($eachFile) . ' ';
 
+                //locking all operations if some of files in processing now
+                if ($fileInUseFlag) {
+                    $actLinks = wf_img_sized('skins/ajaxloader.gif', __('Record') . ' ' . __('is currently being processed'), 110);
+                }
+
                 $cells = wf_TableCell($cameraComment);
-                $cells .= wf_TableCell($fileNameParts['from']);
-                $cells .= wf_TableCell($fileNameParts['to']);
+                $cells .= wf_TableCell($recDate);
+                $cells .= wf_TableCell($recTimeFrom);
+                $cells .= wf_TableCell($recTimeTo);
                 $cells .= wf_TableCell($recordSizeLabel, '', '', 'sorttable_customkey="' . $recordSize . '"');
 
                 $cells .= wf_TableCell($actLinks);
@@ -1090,24 +1211,30 @@ class Export {
     public function deleteRecording($fileName, $userLogin = '') {
         $result = '';
         $fileName = ubRouting::filters($fileName, 'mres');
+        $sysProc = new SysProc();
         if (empty($userLogin)) {
             $userLogin = $this->myLogin;
         }
         if (!empty($fileName)) {
-            $userRecordingsDir = $this->prepareRecordingsDir($userLogin);
-            if (!empty($userRecordingsDir)) {
-                if (file_exists($userRecordingsDir . $fileName)) {
-                    if (is_writable($userRecordingsDir . $fileName)) {
-                        unlink($userRecordingsDir . $fileName);
-                        log_register('EXPORT DELETE `' . $fileName . '`');
+            if (!$sysProc->isFileInUse($fileName)) {
+                $userRecordingsDir = $this->prepareRecordingsDir($userLogin);
+                if (!empty($userRecordingsDir)) {
+                    if (file_exists($userRecordingsDir . $fileName)) {
+                        if (is_writable($userRecordingsDir . $fileName)) {
+                            unlink($userRecordingsDir . $fileName);
+                            log_register('EXPORT DELETE `' . $fileName . '`');
+                        } else {
+                            $result .= __('Recording') . ' ' . __('is not writable');
+                            log_register('EXPORT DELETE FAIL `' . $fileName . '` NOT WRITABLE');
+                        }
                     } else {
-                        $result .= __('Recording') . ' ' . __('is not writable');
-                        log_register('EXPORT DELETE FAIL `' . $fileName . '` NOT WRITABLE');
+                        $result .= __('Recording') . ' ' . __('not exists');
+                        log_register('EXPORT DELETE FAIL `' . $fileName . '` NOT EXISTS');
                     }
-                } else {
-                    $result .= __('Recording') . ' ' . __('not exists');
-                    log_register('EXPORT DELETE FAIL `' . $fileName . '` NOT EXISTS');
                 }
+            } else {
+                $result .= __('Recording') . ' ' . __('is currently being processed');
+                log_register('EXPORT DELETE FAIL `' . $fileName . '` IN PROCESSING');
             }
         } else {
             $result .= __('Recording') . ' ' . __('is empty');

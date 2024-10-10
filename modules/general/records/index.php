@@ -23,12 +23,14 @@ if (cfr('EXPORT')) {
         }
 
         //motion detection handling
-        if (ubRouting::checkGet($export::ROUTE_MODET)) {
+        if (ubRouting::checkPost($export::PROUTE_MODET_RUN)) {
             if ($ubillingConfig->getAlterParam(MoDet::OPTION_ENABLE)) {
                 $motionDetector = new MoDet();
-                $motionResult = $motionDetector->runMotionFiltering(ubRouting::get($export::ROUTE_MODET));
+                $motionThreshold = $export->getMoDetParamSensitivity(ubRouting::post($export::PROUTE_MODET_SENS));
+                $motionTimeScale = $export->getMoDetParamTimeScale(ubRouting::post($export::PROUTE_MODET_TIMESCALE));
+                $motionResult = $motionDetector->runMotionFiltering(ubRouting::post($export::PROUTE_MODET_RUN), $motionThreshold, $motionTimeScale);
                 if (empty($motionResult)) {
-                    show_window('',$motionDetector->renderScheduledNotify());
+                    show_window('', $motionDetector->renderScheduledNotify());
                 } else {
                     show_error($motionResult);
                 }

@@ -66,14 +66,35 @@ class MoDet {
     }
 
     /**
+     * Returns current user recordings path
+     *
+     * @return void
+     */
+    protected function getUserRecordingsDir() {
+        $result = '';
+        $userLogin = whoami();
+        if (!empty($userLogin)) {
+            $fullUserPath = Export::PATH_RECORDS . $userLogin;
+            if (file_exists($fullUserPath)) {
+                $result = $fullUserPath . '/'; //with ending slash
+            }
+        }
+        return ($result);
+    }
+
+    /**
      * Runs motion detection filtering process
      *
      * @param string $filePathEnc
+     * @param int $threshold
+     * @param int $timeScale
      * 
      * @return void
      */
-    public function startMotionFilteringProcess($filePathEnc) {
+    public function startMotionFilteringProcess($filePathEnc, $threshold = 0, $timeScale = 0) {
         $filePath = @base64_decode($filePathEnc);
+        $threshold = ubRouting::filters($threshold, 'int');
+        $timeScale = ubRouting::filters($timeScale, 'int');
         if (!empty($filePath)) {
             if (file_exists($filePath)) {
                 if ($this->process->notRunning()) {
@@ -83,6 +104,9 @@ class MoDet {
                             if (!ispos($filePath, '_' . self::FILTERED_MARK . Export::RECORDS_EXT)) {
                                 $this->process->start();
                                 log_register('MOTION FILTERING `' . $filePath . '` STARTED');
+                                if ($threshold and $timeScale) {
+                                    $this->cliFF->setMoDetParams($threshold, $timeScale);
+                                }
                                 $command = $this->cliFF->getFFmpegPath() . ' -i ' . $filePath . ' ' . $this->cliFF->getMoDetOpts() . ' ' . $newFilePath;
                                 shell_exec($command);
                                 log_register('MOTION FILTERING `' . $newFilePath . '` FINISHED');
@@ -105,37 +129,50 @@ class MoDet {
     }
 
 
-
     /**
      * Schedules background motion detection process for background execution
      *
-     * @param string $filePathEnc
+     * @param string $fileNameEnc
+     * @param int $threshold
+     * @param int $timeScale
      * 
      * @return void
      */
-    public function runMotionFiltering($filePathEnc) {
+    public function runMotionFiltering($fileNameEnc, $threshold = 0, $timeScale = 0) {
         $result = '';
-        $filePath = @base64_decode($filePathEnc);
-        if (!empty($filePath)) {
+        $userRecordingsDir = $this->getUserRecordingsDir();
+        $fileName = @base64_decode($fileNameEnc);
+        $threshold = ubRouting::filters($threshold, 'int');
+        $timeScale = ubRouting::filters($timeScale, 'int');
+        if (!empty($fileName)) {
+            $filePath = $userRecordingsDir . $fileName;
+            $newFileName = $this->getFilteredFileName($fileName);
+            $newFilePath = $userRecordingsDir . $newFileName;
             if (file_exists($filePath)) {
-                if ($this->process->notRunning()) {
-                    $newFilePath = $this->getFilteredFileName($filePath);
-                    if ($newFilePath) {
-                        if (!file_exists($newFilePath)) {
+                if (!file_exists($newFilePath)) {
+                    if ($this->process->notRunning()) {
+                        if ($newFilePath) {
                             if (!ispos($filePath, '_' . self::FILTERED_MARK . Export::RECORDS_EXT)) {
-                                $this->process->runBackgroundProcess(self::WRAPPER . ' "modet&mdfp=' . $filePathEnc . '"', 0);
-                                log_register('MOTION FILTERING `' . $filePath . '` SCHEDULED');
+                                $bgUrl = '"';
+                                $bgUrl .= 'modet&mdfp=' . base64_encode($filePath);
+                                if ($threshold and $timeScale) {
+                                    $bgUrl .= '&th=' . $threshold . '&ts=' . $timeScale;
+                                }
+                                $bgUrl .= '"';
+                                $procCmd = self::WRAPPER . ' ' . $bgUrl;
+                                $this->process->runBackgroundProcess($procCmd, 0);
+                                log_register('MOTION FILTERING `' . $newFileName . '` SENS `' . $threshold . '` TSCALE `' . $timeScale . '` SCHEDULED');
                             } else {
-                                $result .= __('Something went wrong') . ' - ' . __('already filtered');
+                                $result .= __('Something went wrong') . ' - ' . __('Record') . ' ' . __('already filtered');
                             }
                         } else {
-                            $result .=  __('Motion filtering') . ' ' . __('for this record') . ' - ' . __('already exists');
+                            $result .= __('Something went wrong');
                         }
                     } else {
-                        $result .= __('Something went wrong');
+                        $result .= __('Motion filtering service is busy at this moment') . '. ' . __('Please try again later') . '.';
                     }
                 } else {
-                    $result .= __('Motion filtering') . ' ' . __('already running');
+                    $result .=  __('Motion filtering') . ' ' . __('for this record') . ' - ' . __('already exists');
                 }
             } else {
                 $result .= __('File not exists');

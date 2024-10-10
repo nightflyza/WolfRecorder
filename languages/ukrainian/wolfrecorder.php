@@ -287,7 +287,24 @@ $lang['def']['Motion filtering'] = 'Фільтрування руху';
 $lang['def']['Motion filtering for your video is running in the background. It may take some time.'] = 'Фільтрування руху для вашого відео запущено в фоновому режимі. Це може тривати деякий час.';
 $lang['def']['for this record'] = 'для цього запису';
 $lang['def']['already filtered'] = 'вже відфільтровано';
+$lang['def']['Record'] = 'Запис';
+$lang['def']['Motion filtering service is busy at this moment'] = 'Наразі сервіс фільтрації руху зайнятий';
+$lang['def']['Please try again later'] = 'Будь ласка, спробуйте трішечки пізніше';
+$lang['def']['is currently being processed'] = 'зараз обробляється';
+$lang['def']['Run motion filtering'] = 'Запустити фільтрування руху';
+$lang['def']['Sensitivity'] = 'Чутливість';
+$lang['def']['Low'] = 'Низька';
+$lang['def']['Normal'] = 'Нормальна';
+$lang['def']['High'] = 'Висока';
+$lang['def']['Time scale'] = 'Маштаб часу';
+$lang['def']['Slow'] = 'Повільно';
+$lang['def']['Fast'] = 'Швидко';
+$lang['def']['Sonic'] = 'Блискавичний';
+$lang['def']['Original'] = 'Оригінальний';
+$lang['def']['With this tool, you can filter out only scenes with motion and save them as a new recording'] = 'За допомогою цього інструменту ви зможете відфільтрувати з запису тільки сцени в яких присутній рух та зберегти їх як новий запис';
 $lang['def'][''] = '';
+
+
 
 
 
