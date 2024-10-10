@@ -1090,7 +1090,7 @@ class Export {
     }
 
     /**
-     * Checks for reserved space availability to perform motion detection and filtering
+     * Checks for reserved space availability to perform motion filtering depend on source file size
      *
      * @param string $fileNameEnc
      * 
@@ -1179,8 +1179,10 @@ class Export {
                         $cameraComment .= ' ' . wf_img('skins/motion_filtered.png', __('Motion filtered'));
                     } else {
                         if ($moDetFlag) {
-                            $modetForm = $this->renderMoDetScheduleForm($fileName);
-                            $moControls .= wf_modalAuto(wf_img('skins/motion.png', __('Motion')), __('Motion filtering'), $modetForm);
+                            if (cfr('MOTION')) {
+                                $modetForm = $this->renderMoDetScheduleForm($fileName);
+                                $moControls .= wf_modalAuto(wf_img('skins/motion.png', __('Motion')), __('Motion filtering'), $modetForm);
+                            }
                         }
                     }
                 }
