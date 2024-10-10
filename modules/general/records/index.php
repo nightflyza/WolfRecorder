@@ -25,14 +25,18 @@ if (cfr('EXPORT')) {
         //motion detection handling
         if (ubRouting::checkPost($export::PROUTE_MODET_RUN)) {
             if ($ubillingConfig->getAlterParam(MoDet::OPTION_ENABLE)) {
-                $motionDetector = new MoDet();
-                $motionThreshold = $export->getMoDetParamSensitivity(ubRouting::post($export::PROUTE_MODET_SENS));
-                $motionTimeScale = $export->getMoDetParamTimeScale(ubRouting::post($export::PROUTE_MODET_TIMESCALE));
-                $motionResult = $motionDetector->runMotionFiltering(ubRouting::post($export::PROUTE_MODET_RUN), $motionThreshold, $motionTimeScale);
-                if (empty($motionResult)) {
-                    show_window('', $motionDetector->renderScheduledNotify());
+                if ($export->isMoDetSpaceAvailable(ubRouting::post($export::PROUTE_MODET_RUN))) {
+                    $motionDetector = new MoDet();
+                    $motionThreshold = $export->getMoDetParamSensitivity(ubRouting::post($export::PROUTE_MODET_SENS));
+                    $motionTimeScale = $export->getMoDetParamTimeScale(ubRouting::post($export::PROUTE_MODET_TIMESCALE));
+                    $motionResult = $motionDetector->runMotionFiltering(ubRouting::post($export::PROUTE_MODET_RUN), $motionThreshold, $motionTimeScale);
+                    if (empty($motionResult)) {
+                        show_window('', $motionDetector->renderScheduledNotify());
+                    } else {
+                        show_error($motionResult);
+                    }
                 } else {
-                    show_error($motionResult);
+                    show_error(__('Motion filtering') . ': ' . __('Not enough free space') . '!');
                 }
             }
         }

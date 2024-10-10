@@ -1018,7 +1018,7 @@ class Export {
         );
 
         $result .= wf_tag('center');
-        $hint=__('With this tool, you can filter out only scenes with motion and save them as a new recording');
+        $hint = __('With this tool, you can filter out only scenes with motion and save them as a new recording');
         $result .= wf_img('skins/motion_big.png', $hint);
         $result .= wf_tag('center', true);
         $result .= wf_delimiter(0);
@@ -1090,6 +1090,35 @@ class Export {
     }
 
     /**
+     * Checks for reserved space availability to perform motion detection and filtering
+     *
+     * @param string $fileNameEnc
+     * 
+     * @return bool
+     */
+    public function isMoDetSpaceAvailable($fileNameEnc) {
+        $result = false;
+        $fileName = @base64_decode($fileNameEnc);
+        $userRecordingsDir = $this->prepareRecordingsDir();
+        if ($fileName) {
+            $filePath = $userRecordingsDir . $fileName;
+            if (file_exists($filePath)) {
+                $maxUserSpace = $this->getUserMaxSpace();
+                $usedSpaceByMe = $this->getUserUsedSpace($userRecordingsDir);
+                $moDetForecast = filesize($filePath); //we hope that the filtered file will not be larger
+                $spaceLeft = $maxUserSpace - $usedSpaceByMe;
+                $spaceFreePredict = $spaceLeft - $moDetForecast;
+                if ($spaceFreePredict > 0) {
+                    $result = true;
+                }
+            }
+        }
+
+
+        return ($result);
+    }
+
+    /**
      * Returns list of available records
      * 
      * @param string $channelId
@@ -1139,18 +1168,20 @@ class Export {
                 $recTimeFrom = date("H:i:s", strtotime($fileNameParts['from']));
                 $recTimeTo = date("H:i:s", strtotime($fileNameParts['to']));
                 $fileInUseFlag = $sysProc->isFileInUse($fileName);
+                $fileMarker = $fileNameParts['marker'];
 
                 if ($channelId) {
                     $previewUrl .= '&' . self::ROUTE_BACK_EXPORT . '=' . $channelId;
                 }
 
-                if ($moDetFlag and empty($channelId)) {
-                    $fileMarker = $fileNameParts['marker'];
+                if (empty($channelId)) {
                     if ($fileMarker == $moDet::FILTERED_MARK) {
                         $cameraComment .= ' ' . wf_img('skins/motion_filtered.png', __('Motion filtered'));
                     } else {
-                        $modetForm = $this->renderMoDetScheduleForm($fileName);
-                        $moControls .= wf_modalAuto(wf_img('skins/motion.png', __('Motion')), __('Motion filtering'), $modetForm);
+                        if ($moDetFlag) {
+                            $modetForm = $this->renderMoDetScheduleForm($fileName);
+                            $moControls .= wf_modalAuto(wf_img('skins/motion.png', __('Motion')), __('Motion filtering'), $modetForm);
+                        }
                     }
                 }
 
