@@ -41,7 +41,7 @@ if (cfr('ROOT')) {
         $updateBranch = ubRouting::get($updateManager::ROUTE_AUTOSYSUPGRADE);
         $currentSystemVersion = wr_getLocalSystemVersion();
         $updateBranchVersion = wr_GetReleaseInfo($updateBranch);
-        if ($currentSystemVersion AND $updateBranchVersion) {
+        if ($currentSystemVersion and $updateBranchVersion) {
             if ($currentSystemVersion != $updateBranchVersion) {
                 //running upgrade process
                 if (ubRouting::checkPost($updateManager::PROUTE_UPGRADEAGREE)) {
@@ -60,6 +60,7 @@ if (cfr('ROOT')) {
                     $confirmationInputs .= wf_CheckInput($updateManager::PROUTE_UPGRADEAGREE, __('I`m ready'), true, false);
                     $confirmationInputs .= wf_Submit(__('System update'));
                     $confirmationForm = wf_Form('', 'POST', $confirmationInputs, 'glamour');
+                    $confirmationForm .= wf_FormDisabler();
                     show_window(__('System update'), $confirmationForm);
                 }
             } else {
@@ -77,7 +78,7 @@ if (cfr('ROOT')) {
         }
         show_window('', wf_BackLink($updateManager::URL_ME));
     } else {
-        if (!ubRouting::checkGet('applysql') AND ! ubRouting::checkGet('showconfigs')) {
+        if (!ubRouting::checkGet('applysql') and ! ubRouting::checkGet('showconfigs')) {
             //updates check
             show_window('', $updateManager->renderVersionInfo());
 
@@ -98,4 +99,3 @@ if (cfr('ROOT')) {
 } else {
     show_error(__('Access denied'));
 }
-        
