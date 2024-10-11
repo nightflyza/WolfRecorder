@@ -319,7 +319,7 @@ chmod a+x /bin/autowrupdate.sh
 
 # Setting snmpd read only community string
 perl -e "s/SNMPCOMMTPL/${SNMP_COMMUNITY}/g" -pi /usr/local/etc/snmpd.conf
-$DIALOG --infobox "SNMP read only community set" 4 60
+$DIALOG --infobox "SNMP read only community set: ${SNMP_COMMUNITY}" 4 60
 
 #cleaning up installer work directory
 cd /
