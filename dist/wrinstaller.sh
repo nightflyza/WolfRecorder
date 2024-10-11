@@ -189,7 +189,7 @@ cat dist/presets/freebsd/sysctl.preconf >> /etc/sysctl.conf
 cat dist/presets/freebsd/loader.preconf >> /boot/loader.conf
 cp -R dist/presets/freebsd/firewall.conf /etc/firewall.conf
 chmod a+x /etc/firewall.conf
-cp -R dist/presets/snmpd.preconf /usr/local/etc/snmpd.conf
+cp -R dist/presets/freebsd/snmpd.preconf /usr/local/etc/snmpd.conf
 
 # setting up default web awesomeness
 cp -R dist/landing/index.html ${APACHE_DATA_PATH}/index.html
