@@ -20,8 +20,13 @@ firewall_script="/etc/firewall.conf"
 memcached_enable="YES"
 memcached_flags="-l 127.0.0.1 -m 256 -I 16M"
 
-#ZFS support
+# ZFS support
 zfs_enable="YES"
+
+# snmpd 
+snmpd_enable="YES" 
+snmpd_flags="-a" 
+snmpd_conffile="/usr/local/etc/snmpd.conf" 
 
 # FS check options
 fsck_y_enable="YES"

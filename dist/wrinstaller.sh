@@ -86,14 +86,20 @@ WRSERIAL=`cat /tmp/wrsrl`
 ;;
 esac
 
+# generating snmp community string
+GEN_SNM_COMM=`dd if=/dev/urandom count=128 bs=1 2>&1 | md5 | cut -b-8`
+echo "snm"${GEN_SNM_COMM} > /tmp/wrsnmpcomm
+SNMP_COMMUNITY=`cat /tmp/wrsnmpcomm`
+
 # cleaning temp files
 rm -fr /tmp/wrarch
 rm -fr /tmp/wrmypass
 rm -fr /tmp/wrsrl
 rm -fr /tmp/insttype
+rm -fr /tmp/wrsnmpcomm
 
 #last chance to exit
-$DIALOG --title "Check settings"   --yesno "Are all of these settings correct? \n \n MySQL password: ${MYSQL_PASSWD} \n System: ${ARCH} \n WolfRecorder serial: ${WRSERIAL}\n" 10 60
+$DIALOG --title "Check settings"   --yesno "Are all of these settings correct? \n \n MySQL password: ${MYSQL_PASSWD} \n SNMP RO community: ${SNMP_COMMUNITY} \n System: ${ARCH} \n WolfRecorder serial: ${WRSERIAL}\n" 10 60
 AGREE=$?
 clear
 
@@ -183,6 +189,7 @@ cat dist/presets/freebsd/sysctl.preconf >> /etc/sysctl.conf
 cat dist/presets/freebsd/loader.preconf >> /boot/loader.conf
 cp -R dist/presets/freebsd/firewall.conf /etc/firewall.conf
 chmod a+x /etc/firewall.conf
+cp -R dist/presets/snmpd.preconf /usr/local/etc/snmpd.conf
 
 # setting up default web awesomeness
 cp -R dist/landing/index.html ${APACHE_DATA_PATH}/index.html
@@ -309,6 +316,10 @@ fi
 # Setting up autoupdate sctipt
 cp -R ./dist/presets/freebsd/autowrupdate.sh /bin/
 chmod a+x /bin/autowrupdate.sh
+
+# Setting snmpd read only community string
+perl -e "s/SNMPCOMMTPL/${SNMP_COMMUNITY}/g" -pi /usr/local/etc/snmpd.conf
+$DIALOG --infobox "SNMP read only community set" 4 60
 
 #cleaning up installer work directory
 cd /
