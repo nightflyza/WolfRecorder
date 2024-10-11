@@ -83,6 +83,7 @@ class Cameras {
     const PROUTE_NEWACT = 'newcameraactive';
     const PROUTE_NEWSTORAGE = 'newcamerastorageid';
     const PROUTE_NEWCOMMENT = 'newcameracomment';
+    const PROUTE_NEWCUSTPORT = 'newcameracustomport';
     const PROUTE_ED_CAMERAID = 'editcameraid';
     const PROUTE_ED_MODEL = 'editcameramodelid';
     const PROUTE_ED_IP = 'editcameraip';
@@ -230,11 +231,12 @@ class Cameras {
      * @param string $login
      * @param string $password
      * @param int $storageId
-     * @param comment $comment
+     * @param string $comment
+     * @param int $customPort
      * 
      * @return void/string on error
      */
-    public function save($cameraId, $modelId, $ip, $login, $password, $storageId, $comment = '') {
+    public function save($cameraId, $modelId, $ip, $login, $password, $storageId, $comment = '', $customPort = 0) {
         $result = '';
         $cameraId = ubRouting::filters($cameraId, 'int');
         $modelId = ubRouting::filters($modelId, 'int');
@@ -243,34 +245,63 @@ class Cameras {
         $passwordF = ubRouting::filters($password, 'mres');
         $storageId = ubRouting::filters($storageId, 'int');
         $commentF = ubRouting::filters($comment, 'safe');
+
         if (isset($this->allCameras[$cameraId])) {
-            $cameraData = $this->allCameras[$cameraId];
+            $fullCamerasData = $this->getAllCamerasFullData();
+            $cameraData = $fullCamerasData[$cameraId]['CAMERA'];
+            $cameraCurrentIp = $cameraData['ip'];
+            $cameraCurrentRealPort = $cameraData['realport'];
+            $credentialsOk = false;
             if ($cameraData['active'] == 0) {
                 $allStorages = $this->storages->getAllStorageNames();
-                $allModels = $this->models->getAllModelNames();
+                $allModelsData = $this->models->getAllModelData();
+                $allModelsTemplates = $this->models->getAllModelTemplates();
                 if (isset($allStorages[$storageId])) {
                     $storageData = $this->storages->getStorageData($storageId);
                     $storagePathValid = $this->storages->checkPath($storageData['path']);
                     if ($storagePathValid) {
-                        if (isset($allModels[$modelId])) {
+                        if (isset($allModelsData[$modelId])) {
+                            $modelTemplate = $allModelsTemplates[$modelId];
+                            $templatePort = $modelTemplate['RTSP_PORT'];
+                            $futurePort = $templatePort;
+                            if (!empty($customPort)) {
+                                //overrided with some custom?
+                                $futurePort = $customPort;
+                            }
+
+                            //checking base IP+port pair if its tries to change
+                            if ($ipF != $cameraCurrentIp or $futurePort != $cameraCurrentRealPort) {
+                                $credentialsOk = $this->isCameraIpPortFree($ipF, $futurePort);
+                            } else {
+                                $credentialsOk = true;
+                            }
+
                             if (zb_isIPValid($ipF)) {
-                                if (!empty($loginF) and !empty($passwordF)) {
-                                    //storage migration?
-                                    if ($cameraData['storageid'] != $storageId) {
-                                        $this->storages->migrateChannel($storageId, $cameraData['channel']);
+                                if ($credentialsOk) {
+                                    if (!empty($loginF) and !empty($passwordF)) {
+                                        //storage migration?
+                                        if ($cameraData['storageid'] != $storageId) {
+                                            $this->storages->migrateChannel($storageId, $cameraData['channel']);
+                                        }
+                                        //updating db
+                                        $this->camerasDb->where('id', '=', $cameraId);
+                                        $this->camerasDb->data('modelid', $modelId);
+                                        $this->camerasDb->data('ip', $ipF);
+                                        $this->camerasDb->data('login', $loginF);
+                                        $this->camerasDb->data('password', $passwordF);
+                                        $this->camerasDb->data('storageid', $storageId);
+                                        $this->camerasDb->data('comment', $commentF);
+                                        $this->camerasDb->save();
+
+                                        //updating custom port
+                                        $this->saveCamoptsRtspPort($cameraId, $customPort);
+
+                                        log_register('CAMERA EDIT [' . $cameraId . ']  MODEL [' . $modelId . '] IP `' . $ip . '` STORAGE [' . $storageId . '] COMMENT `' . $comment . '`');
+                                    } else {
+                                        $result .= __('Login or password is empty');
                                     }
-                                    //updating db
-                                    $this->camerasDb->where('id', '=', $cameraId);
-                                    $this->camerasDb->data('modelid', $modelId);
-                                    $this->camerasDb->data('ip', $ipF);
-                                    $this->camerasDb->data('login', $loginF);
-                                    $this->camerasDb->data('password', $passwordF);
-                                    $this->camerasDb->data('storageid', $storageId);
-                                    $this->camerasDb->data('comment', $commentF);
-                                    $this->camerasDb->save();
-                                    log_register('CAMERA EDIT [' . $cameraId . ']  MODEL [' . $modelId . '] IP `' . $ip . '` STORAGE [' . $storageId . '] COMMENT `' . $comment . '`');
                                 } else {
-                                    $result .= __('Login or password is empty');
+                                    $result .= __('Camera IP already registered');
                                 }
                             } else {
                                 $result .= __('Wrong IP format') . ': `' . $ip . '`';
@@ -417,7 +448,30 @@ class Cameras {
     }
 
     /**
-     * Creates new camera
+     * Checks is camera IP + ralport pair already registered or not?
+     * 
+     * @param string $ip
+     * 
+     * @return bool
+     */
+    public function isCameraIpPortFree($ip, $port) {
+        $result = true;
+        $fullCamerasData = $this->getAllCamerasFullData();
+        if (!empty($fullCamerasData)) {
+            foreach ($fullCamerasData as $io => $each) {
+                if ($each['CAMERA']['ip'] == $ip) {
+                    if ($each['CAMERA']['realport'] == $port) {
+                        $result = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return ($result);
+    }
+
+    /**
+     * Creates new camera database record
      * 
      * @param int $modelId
      * @param string $ip
@@ -425,11 +479,12 @@ class Cameras {
      * @param string $password
      * @param bool $active
      * @param int $storageId
-     * @param comment $comment
+     * @param string $comment
+     * @param int $customPort
      * 
-     * @return void/string on error
+     * @return void|string on error
      */
-    public function create($modelId, $ip, $login, $password, $active, $storageId, $comment = '') {
+    public function create($modelId, $ip, $login, $password, $active, $storageId, $comment = '', $customPort = 0) {
         $result = '';
         $modelId = ubRouting::filters($modelId, 'int');
         $ipF = ubRouting::filters($ip, 'mres');
@@ -437,6 +492,8 @@ class Cameras {
         $passwordF = ubRouting::filters($password, 'mres');
         $actF = ($active) ? 1 : 0;
         $storageId = ubRouting::filters($storageId, 'int');
+        $customPort = ubRouting::filters($customPort, 'int');
+
         //automatic storage selection?
         if ($storageId == 0) {
             $storageId = $this->storages->getLeastUsedStorage();
@@ -445,14 +502,22 @@ class Cameras {
         $channelId = $this->getChannelId();
 
         $allStorages = $this->storages->getAllStorageNames();
-        $allModels = $this->models->getAllModelNames();
+        $allModelsData = $this->models->getAllModelData();
+        $allModelsTemplates = $this->models->getAllModelTemplates();
         if (isset($allStorages[$storageId])) {
             $storageData = $this->storages->getStorageData($storageId);
             $storagePathValid = $this->storages->checkPath($storageData['path']);
             if ($storagePathValid) {
-                if (isset($allModels[$modelId])) {
+                if (isset($allModelsData[$modelId])) {
+                    $modelTemplate = $allModelsTemplates[$modelId];
+                    $templatePort = $modelTemplate['RTSP_PORT'];
+                    $futurePort = $templatePort;
+                    if (!empty($customPort)) {
+                        //overrided with some custom?
+                        $futurePort = $customPort;
+                    }
                     if (zb_isIPValid($ipF)) {
-                        if (!$this->isCameraIpUsed($ipF)) {
+                        if ($this->isCameraIpPortFree($ipF, $futurePort)) {
                             if (!empty($loginF) and !empty($passwordF)) {
                                 $this->camerasDb->data('modelid', $modelId);
                                 $this->camerasDb->data('ip', $ipF);
@@ -464,9 +529,17 @@ class Cameras {
                                 $this->camerasDb->data('comment', $commentF);
                                 $this->camerasDb->create();
                                 $newId = $this->camerasDb->getLastId();
-                                log_register('CAMERA CREATE [' . $newId . ']  MODEL [' . $modelId . '] IP `' . $ip . '` STORAGE [' . $storageId . '] COMMENT `' . $comment . '`');
+                                log_register('CAMERA CREATE [' . $newId . ']  MODEL [' . $modelId . '] IP `' . $ip . '` STORAGE [' . $storageId . '] COMMENT `' . $comment . '` PORT `' . $futurePort . '`');
                                 //custom options new empty record creation
                                 $this->createCamOpts($newId);
+
+                                //reload cameras data
+                                $this->loadAllCameras();
+
+                                //set custom rtsp port if required
+                                if (!empty($customPort)) {
+                                    $this->saveCamoptsRtspPort($newId, $customPort);
+                                }
                             } else {
                                 $result .= __('Login or password is empty');
                             }
@@ -712,10 +785,24 @@ class Cameras {
             $allModelsTemplates = $this->models->getAllModelTemplates();
             $allStoragesData = $this->storages->getAllStoragesData();
             foreach ($this->allCameras as $io => $each) {
-                $result[$each['id']]['CAMERA'] = $each;
+                $eachCamData = $each;
+                $eachCamData['realport'] = 0;
+                $result[$each['id']]['CAMERA'] = $eachCamData;
                 $result[$each['id']]['TEMPLATE'] = $allModelsTemplates[$each['modelid']];
                 $result[$each['id']]['STORAGE'] = $allStoragesData[$each['storageid']];
                 $result[$each['id']]['OPTS'] = $this->getCamOpts($each['id']);
+
+                //setting real rtsp port value depend on template and extopts
+                if (isset($result[$each['id']]['TEMPLATE']['RTSP_PORT'])) {
+                    $result[$each['id']]['CAMERA']['realport'] = $result[$each['id']]['TEMPLATE']['RTSP_PORT'];
+                }
+
+                //realport overrided by opts
+                if (isset($result[$each['id']]['OPTS']['rtspport'])) {
+                    if (!empty($result[$each['id']]['OPTS']['rtspport'])) {
+                        $result[$each['id']]['CAMERA']['realport'] = $result[$each['id']]['OPTS']['rtspport'];
+                    }
+                }
             }
         }
         return ($result);
@@ -910,6 +997,7 @@ class Cameras {
                 $inputs .= wf_TextInput(self::PROUTE_NEWLOGIN, __('Login'), '', true, 14, 'alphanumeric') . ' ';
                 $inputs .= wf_PasswordInput(self::PROUTE_NEWPASS, __('Password'), '', true, 14) . ' ';
                 $inputs .= wf_CheckInput(self::PROUTE_NEWACT, __('Enabled'), true, true) . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_NEWCUSTPORT, __('Custom RTSP port'), '', true, 4, 'digits');
                 $inputs .= wf_Selector(self::PROUTE_NEWSTORAGE, $storagesParams, __('Storage'), '', true) . ' ';
                 $inputs .= wf_TextInput(self::PROUTE_NEWCOMMENT, __('Description'), '', true, 18, '') . ' ';
                 $inputs .= wf_Submit(__('Create'));

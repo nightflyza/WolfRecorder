@@ -12,8 +12,9 @@ if (cfr('CAMERAS')) {
         $newAct = ubRouting::post($cameras::PROUTE_NEWACT);
         $newStorageId = ubRouting::post($cameras::PROUTE_NEWSTORAGE);
         $newComment = ubRouting::post($cameras::PROUTE_NEWCOMMENT);
+        $newCustPort = ubRouting::post($cameras::PROUTE_NEWCUSTPORT);
 
-        $creationResult = $cameras->create($newModelId, $newIp, $newLogin, $newPass, $newAct, $newStorageId, $newComment);
+        $creationResult = $cameras->create($newModelId, $newIp, $newLogin, $newPass, $newAct, $newStorageId, $newComment, $newCustPort);
         if ($creationResult) {
             show_error($creationResult);
         } else {
@@ -63,8 +64,8 @@ if (cfr('CAMERAS')) {
         $edPort = ubRouting::post($cameras::PROUTE_ED_CUSTPORT);
         $edStorageId = ubRouting::post($cameras::PROUTE_ED_STORAGE);
         $edComment = ubRouting::post($cameras::PROUTE_ED_COMMENT);
-        $editingResult = $cameras->save($edCameraId, $edModelId, $edIp, $edLogin, $edPass, $edStorageId, $edComment);
-        $cameras->saveCamoptsRtspPort($edCameraId, $edPort);
+        $editingResult = $cameras->save($edCameraId, $edModelId, $edIp, $edLogin, $edPass, $edStorageId, $edComment, $edPort);
+
         if ($editingResult) {
             show_error($editingResult);
         } else {
