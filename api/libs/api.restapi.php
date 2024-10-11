@@ -45,7 +45,8 @@ class RestAPI {
                 'deactivate' => 'camerasDeactivate',
                 'setdescription' => 'camerasSetDescription',
                 'delete' => 'camerasDelete',
-                'isregistered' => 'camerasIsRegistered'
+                'isregistered' => 'camerasIsRegistered',
+                'isipportfree' => 'camerasIpPortFree'
             ),
             'users' => array(
                 'getall' => 'usersGetAll',
@@ -104,7 +105,7 @@ class RestAPI {
                 $result = false;
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -174,7 +175,7 @@ class RestAPI {
     protected function modelsGetAll() {
         $models = new Models();
         $result = $models->getAllModelData();
-        return($result);
+        return ($result);
     }
 
     //////////////////////
@@ -189,7 +190,7 @@ class RestAPI {
     protected function storagesGetAll() {
         $storages = new Storages();
         $result = $storages->getAllStoragesData();
-        return($result);
+        return ($result);
     }
 
     /**
@@ -213,7 +214,7 @@ class RestAPI {
                 $result[$each['id']]['free'] = $storageFree;
             }
         }
-        return($result);
+        return ($result);
     }
 
     /////////////////////
@@ -228,7 +229,7 @@ class RestAPI {
     protected function camerasGetAll() {
         $cameras = new Cameras();
         $result = $cameras->getAllCamerasFullData();
-        return($result);
+        return ($result);
     }
 
     /**
@@ -259,7 +260,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -283,7 +284,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -307,7 +308,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -331,7 +332,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -355,7 +356,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -376,7 +377,29 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
+    }
+
+
+    /**
+     * Checks is camera registered or not by its IP
+     * 
+     * @param array $request
+     * 
+     * @return array
+     */
+    protected function camerasIpPortFree($request) {
+        $result = array();
+        $requiredFields = array('ip', 'port');
+        if ($this->checkRequestFields($requiredFields, $request)) {
+            $cameras = new Cameras();
+            $check = $cameras->isCameraIpPortFree($request['ip'], $request['port']);
+            $freeState = ($check) ? 1 : 0;
+            $result = array('error' => 0, 'free' => $freeState);
+        } else {
+            $result = array('error' => 3, 'message' => __('Wrong request data'));
+        }
+        return ($result);
     }
 
     ///////////////////////////
@@ -390,7 +413,7 @@ class RestAPI {
      */
     protected function systemCheckConnection() {
         $result = array('error' => 0, 'connection' => 1, 'message' => __('Success'));
-        return($result);
+        return ($result);
     }
 
     /**
@@ -400,7 +423,7 @@ class RestAPI {
      */
     protected function systemGetHealth() {
         global $ubillingConfig;
-        $hwInfo=new SystemHwInfo();
+        $hwInfo = new SystemHwInfo();
         $result = array(
             'storages' => 1,
             'network' => 1,
@@ -447,15 +470,15 @@ class RestAPI {
         $result['loadavg'] = $loadAvg;
 
         //system load
-        $cpuLoad=$hwInfo->getsystemLoadPercent();
+        $cpuLoad = $hwInfo->getsystemLoadPercent();
         $result['cpuload'] = $cpuLoad;
 
         //system name
-        $osName=$hwInfo->getOs();
-        $osRelease=$hwInfo->getOsRelease();
-        $phpVer=$hwInfo->getPhpVersion();
-        $result['os'] = 'OS: ' . $osName.' '.$osRelease . ' PHP: ' . $phpVer;
-        return($result);
+        $osName = $hwInfo->getOs();
+        $osRelease = $hwInfo->getOsRelease();
+        $phpVer = $hwInfo->getPhpVersion();
+        $result['os'] = 'OS: ' . $osName . ' ' . $osRelease . ' PHP: ' . $phpVer;
+        return ($result);
     }
 
     ///////////////////////////
@@ -469,7 +492,7 @@ class RestAPI {
      */
     protected function usersGetAll() {
         $userManager = new UserManager();
-        return($userManager->getAllUsersData());
+        return ($userManager->getAllUsersData());
     }
 
     /**
@@ -496,7 +519,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -522,7 +545,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -543,7 +566,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -568,7 +591,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -584,7 +607,7 @@ class RestAPI {
         if ($this->checkRequestFields($requiredFields, $request)) {
             $login = $request['login'];
             $password = $request['password'];
-            if (!empty($login) AND !empty($password)) {
+            if (!empty($login) and !empty($password)) {
                 $userManager = new UserManager();
                 $allUsersData = $userManager->getAllUsersData();
                 if (isset($allUsersData[$login])) {
@@ -608,7 +631,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     ///////////////////
@@ -624,7 +647,7 @@ class RestAPI {
         $result = array();
         $acl = new ACL();
         $result = $acl->getAllAclsData();
-        return($result);
+        return ($result);
     }
 
     /**
@@ -636,7 +659,7 @@ class RestAPI {
         $result = array();
         $acl = new ACL();
         $result = $acl->getAllCameraAclsData();
-        return($result);
+        return ($result);
     }
 
     /**
@@ -648,7 +671,7 @@ class RestAPI {
         $result = array();
         $acl = new ACL();
         $result = $acl->getAllChannelAclsData();
-        return($result);
+        return ($result);
     }
 
     /**
@@ -671,7 +694,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -694,7 +717,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -720,7 +743,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -746,7 +769,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -767,7 +790,7 @@ class RestAPI {
             $allAcls = $acl->getAllAclsData();
             if (!empty($allAcls)) {
                 foreach ($allAcls as $io => $each) {
-                    if ($each['user'] == $login AND $each['cameraid'] == $cameraId) {
+                    if ($each['user'] == $login and $each['cameraid'] == $cameraId) {
                         $aclDeletionId = $each['id'];
                     }
                 }
@@ -786,7 +809,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -807,7 +830,7 @@ class RestAPI {
             $allAcls = $acl->getAllAclsData();
             if (!empty($allAcls)) {
                 foreach ($allAcls as $io => $each) {
-                    if ($each['user'] == $login AND $each['channel'] == $channelId) {
+                    if ($each['user'] == $login and $each['channel'] == $channelId) {
                         $aclDeletionId = $each['id'];
                     }
                 }
@@ -826,7 +849,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     ///////////////////////
@@ -842,7 +865,7 @@ class RestAPI {
         $result = array();
         $cameras = new Cameras();
         $result = $cameras->getAllCamerasChannels();
-        return($result);
+        return ($result);
     }
 
     /**
@@ -863,7 +886,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -886,7 +909,7 @@ class RestAPI {
             }
         }
 
-        return($result);
+        return ($result);
     }
 
     /**
@@ -906,7 +929,7 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 
     ///////////////////////
@@ -922,7 +945,7 @@ class RestAPI {
         $result = array();
         $recorders = new Recorder();
         $result = $recorders->getRunningRecorders();
-        return($result);
+        return ($result);
     }
 
     /**
@@ -943,6 +966,6 @@ class RestAPI {
         } else {
             $result = array('error' => 3, 'message' => __('Wrong request data'));
         }
-        return($result);
+        return ($result);
     }
 }
