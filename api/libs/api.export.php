@@ -83,8 +83,24 @@ class Export {
     protected $acl = '';
 
     /**
+     * Export schedule process StarDust instance
+     *
+     * @var object
+     */
+    protected $scheduleProcess = '';
+
+    /**
+     * Force background schedule run on video export task creation flag
+     *
+     * @var bool
+     */
+    protected $scheduleForceFlag = false;
+
+
+    /**
      * other predefined stuff like routes
      */
+    const LABEL_RUNNING = ' 🏁 ';
     const EXPORTLIST_MASK = '_el.txt';
     const URL_ME = '?module=export';
     const URL_RECORDS = '?module=records';
@@ -106,13 +122,16 @@ class Export {
     const RECORDS_EXT = '.mp4';
     const TABLE_SCHED = 'schedule';
     const OPTION_MODET = 'MODET_ENABLED';
-    const LABEL_RUNNING = ' 🏁 ';
+    const OPTION_FORCESCHED = 'EXPORT_FORCED_SCHED';
+    const WRAPPER = '/bin/wrapi';
+
 
     public function __construct() {
         $this->setLogin();
         $this->initMessages();
         $this->loadConfigs();
         $this->setOptions();
+        $this->initStarDust();
         $this->initStorages();
         $this->initCameras();
         $this->initArchive();
@@ -148,6 +167,11 @@ class Export {
      */
     protected function setOptions() {
         $this->ffmpgPath = $this->binPaths['FFMPG_PATH'];
+        if (isset($this->altCfg[self::OPTION_FORCESCHED])) {
+            if ($this->altCfg[self::OPTION_FORCESCHED]) {
+                $this->scheduleForceFlag = true;
+            }
+        }
     }
 
     /**
@@ -157,6 +181,15 @@ class Export {
      */
     protected function initMessages() {
         $this->messages = new UbillingMessageHelper();
+    }
+
+    /**
+     * Inits StarDust process manager
+     *
+     * @return void
+     */
+    protected function initStarDust() {
+        $this->scheduleProcess = new StarDust(self::PID_SCHEDULE);
     }
 
     /**
@@ -795,6 +828,17 @@ class Export {
                                 $schedDateTo = date("Y-m-d H:i:s", $fullDateTo);
                                 //creating export schedule
                                 $result .= $this->scheduleExportTask($this->myLogin, $channelId, $schedDateFrom, $schedDateTo, $chunksSize);
+                                //force schedule background run?
+                                if ($this->scheduleForceFlag) {
+                                    if (empty($result)) {
+                                        if ($this->scheduleProcess->notRunning()) {
+                                            $this->scheduleProcess->runBackgroundProcess(self::WRAPPER . ' "exportsched"', 0);
+                                            log_register('EXPORT SCHEDULE FORCED');
+                                        } else {
+                                            log_register('EXPORT SCHEDULE ALREADY RUNNING');
+                                        }
+                                    }
+                                }
                             } else {
                                 $result .= __('There is not enough space reserved for exporting your records');
                             }
