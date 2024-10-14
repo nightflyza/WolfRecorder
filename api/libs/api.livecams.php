@@ -625,12 +625,18 @@ class LiveCams {
                                     }
                                 }
 
+                                //custom transport protocol?
+                                $transTemplate = $this->liveOptsPrefix;
+                                if (!empty($cameraData['TEMPLATE']['UDP_TRANSPORT'])) {
+                                    $transTemplate = str_replace('-rtsp_transport tcp', '-rtsp_transport udp', $transTemplate);
+                                }
+
                                 //run live stream capture
                                 $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
                                 $streamType = $cameraData['TEMPLATE']['MAIN_STREAM'];
                                 $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $rtspPort . $streamType;
                                 $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "'";
-                                $liveCommand = $this->ffmpgPath . ' ' . $this->liveOptsPrefix . ' ' . $captureFullUrl . ' ' . $this->liveOptsSuffix . ' ' . self::STREAM_PLAYLIST;
+                                $liveCommand = $this->ffmpgPath . ' ' . $transTemplate . ' ' . $captureFullUrl . ' ' . $this->liveOptsSuffix . ' ' . self::STREAM_PLAYLIST;
                                 $fullCommand = 'cd ' . $streamPath . ' && ' . $liveCommand;
                                 shell_exec($fullCommand);
                             }
@@ -676,12 +682,19 @@ class LiveCams {
                                             $rtspPort = $cameraData['OPTS']['rtspport'];
                                         }
                                     }
+
+                                    //custom transport protocol?
+                                    $transTemplate = $this->liveOptsPrefix;
+                                    if (!empty($cameraData['TEMPLATE']['UDP_TRANSPORT'])) {
+                                        $transTemplate = str_replace('-rtsp_transport tcp', '-rtsp_transport udp', $transTemplate);
+                                    }
+
                                     //run live stream capture
                                     $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
                                     $streamType = $cameraData['TEMPLATE']['SUB_STREAM'];
                                     $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $rtspPort . $streamType;
                                     $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "'";
-                                    $liveCommand = $this->ffmpgPath . ' ' . $this->liveOptsPrefix . ' ' . $captureFullUrl . ' ' . $this->liveOptsSuffix . ' ' . self::SUBSTREAM_PLAYLIST;
+                                    $liveCommand = $this->ffmpgPath . ' ' . $transTemplate . ' ' . $captureFullUrl . ' ' . $this->liveOptsSuffix . ' ' . self::SUBSTREAM_PLAYLIST;
                                     $fullCommand = 'cd ' . $streamPath . ' && ' . $liveCommand;
                                     shell_exec($fullCommand);
                                 } else {

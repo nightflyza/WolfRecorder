@@ -222,11 +222,18 @@ class Recorder {
                                                 $rtspPort = $cameraData['OPTS']['rtspport'];
                                             }
                                         }
+
+                                        //custom transport protocol?
+                                        $transTemplate = $this->transportTemplate;
+                                        if (!empty($cameraData['TEMPLATE']['UDP_TRANSPORT'])) {
+                                            $transTemplate = str_replace('-rtsp_transport tcp', '-rtsp_transport udp', $transTemplate);
+                                        }
+
                                         $authString = $cameraData['CAMERA']['login'] . ':' . $cameraData['CAMERA']['password'] . '@';
                                         $streamUrl = $cameraData['CAMERA']['ip'] . ':' . $rtspPort . $cameraData['TEMPLATE']['MAIN_STREAM'];
                                         $audioOpts = ($cameraData['TEMPLATE']['SOUND']) ? $this->audioCapture : '';
                                         $captureFullUrl = "'rtsp://" . $authString . $streamUrl . "' " . $audioOpts . $this->recordOpts . ' ' . self::CHUNKS_MASK . self::CHUNKS_EXT;
-                                        $captureCommand = $this->ffmpgPath . ' ' . $this->transportTemplate . ' ' . $captureFullUrl . ' ' . $this->supressOutput;
+                                        $captureCommand = $this->ffmpgPath . ' ' . $transTemplate . ' ' . $captureFullUrl . ' ' . $this->supressOutput;
                                         $fullCommand = 'cd ' . $channelPath . ' && ' . $captureCommand;
 
                                         $this->stardust->start();
