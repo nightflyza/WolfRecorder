@@ -46,7 +46,13 @@ if (cfr('EXPORT')) {
         }
 
         //already saved records here
-        show_window(__('Your saved records'), $export->renderAvailableRecords());
+        if (ubRouting::checkGet($export::ROUTE_REFRESH)) {
+            $zenflow = new ZenFlow('arreclst', $export->renderAvailableRecords(), 2000);
+            $availableRecords = $zenflow->render();
+        } else {
+            $availableRecords = $export->renderAvailableRecords();
+        }
+        show_window(__('Your saved records'), $availableRecords);
     }
 } else {
     show_error(__('Access denied'));

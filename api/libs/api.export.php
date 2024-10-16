@@ -108,6 +108,7 @@ class Export {
     const ROUTE_SHOWDATE = 'exportdatearchive';
     const ROUTE_DELETE = 'delrec';
     const ROUTE_PREVIEW = 'previewrecord';
+    const ROUTE_REFRESH = 'updateslookup';
     const PROUTE_MODET_RUN = 'filtermotion';
     const PROUTE_MODET_SENS = 'motionsensitivity';
     const PROUTE_MODET_TIMESCALE = 'motiontimescale';
@@ -1177,6 +1178,7 @@ class Export {
         $recordsExtFilter = '*' . self::RECORDS_EXT;
         $allRecords = rcms_scandir($userRecordingsDir, $recordsExtFilter);
         $moDetFlag = (@$this->altCfg[$moDet::OPTION_ENABLE]) ? true : false;
+        $processingFilesCount = 0;
         //channel filter applied?
         if ($channelId) {
             if (!empty($allRecords)) {
@@ -1195,7 +1197,7 @@ class Export {
             $cells .= wf_TableCell(__('Date'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('from'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('to'));
-            $cells .= wf_TableCell(__('Size'));
+            $cells .= wf_TableCell(__('Size'),'10%');
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
             foreach ($allRecords as $io => $eachFile) {
@@ -1239,6 +1241,7 @@ class Export {
                 //locking all operations if some of files in processing now
                 if ($fileInUseFlag) {
                     $actLinks = wf_img_sized('skins/ajaxloader.gif', __('Record') . ' ' . __('is currently being processed'), 110);
+                    $processingFilesCount++;
                 }
 
                 $cells = wf_TableCell($cameraComment);
@@ -1251,6 +1254,19 @@ class Export {
                 $rows .= wf_TableRow($cells, 'row5');
             }
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table sortable');
+
+            //catching auto-update requests
+            if (!$channelId) {
+                if (ubRouting::checkGet(self::ROUTE_REFRESH)) {
+                    if ($processingFilesCount == 0) {
+                        ubRouting::nav(self::URL_RECORDS);
+                    }
+                } else {
+                    if ($processingFilesCount > 0) {
+                        ubRouting::nav(self::URL_RECORDS . '&' . self::ROUTE_REFRESH . '=true');
+                    }
+                }
+            }
         } else {
             $noRecordsNotice = __('You have no saved records yet');
             if ($channelId) {
