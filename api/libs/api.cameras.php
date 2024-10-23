@@ -1263,7 +1263,7 @@ class Cameras {
             $rows .= wf_TableRow($cells, 'row3');
 
             $cells = wf_TableCell(__('Password'), '', 'row2');
-            $cells .= wf_TableCell($cameraData['password']);
+            $cells .= wf_TableCell(wf_ShowHide($cameraData['password'],__('Show')));
             $rows .= wf_TableRow($cells, 'row3');
 
 

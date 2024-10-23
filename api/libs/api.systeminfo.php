@@ -93,8 +93,8 @@ class SystemInfo {
      * @return string
      */
     public function renderSysLoad() {
-        $size=280;
-        $container=$size+20;
+        $size = 280;
+        $container = $size + 20;
         $result = '';
         $result .= wf_tag('h3') . __('System load') . wf_tag('h3', true);
         $laOpts = '
@@ -122,7 +122,7 @@ class SystemInfo {
      * @return string
      */
     public function renderDisksCapacity() {
-        $size=280;
+        $size = 280;
         $usedSpaceArr = array();
         $mountPoints = array();
         $mountPointNames = array();
@@ -130,7 +130,7 @@ class SystemInfo {
         $allStorageNames = $this->storages->getAllStorageNamesLocalized();
 
         //root fs
-        $mountPoints[0]='/';
+        $mountPoints[0] = '/';
         $mountPointNames['/'] = __('System');
 
         if (!empty($availableStorages)) {
@@ -139,7 +139,7 @@ class SystemInfo {
                 $mountPointNames[$each['path']] =  $allStorageNames[$each['id']];
             }
         }
-        
+
         $this->hwInfo->setMountPoints($mountPoints);
         $usedSpaceArr = $this->hwInfo->getAllDiskStats();
 
@@ -170,7 +170,7 @@ class SystemInfo {
                 $freeLabel = wr_convertSize($spaceStats['free']);
                 $totalLabel = wr_convertSize($spaceStats['total']);
                 $partitionLabel = $mountPointNames[$mountPoint] . ' - ' . $freeLabel . ' ' . __('of') . ' ' . $totalLabel . ' ' . __('Free');
-                $result .= wf_renderGauge(round($spaceStats['usedpercent']), $partitionLabel, '%', $opts, ($size+20));
+                $result .= wf_renderGauge(round($spaceStats['usedpercent']), $partitionLabel, '%', $opts, ($size + 20));
             }
         } else {
             $result .= $this->messages->getStyledMessage(__('No storages available'), 'warning');
@@ -190,7 +190,8 @@ class SystemInfo {
         if (!empty($instanceSerial)) {
             $rawRelease = file_get_contents('RELEASE');
             $infoLabel = __('WolfRecorder') . ' ' . $rawRelease . ', ';
-            $infoLabel .= __('This system serial number') . ': ' . wf_tag('b') . $instanceSerial . wf_tag('b', true);
+            $infoLabel .= __('This system serial number') . ': ';
+            $infoLabel .= wf_tag('b') . wf_ShowHide($instanceSerial, __('Show')) . wf_tag('b', true);
             $result .= $this->messages->getStyledMessage(wf_tag('center') . $infoLabel . wf_tag('center', true), 'info');
         } else {
             $result .= $this->messages->getStyledMessage(__('Something went wrong'), 'error');
