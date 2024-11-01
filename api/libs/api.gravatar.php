@@ -9,14 +9,28 @@
  * 
  * @param string $email user email
  * @param bool $secure use HTTPS for API interraction?
+ * @param string $avatarService gravatar|libravatar|etc
  * 
  * @return string
  */
-function gravatar_GetUrl($email, $secure = false) {
+function gravatar_GetUrl($email, $secure = false, $avatarService = '') {
     $hash = strtolower($email);
     $hash = md5($hash);
     $proto = ($secure) ? 'https' : 'http';
-    $baseUrl = 'gravatar.com/avatar/';
+
+    switch ($avatarService) {
+        case 'gravatar':
+            $baseUrl = 'gravatar.com/avatar/';
+            break;
+        case 'libravatar':
+            $baseUrl = 'seccdn.libravatar.org/avatar/';
+            break;
+        default:
+            $baseUrl = 'seccdn.libravatar.org/avatar/';
+            break;
+    }
+
+
     $result = $proto . '://' . $baseUrl . $hash;
     return ($result);
 }
@@ -28,14 +42,16 @@ function gravatar_GetUrl($email, $secure = false) {
  * @param string $email  user email
  * @param int $size   user avatar size
  * @param string $class custom image class
+ * @param title $title custom image title
  * 
  * @return string
  */
-function gravatar_GetAvatar($email, $size = '64', $class = '') {
+function gravatar_GetAvatar($email, $size = '64', $class = '', $title = '') {
     global $ubillingConfig;
     $cachePath = DATA_PATH . 'avatars/';
     $gravatarOption = $ubillingConfig->getAlterParam('GRAVATAR_DEFAULT');
     $gravatarCacheTime = $ubillingConfig->getAlterParam('GRAVATAR_CACHETIME');
+    $avatarService = $ubillingConfig->getAlterParam('GRAVATAR_SERVICE');
     $getsize = ($size) ? '&s=' . $size : '';
     //option not set
     if (!$gravatarOption) {
@@ -43,7 +59,7 @@ function gravatar_GetAvatar($email, $size = '64', $class = '') {
     }
 
     $useSSL = ($gravatarCacheTime) ? false : true; //avoid mixed content issues on disabled caching cases
-    $url = gravatar_GetUrl($email, $useSSL);
+    $url = gravatar_GetUrl($email, $useSSL, $avatarService);
     $fullUrl = $url . '?d=' . $gravatarOption . $getsize;
 
     //avatar caching to local FS.
@@ -74,7 +90,7 @@ function gravatar_GetAvatar($email, $size = '64', $class = '') {
         $fullUrl = $fullCachedPath;
     }
 
-    $result = wf_tag('img', false, $class, 'src="' . $fullUrl . '"');
+    $result = wf_tag('img', false, $class, 'src="' . $fullUrl . '" alt="avatar" title="' . $title . '"');
     return ($result);
 }
 
@@ -102,17 +118,17 @@ function gravatar_GetUserEmail($username) {
  * 
  * @param string $username rcms user login
  * @param int    $size - size of returning avatar
+ * @param string $class - class of image body
+ * @param string $title - title of avatar image
  * 
  * @return string
  */
-function gravatar_ShowAdminAvatar($username, $size = '') {
+function gravatar_ShowAdminAvatar($username, $size = '', $class = '', $title = '') {
     $adminEmail = gravatar_GetUserEmail($username);
     if ($adminEmail) {
-        $result = gravatar_GetAvatar($adminEmail, $size);
+        $result = gravatar_GetAvatar($adminEmail, $size, $class, $title);
     } else {
-        $result = wf_img('skins/admava.png');
+        $result = wf_img('skins/admava.png', $title);
     }
     return ($result);
 }
-
-?>
