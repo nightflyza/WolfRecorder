@@ -248,8 +248,14 @@ class UbillingCache {
         //redis storage
         if ($this->storage == 'redis') {
             $this->redis->set($key, $data);
-            $this->redis->setTimeout($key, $expiration);
-        }
+            // setTimeout method deprecated: https://github.com/phpredis/phpredis/pull/1572
+            // that check required for paleolithic legacy setups with PHP 5.x etc.
+            if (method_exists($this->redis,'expire')) {
+                $this->redis->expire($key, $expiration);
+            } else {
+                @$this->redis->setTimeout($key, $expiration);
+            }
+        }   
 
         $this->logEvent('SET KEY: ' . $key, $data);
     }
@@ -299,7 +305,7 @@ class UbillingCache {
         //memcached storage
         if ($this->storage == 'memcached') {
             $result = $this->memcached->get($key);
-            if (!$result) {
+            if ($result===false) {
                 $result = '';
             }
             $this->logEvent('GET KEY: ' . $key, $result);
@@ -309,7 +315,7 @@ class UbillingCache {
         //redis storage
         if ($this->storage == 'redis') {
             $result = $this->redis->get($key);
-            if (!$result) {
+            if ($result===false) {
                 $result = '';
             }
             $this->logEvent('GET KEY: ' . $key, $result);
