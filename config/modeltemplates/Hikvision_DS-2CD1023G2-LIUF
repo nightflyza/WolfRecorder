@@ -1,0 +1,8 @@
+DEVICE="Hikvision DS-2CD1023G2-LIUF"
+PROTO="rtsp"
+MAIN_STREAM="/Streaming/Channels/101"
+SUB_STREAM="/Streaming/Channels/102"
+RTSP_PORT=554
+HTTP_PORT=80
+SOUND=1
+PTZ=0
