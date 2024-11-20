@@ -780,3 +780,10 @@ sub, sup {
     color:#777777;
     text-decoration: none;
 }
+
+.searchform {
+    float: right;
+    margin-right: 0;
+    margin-left: 32px;
+  /*  border: 1px solid #f24537; */
+}

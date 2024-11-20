@@ -244,7 +244,7 @@ class LiveCams {
      */
     public function renderSearchForm() {
         $result = '';
-        $result .= wf_TextInput('camsearch', ' '.__('Search'), '', false, 20, '', '', 'camsearch', 'autofocus');
+      //  $result .= wf_TextInput('camsearch', ' '.__('Search'), '', false, 20, '', '', 'camsearch', 'autofocus');
         $result .= wf_tag('style');
         $result .= '
             .camerapreview {
