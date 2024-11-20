@@ -134,6 +134,7 @@ class LiveCams {
     const ROUTE_PSEUDOSUB = 'sublq';
     const ROUTE_LIVEWALL = 'wall';
     const ROUTE_DL_PLAYLIST = 'downloadplaylist';
+    const CAM_CONT_ID = 'wrcamcont_';
 
 
     const WRAPPER = '/bin/wrapi';
@@ -237,21 +238,79 @@ class LiveCams {
     }
 
     /**
+     * Renders the search form and frontend controller for live cameras list
+     *
+     * @return string
+     */
+    public function renderSearchForm() {
+        $result = '';
+        $result .= wf_TextInput('camsearch', ' '.__('Search'), '', false, 20, '', '', 'camsearch', 'autofocus');
+        $result .= wf_tag('style');
+        $result .= '
+            .camerapreview {
+                float: left; 
+                margin: 5px;"
+                transition: opacity 0.5s, transform 0.5s;
+                opacity: 1;
+                transform: translateY(0);
+             }
+
+            .hiddencam {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            .hiddencam[style*="display: none;"] {
+                transform: translateY(0);
+            }
+        ';
+        $result .= wf_tag('style', true);
+
+        $result .= wf_tag('script');
+        $result .= "
+            document.getElementById('camsearch').addEventListener('input', function () {
+            const searchValue = this.value.toLowerCase();
+            const cameras = document.querySelectorAll('[id^=\"wrcamcont_\"]');
+
+            cameras.forEach(camera => {
+                const idText = camera.id.toLowerCase();
+                if (searchValue === '' || idText.includes(searchValue)) {
+                    camera.classList.remove('hiddencam');
+                    camera.style.display = 'block';
+                    requestAnimationFrame(() => camera.style.opacity = '1');
+                } else {
+                    camera.classList.add('hiddencam');
+                    setTimeout(() => {
+                        if (camera.classList.contains('hiddencam')) {
+                            camera.style.display = 'none';
+                        }
+                    }, 300);
+                }
+            });
+        });
+        ";
+        $result .= wf_tag('script', true);
+        return ($result);
+    }
+
+    /**
      * Lists available cameras as channels shots preview
      * 
      * @return string
      */
     public function renderList() {
         $result = '';
+        $result .= $this->renderSearchForm();
         if ($this->acl->haveCamsAssigned()) {
             if (!empty($this->allCamerasData)) {
-                $style = 'style="float: left; margin: 5px;"';
+               // $style = 'style="float: left; margin: 5px;"';
                 $result .= wf_tag('div');
                 foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
                     if ($this->acl->isMyCamera($eachCameraId)) {
                         $cameraChannel = $eachCameraData['CAMERA']['channel'];
                         $channelScreenshot = $this->chanshots->getChannelScreenShot($cameraChannel);
                         $cameraLabel = $this->cameras->getCameraComment($cameraChannel);
+                        $containerId = ' id="' . self::CAM_CONT_ID . $cameraLabel . '" ';
                         if (empty($channelScreenshot)) {
                             $channelScreenshot = $this->chanshots::ERR_NOSIG;
                         } else {
@@ -271,9 +330,7 @@ class LiveCams {
                             $channelScreenshot = $this->chanshots::ERR_DISABLD;
                         }
 
-
-
-                        $result .= wf_tag('div', false, '', $style);
+                        $result .= wf_tag('div', false, 'camerapreview', $containerId);
                         $channelUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $cameraChannel;
                         $channelImage = wf_img($channelScreenshot, $cameraLabel, 'width: 480px; height: 270px;  object-fit: cover;');
                         $channelLink = wf_Link($channelUrl, $channelImage);
