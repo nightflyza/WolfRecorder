@@ -8,7 +8,7 @@
  */
 function wr_QuickSearchRenderForm() {
     global $ubillingConfig;
-    $modList = array('livecams', 'archive');
+    $modList = array('livecams', 'archive','export');
     $modList = array_flip($modList);
     $result = '';
     

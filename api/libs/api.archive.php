@@ -163,26 +163,12 @@ class Archive {
             if (!empty($allStotagesData)) {
                 if (!empty($this->allCamerasData)) {
                     $screenshots = new ChanShots();
-
-                    $cells = '';
-                    if (cfr('CAMERAS')) {
-                        $cells .= wf_TableCell(__('ID'));
-                        $cells .= wf_TableCell(__('IP'));
-                    }
-                    $cells .= wf_TableCell(__('Description'));
-                    $cells .= wf_TableCell(__('Actions'));
-                    $rows = wf_TableRow($cells, 'row1');
+                    $result.=wf_tag('div',false,'cameraslist');
                     foreach ($this->allCamerasData as $io => $each) {
                         $eachCamId = $each['CAMERA']['id'];
                         if ($this->acl->isMyCamera($eachCamId)) {
-                            $eachCamIp = $each['CAMERA']['ip'];
                             $eachCamDesc = $each['CAMERA']['comment'];
                             $eachCamChannel = $each['CAMERA']['channel'];
-                            $cells = '';
-                            if (cfr('CAMERAS')) {
-                                $cells .= wf_TableCell($eachCamId);
-                                $cells .= wf_TableCell($eachCamIp, '', '', 'sorttable_customkey="' . ip2int($eachCamIp) . '"');
-                            }
                             $eachCamUrl = self::URL_ME . '&' . self::ROUTE_VIEW . '=' . $eachCamChannel;
                             $camPreview = '';
                             $chanShot = $screenshots->getChannelScreenShot($eachCamChannel);
@@ -200,17 +186,22 @@ class Archive {
                                     }
                                 }
                             }
+
                             if (!$each['CAMERA']['active']) {
                                 $chanShot = $screenshots::ERR_DISABLD;
                             }
-                            $camPreview = $screenshots->renderListBox($eachCamChannel, $chanShot);
-                            $cells .= wf_TableCell(wf_Link($eachCamUrl, $camPreview . $eachCamDesc, false, 'camlink', 'id="camlink' . $eachCamChannel . '"'));
-                            $actLinks = wf_Link($eachCamUrl, wf_img('skins/icon_play_small.png', __('View')));
-                            $cells .= wf_TableCell($actLinks);
-                            $rows .= wf_TableRow($cells, 'row5');
+
+                            $camPreview = wf_img($chanShot,$eachCamDesc);
+                            $containerId='wrcamcont_'.$eachCamDesc;
+                        
+                        $result.=wf_tag('div',false,'','id="'.$containerId.'"');
+                        $camInfo=wf_tag('div',false,'camera-info').$eachCamDesc.wf_tag('div',true);
+                        $result.=wf_Link($eachCamUrl, $camPreview . $camInfo, false, 'camera-item');
+                        $result.=wf_tag('div',true);
                         }
                     }
-                    $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
+                    $result.=wf_tag('div',true);
+                    $result.=wf_AjaxContainer('wrqsstatus','','');
                 } else {
                     $result .= $this->messages->getStyledMessage(__('Cameras') . ': ' . __('Nothing to show'), 'warning');
                 }

@@ -30,7 +30,7 @@ if (cfr('ARCHIVE')) {
 
     //cameras list
     if (!ubRouting::checkGet($archive::ROUTE_VIEW)) {
-        show_window(__('Available cameras'), $archive->renderCamerasList());
+        show_window(__('Video from cameras'), $archive->renderCamerasList());
         wr_Stats();
     }
 } else {

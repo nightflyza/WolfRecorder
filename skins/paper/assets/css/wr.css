@@ -34,7 +34,7 @@
 .searchform {
     float: right;
     margin-right: 0;
-    margin-left: 32px;
+    margin-left: 20px;
     position: relative;
     display: flex;
     align-items: center;
@@ -43,7 +43,7 @@
 .searchform input {
     border-radius: 10px;
     border: 1px solid #ccc;
-    padding: 10px 15px;
+    padding: 8px 8px;
     font-size: 12px;
     outline: none;
     transition: all 0.3s ease;
@@ -74,4 +74,63 @@
 
 .searchform .clear-btn:hover {
     color: #000;
+}
+
+.cameraslist {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    list-style: none;
+    margin: 0;
+}
+
+.cameraslist .camera-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    width: 100%;
+    text-decoration: none;
+    color: #777777;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cameraslist .camera-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+.cameraslist .camera-item img {
+    object-fit: cover;
+    width: 124px;
+    height: 75px;
+    margin-right: 16px;
+}
+
+.cameraslist .camera-item .camera-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    font-size: 14px;
+}
+
+/* mobile devs lists */
+@media (max-width: 768px) {
+    .cameraslist .camera-item {
+        flex-direction: column;
+        text-align: center;
+        padding: 14px;
+    }
+
+    .cameraslist .camera-item img {
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
 }

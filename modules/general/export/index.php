@@ -58,7 +58,7 @@ if (cfr('EXPORT')) {
 
     //rendering channels list
     if (!ubRouting::checkGet($export::ROUTE_CHANNEL)) {
-        show_window(__('Available cameras'), $export->renderCamerasList());
+        show_window(__('Save records'), $export->renderCamerasList());
     }
 } else {
     show_error(__('Access denied'));

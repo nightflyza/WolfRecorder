@@ -375,31 +375,4 @@ class ChanShots {
         }
     }
 
-    /**
-     * Renders small channel preview for camera lists
-     * 
-     * @param string $channel
-     * @param string $screenshot
-     * 
-     * @return string
-     */
-    public function renderListBox($channel, $screenshot) {
-        $result = wf_tag('style');
-        $result .= '  .preview' . $channel . ' {
-                position: relative;
-                margin-right: 10px;
-               }
-               
-              .preview' . $channel . ' img {
-                   object-fit: cover;
-                   width: 124px;
-                   height: 75px;
-                  }
-               ';
-        $result .= wf_tag('style', true);
-        $result .= wf_tag('span', false, 'preview' . $channel);
-        $result .= wf_tag('img', false, 'preview' . $channel, 'src="' . $screenshot . '" style="width:124px;"');
-        $result .= wf_tag('span', true);
-        return ($result);
-    }
 }

@@ -71,7 +71,11 @@
                                 </button>
                             </div>
                             <a class="navbar-brand" href="index.php"><?=__($system->getPageTitle()); ?></a>
-                            <?=wr_QuickSearchRenderForm(); ?>
+                            <?php
+                                if (function_exists('wr_QuickSearchRenderForm')) {
+                                    print(wr_QuickSearchRenderForm());
+                                }
+                             ?>
                         </div>
                   
                         <div class="collapse navbar-collapse justify-content-end" id="navigation">
