@@ -22,6 +22,7 @@
         <!-- Ubilling custom styles -->
         <link href="<?=$system->getSkinPath(); ?>assets/css/ubilling.css" rel="stylesheet" />
         <script src="<?=$system->getSkinPath(); ?>assets/js/core/jquery.min.js"></script>
+        <link href="<?=$system->getSkinPath(); ?>assets/css/wr.css" rel="stylesheet" />
         <!-- JQDT  -->
         <style type="text/css" title="currentStyle">
             @import "modules/jsc/dt3/css/jquery.dataTables_themeroller.css";
@@ -70,9 +71,7 @@
                                 </button>
                             </div>
                             <a class="navbar-brand" href="index.php"><?=__($system->getPageTitle()); ?></a>
-                            <div class="searchform">
-                                <input type="text" name="camsearch" value="" size="15" id="camsearch" placeholder="швидкий пошук..." class="" autofocus>
-                            </div>
+                            <?=wr_QuickSearchRenderForm(); ?>
                         </div>
                   
                         <div class="collapse navbar-collapse justify-content-end" id="navigation">

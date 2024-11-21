@@ -304,6 +304,7 @@ $lang['def']['Original'] = 'Оригінальний';
 $lang['def']['With this tool, you can filter out only scenes with motion and save them as a new recording'] = 'За допомогою цього інструменту ви зможете відфільтрувати з запису тільки сцени в яких присутній рух та зберегти їх як новий запис';
 $lang['def']['Not enough free space'] = 'Недостатньо вільного простору';
 $lang['def']['right to use motion detection'] = 'Право використовувати розпізнавання руху';
+$lang['def']['Quick search'] = 'Швидкий пошук';
 $lang['def'][''] = '';
 
 

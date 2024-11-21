@@ -237,61 +237,6 @@ class LiveCams {
         $this->allCamerasData = $this->cameras->getAllCamerasFullData();
     }
 
-    /**
-     * Renders the search form and frontend controller for live cameras list
-     *
-     * @return string
-     */
-    public function renderSearchForm() {
-        $result = '';
-      //  $result .= wf_TextInput('camsearch', ' '.__('Search'), '', false, 20, '', '', 'camsearch', 'autofocus');
-        $result .= wf_tag('style');
-        $result .= '
-            .camerapreview {
-                float: left; 
-                margin: 5px;"
-                transition: opacity 0.5s, transform 0.5s;
-                opacity: 1;
-                transform: translateY(0);
-             }
-
-            .hiddencam {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            .hiddencam[style*="display: none;"] {
-                transform: translateY(0);
-            }
-        ';
-        $result .= wf_tag('style', true);
-
-        $result .= wf_tag('script');
-        $result .= "
-            document.getElementById('camsearch').addEventListener('input', function () {
-            const searchValue = this.value.toLowerCase();
-            const cameras = document.querySelectorAll('[id^=\"wrcamcont_\"]');
-
-            cameras.forEach(camera => {
-                const idText = camera.id.toLowerCase();
-                if (searchValue === '' || idText.includes(searchValue)) {
-                    camera.classList.remove('hiddencam');
-                    camera.style.display = 'block';
-                    requestAnimationFrame(() => camera.style.opacity = '1');
-                } else {
-                    camera.classList.add('hiddencam');
-                    setTimeout(() => {
-                        if (camera.classList.contains('hiddencam')) {
-                            camera.style.display = 'none';
-                        }
-                    }, 300);
-                }
-            });
-        });
-        ";
-        $result .= wf_tag('script', true);
-        return ($result);
-    }
 
     /**
      * Lists available cameras as channels shots preview
@@ -300,10 +245,8 @@ class LiveCams {
      */
     public function renderList() {
         $result = '';
-        $result .= $this->renderSearchForm();
         if ($this->acl->haveCamsAssigned()) {
             if (!empty($this->allCamerasData)) {
-               // $style = 'style="float: left; margin: 5px;"';
                 $result .= wf_tag('div');
                 foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
                     if ($this->acl->isMyCamera($eachCameraId)) {
@@ -339,6 +282,7 @@ class LiveCams {
                     }
                 }
                 $result .= wf_tag('div', true);
+                $result.=wf_AjaxContainer('wrqsstatus','','');
             } else {
                 $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
             }
@@ -399,8 +343,6 @@ class LiveCams {
         $result = '';
         if ($this->acl->haveCamsAssigned()) {
             if (!empty($this->allCamerasData)) {
-                $style = 'style="float: left; margin: 5px; min-height:240px; min-width:320px; border: 0px solid red;"';
-                $style .= ' id="livewallelement"';
                 $result .= wf_tag('div');
                 foreach ($this->allCamerasData as $eachCameraId => $eachCameraData) {
                     if ($this->acl->isMyCamera($eachCameraId)) {
@@ -409,6 +351,7 @@ class LiveCams {
                         $cameraId = $eachCameraData['CAMERA']['id'];
                         $channelScreenshot = $this->chanshots->getChannelScreenShot($cameraChannel);
                         $cameraLabel = $this->cameras->getCameraComment($cameraChannel);
+                        $containerId = ' id="' . self::CAM_CONT_ID . $cameraLabel . '" ';
                         if (empty($channelScreenshot)) {
                             $channelScreenshot = $this->chanshots::ERR_NOSIG;
                             $viewableFlag = false;
@@ -418,7 +361,7 @@ class LiveCams {
                             $channelScreenshot = $this->chanshots::ERR_DISABLD;
                             $viewableFlag = false;
                         }
-                        $result .= wf_tag('div', false, '', $style);
+                        $result .= wf_tag('div', false, 'cameralivewall', $containerId);
                         if ($viewableFlag) {
                             $streamUrl = $this->getSubStreamUrl($cameraChannel);
                             if ($streamUrl) {
@@ -448,6 +391,7 @@ class LiveCams {
                     }
                 }
                 $result .= wf_tag('div', true);
+                $result.=wf_AjaxContainer('wrqsstatus','','');
             } else {
                 $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
             }
