@@ -7,10 +7,10 @@
 }
 
 .cameralivewall {
-    float: left; 
-    margin: 5px; 
-    min-height:240px;
-    min-width:320px;
+    float: left;
+    margin: 5px;
+    min-height: 240px;
+    min-width: 320px;
 }
 
 .hiddencam {
@@ -56,7 +56,8 @@
     cursor: pointer;
     font-size: 18px;
     color: #aaa;
-    display: none; /* clear button is hidden by default */
+    display: none;
+    /* clear button is hidden by default */
     align-items: center;
     justify-content: center;
     height: 100%;
@@ -112,7 +113,7 @@
     font-size: 14px;
 }
 
-/* mobile devs lists */
+/* mobile devs cameras lists */
 @media (max-width: 768px) {
     .cameraslist .camera-item {
         flex-direction: column;
@@ -124,4 +125,41 @@
         margin-right: 0;
         margin-bottom: 8px;
     }
+}
+
+/* archive and records player styling */
+.archplayercontainer {
+    width: 60%;
+}
+
+.recplayercontainer {
+    width: 80%;
+}
+
+.liveplayercontainer {
+    width: 80%;
+}
+
+
+.rectimeline {
+    width: 67%;
+}
+
+@media (max-width: 768px) {
+    .archplayercontainer {
+        width: 100%;
+    }
+
+    .recplayercontainer {
+        width: 100%;
+    }
+
+    .liveplayercontainer {
+        width: 100%;
+    }
+
+    .rectimeline {
+        width: 100%;
+    }
+
 }

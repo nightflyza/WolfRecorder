@@ -252,7 +252,7 @@ class Export {
             if (!empty($allStotagesData)) {
                 if (!empty($this->allCamerasData)) {
                     $screenshots = new ChanShots();
-                    $result.=wf_tag('div',false,'cameraslist');
+                    $result .= wf_tag('div', false, 'cameraslist');
                     foreach ($this->allCamerasData as $io => $each) {
                         $eachCamId = $each['CAMERA']['id'];
                         if ($this->acl->isMyCamera($eachCamId)) {
@@ -285,17 +285,17 @@ class Export {
                                 $chanShot = $screenshots::ERR_DISABLD;
                             }
 
-                            $camPreview = wf_img($chanShot,$eachCamDesc);
-                            $containerId='wrcamcont_'.$eachCamDesc;
+                            $camPreview = wf_img($chanShot, $eachCamDesc);
+                            $containerId = 'wrcamcont_' . $eachCamDesc;
 
-                            $result.=wf_tag('div',false,'','id="'.$containerId.'"');
-                            $camInfo=wf_tag('div',false,'camera-info').$eachCamDesc.wf_tag('div',true);
-                            $result.=wf_Link($eachCamUrl, $camPreview . $camInfo, false, 'camera-item');
-                            $result.=wf_tag('div',true);
+                            $result .= wf_tag('div', false, '', 'id="' . $containerId . '"');
+                            $camInfo = wf_tag('div', false, 'camera-info') . $eachCamDesc . wf_tag('div', true);
+                            $result .= wf_Link($eachCamUrl, $camPreview . $camInfo, false, 'camera-item');
+                            $result .= wf_tag('div', true);
                         }
                     }
-                    $result.=wf_tag('div',true);
-                    $result.=wf_AjaxContainer('wrqsstatus','','');
+                    $result .= wf_tag('div', true);
+                    $result .= wf_AjaxContainer('wrqsstatus', '', '');
                 } else {
                     $result .= $this->messages->getStyledMessage(__('Cameras') . ': ' . __('Nothing to show'), 'warning');
                 }
@@ -1023,7 +1023,9 @@ class Export {
             }
 
             if ($filePath and file_exists($filePath)) {
-                $webPlayer .= $this->renderRecordPlayer($filePath, '80%', true, $filePath);
+                $webPlayer .= wf_tag('div', false, 'recplayercontainer');
+                $webPlayer .= $this->renderRecordPlayer($filePath, '100%', true, $filePath);
+                $webPlayer .= wf_tag('div', true);
                 $controls .= wf_Link($filePath, web_icon_download() . ' ' . __('Download'), false, 'ubButton');
             } else {
                 $result .= $this->messages->getStyledMessage(__('File not exists'), 'error');
@@ -1194,7 +1196,7 @@ class Export {
             $cells .= wf_TableCell(__('Date'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('from'));
             $cells .= wf_TableCell(__('Time') . ' ' . __('to'));
-            $cells .= wf_TableCell(__('Size'),'10%');
+            $cells .= wf_TableCell(__('Size'), '10%');
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
             foreach ($allRecords as $io => $eachFile) {

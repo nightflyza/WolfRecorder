@@ -64,7 +64,7 @@ class Archive {
      *
      * @var string
      */
-    protected $playerWidth = '70%';
+    protected $playerWidth = '100%';
 
     /**
      * ACL instance placeholder
@@ -290,7 +290,7 @@ class Archive {
                 if ($chunksByDay > 3) {
                     $barWidth = 0.064;
                     $barStyle = 'width:' . $barWidth . '%;';
-                    $result = wf_tag('div', false, '', 'style = "width:' . $this->playerWidth . ';"');
+                    $result = wf_tag('div', false, 'rectimeline', '');
                     foreach ($dayMinAlloc as $eachMin => $recAvail) {
                         $recAvailBar = ($recAvail) ? 'skins/rec_avail.png' : 'skins/rec_unavail.png';
                         if ($curDate == $date) {

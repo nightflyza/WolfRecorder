@@ -59,7 +59,7 @@ class LiveCams {
      *
      * @var string
      */
-    protected $playerWidth = '80%';
+    protected $playerWidth = '100%';
 
     /**
      * Contains system messages helper instance
@@ -282,7 +282,7 @@ class LiveCams {
                     }
                 }
                 $result .= wf_tag('div', true);
-                $result.=wf_AjaxContainer('wrqsstatus','','');
+                $result .= wf_AjaxContainer('wrqsstatus', '', '');
             } else {
                 $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
             }
@@ -391,7 +391,7 @@ class LiveCams {
                     }
                 }
                 $result .= wf_tag('div', true);
-                $result.=wf_AjaxContainer('wrqsstatus','','');
+                $result .= wf_AjaxContainer('wrqsstatus', '', '');
             } else {
                 $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
             }
@@ -910,7 +910,9 @@ class LiveCams {
                     //seems live stream now live
                     $playerId = 'liveplayer_' . $channelId;
                     $player = new Player($this->playerWidth, true);
+                    $result .= wf_tag('div', false, 'liveplayercontainer');
                     $result .= $player->renderLivePlayer($streamUrl, $playerId);
+                    $result .= wf_tag('div', true);
                     $result .= $this->renderKeepAliveCallback($cameraId);
                 } else {
                     $result .= $this->messages->getStyledMessage(__('Oh no') . ': ' . __('No such live stream'), 'error');

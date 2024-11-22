@@ -82,7 +82,7 @@ class Player {
         $result = '';
         $result .= wf_tag('script', false, '', 'src="' . $this->playerLib . '"') . wf_tag('script', true);
         $result .= wf_tag('div', false, '', 'style="float:left; width:' . $this->width . '; margin:5px;"');
-        $result .= wf_tag('div', false, '', 'id = "' . $playerId . '" style="width:90%;"') . wf_tag('div', true);
+        $result .= wf_tag('div', false, 'archplayercontainer', 'id = "' . $playerId . '"') . wf_tag('div', true);
         $result .= wf_tag('script');
         $result .= 'var player = new Playerjs({id:"' . $playerId . '", ' . $poster . ' file:"' . $playlistPath . '", autoplay:' . $autoPlay . ' ' . $plStart . '});';
         $result .= wf_tag('script', true);

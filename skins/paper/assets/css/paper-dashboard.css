@@ -2306,7 +2306,7 @@ h4,
 h5,
 h6 {
     font-weight: 400;
-    word-break:break-all;
+    word-break: break-all;
 }
 
 a {
@@ -2334,7 +2334,7 @@ h1 small,
 
 h2,
 .h2 {
-    font-size: 2.4em;
+    font-size: 2.2em;
     margin-bottom: 8px;
 }
 
