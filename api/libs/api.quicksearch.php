@@ -8,22 +8,24 @@
  */
 function wr_QuickSearchRenderForm() {
     global $ubillingConfig;
-    $modList = array('livecams', 'archive','export');
-    $modList = array_flip($modList);
+    $modList = array('livecams', 'archive', 'export');
+    $denyList = array('livechannel', 'viewchannel', 'exportchannel');
     $result = '';
-    
-        if ($ubillingConfig->getAlterParam('QUICKSEARCH_ENABLED')) {
-            if (ubRouting::checkGet('module')) {
-                $curModule = ubRouting::get('module', 'gigasafe');
-                if (isset($modList[$curModule])) {
-                    $result .= wf_tag('div', false, 'searchform');
-                    $result .= wf_TextInput('camsearch', ' ' . '', '', false, 15, '', '', 'camsearch', 'placeholder="' . __('Quick search') . '...' . '"');
-            
-                    $result.= wf_tag('button',false,'clear-btn','type="button" aria-label="Clear search"').'&times;'.wf_tag('button',true);
-                    $result .= wf_tag('div', true);
 
-                    $result .= wf_tag('script');
-                    $result .= "
+    if ($ubillingConfig->getAlterParam('QUICKSEARCH_ENABLED')) {
+        if (ubRouting::checkGet('module')) {
+            $modList = array_flip($modList);
+            $curModule = ubRouting::get('module', 'gigasafe');
+            $skipRenderFlag = (ubRouting::checkGet($denyList, true, true)) ? true : false;
+            if (isset($modList[$curModule]) and !$skipRenderFlag) {
+                $result .= wf_tag('div', false, 'searchform');
+                $result .= wf_TextInput('camsearch', ' ' . '', '', false, 15, '', '', 'camsearch', 'placeholder="' . __('Quick search') . '...' . '"');
+
+                $result .= wf_tag('button', false, 'clear-btn', 'type="button" aria-label="Clear search"') . '&times;' . wf_tag('button', true);
+                $result .= wf_tag('div', true);
+
+                $result .= wf_tag('script');
+                $result .= "
                     document.getElementById('camsearch').addEventListener('input', function () {
                         const searchValue = this.value.toLowerCase();
                         const cameras = document.querySelectorAll('[id^=\"wrcamcont_\"]');
@@ -49,7 +51,7 @@ function wr_QuickSearchRenderForm() {
                 
                         //no cameras found
                         if (visibleCount === 0) {
-                            statusContainer.textContent = '".__('Nothing found')."';
+                            statusContainer.textContent = '" . __('Nothing found') . "';
                         } else {
                             statusContainer.textContent = '';
                         }
@@ -74,10 +76,10 @@ function wr_QuickSearchRenderForm() {
                         });
                     });
                 ";
-                    $result .= wf_tag('script', true);
-                }
+                $result .= wf_tag('script', true);
             }
         }
+    }
 
     return ($result);
 }
