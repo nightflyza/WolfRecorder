@@ -365,14 +365,14 @@ apt install -y gnupg2 >> ${INSTALLER_LOG}  2>&1
 
 
 $DIALOG --menu "Choose your Linux distribution" 16 50 8 \
-                   DEB126 "Debian 12.6 Bookworm"\
+                   DEB12 "Debian 12 Bookworm"\
         2> /tmp/wrarch
 clear
 
 ARCH=`cat /tmp/wrarch`
 
 case $ARCH in 
-DEB126)
+DEB12)
 #some remote paths here
 FETCH="/usr/bin/wget"
 APACHE_VERSION="apache24"
@@ -689,7 +689,7 @@ exit
 esac
 
 #
-# End of Debian 12.6 script here
+# End of Debian 12 script here
 #
 ;;
 esac
