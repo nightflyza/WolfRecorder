@@ -310,7 +310,7 @@ class LiveCams {
                             $channelId = $eachCameraData['CAMERA']['channel'];
                             $channelName = $eachCameraData['CAMERA']['comment'];
                             $psUrl = $baseUrl . self::URL_PSEUDOSTREAM . '&' . self::ROUTE_PSEUDOLIVE . '=' . $channelId . '&file=' . self::STREAM_PLAYLIST;
-                            $playList .= '#EXTINF:-1,' . $channelName . PHP_EOL;
+                            $playList .= '#EXTINF:-1 tvg-name="' . $channelName . '",' . $channelName . PHP_EOL;
                             $playList .= $psUrl . PHP_EOL;
                             $camCount++;
                         }
