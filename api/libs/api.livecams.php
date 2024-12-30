@@ -126,7 +126,7 @@ class LiveCams {
     const SUBSTREAMS_SUBDIR = 'livelq/';
     const STREAM_PLAYLIST = 'stream.m3u8';
     const SUBSTREAM_PLAYLIST = 'livesub.m3u8';
-    const LIVECAMSDL_PLAYLIST = 'livecams.m3u8';
+    const LIVECAMSDL_PLAYLIST = 'livecams.m3u';
     const URL_ME = '?module=livecams';
     const URL_PSEUDOSTREAM = '?module=pseudostream';
     const ROUTE_VIEW = 'livechannel';
@@ -310,7 +310,7 @@ class LiveCams {
                             $channelId = $eachCameraData['CAMERA']['channel'];
                             $channelName = $eachCameraData['CAMERA']['comment'];
                             $psUrl = $baseUrl . self::URL_PSEUDOSTREAM . '&' . self::ROUTE_PSEUDOLIVE . '=' . $channelId . '&file=' . self::STREAM_PLAYLIST;
-                            $playList .= '#EXTINF:0,' . $channelName . PHP_EOL;
+                            $playList .= '#EXTINF:-1,' . $channelName . PHP_EOL;
                             $playList .= $psUrl . PHP_EOL;
                             $camCount++;
                         }
