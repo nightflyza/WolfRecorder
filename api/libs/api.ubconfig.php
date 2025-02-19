@@ -38,7 +38,7 @@ class UbillingConfig {
     /**
      * getter some parameter from alterCfg
      *
-     * @return parametr from alter.ini or FALSE if parameter not defined
+     * @return string parametr from alter.ini or FALSE if parameter not defined
      */
     public function getAlterParam($param = false) {
         return ($param and isset($this->alterCfg[$param])) ? $this->alterCfg[$param] : false;

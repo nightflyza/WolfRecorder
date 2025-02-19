@@ -118,6 +118,13 @@ class YALFCore {
     protected $cookie_user = 'yalf_user';
 
     /**
+     * Name of default auth ghost-mode cookie. May be configurable in future.
+     *
+     * @var string
+     */
+    protected $cookie_ghost = 'yalf_ghost';
+
+    /**
      * Name of default user defined locale. May be configurable in future.
      *
      * @var string
@@ -235,7 +242,7 @@ class YALFCore {
             }
         }
 
-        return($result);
+        return ($result);
     }
 
     /**
@@ -320,14 +327,14 @@ class YALFCore {
                 //some custom locale already set
                 if (@$_COOKIE[$this->cookie_locale]) {
                     if (is_string($_COOKIE[$this->cookie_locale])) {
-                    $customLocale = preg_replace('/\0/s', '', $_COOKIE[$this->cookie_locale]);
-                    $customLocale = preg_replace("#[^a-z0-9A-Z]#Uis", '', $customLocale);
-                    if (!empty($customLocale)) {
-                        if (file_exists(self::LANG_PATH . $customLocale)) {
-                            $this->language = $customLocale;
+                        $customLocale = preg_replace('/\0/s', '', $_COOKIE[$this->cookie_locale]);
+                        $customLocale = preg_replace("#[^a-z0-9A-Z]#Uis", '', $customLocale);
+                        if (!empty($customLocale)) {
+                            if (file_exists(self::LANG_PATH . $customLocale)) {
+                                $this->language = $customLocale;
+                            }
                         }
                     }
-                }
                 }
             }
         }
@@ -386,7 +393,7 @@ class YALFCore {
      */
     protected function switchIndexModule() {
         $forceLoginForm = false; //show login form module instead any of called
-//user is not authorized now and auth engine enabled
+        //user is not authorized now and auth engine enabled
         if (!$this->loggedIn) {
             $forceLoginForm = true;
         }
@@ -435,7 +442,7 @@ class YALFCore {
      * @return void
      */
     public function loadCurrentModule() {
-        require_once ($this->getIndexModulePath());
+        require_once($this->getIndexModulePath());
     }
 
     /**
@@ -499,7 +506,7 @@ class YALFCore {
      * @return array
      */
     public function getLibs() {
-        return($this->loadLibs);
+        return ($this->loadLibs);
     }
 
     /**
@@ -508,7 +515,7 @@ class YALFCore {
      * @return bool
      */
     public function isLocaleSwitchable() {
-        return($this->langSwitchAllowed);
+        return ($this->langSwitchAllowed);
     }
 
     /**
@@ -517,7 +524,7 @@ class YALFCore {
      * @return string
      */
     public function getIndexModulePath() {
-        return(MODULES_PATH . $this->indexModule . '/' . self::MODULE_CODE_NAME);
+        return (MODULES_PATH . $this->indexModule . '/' . self::MODULE_CODE_NAME);
     }
 
     /**
@@ -526,7 +533,7 @@ class YALFCore {
      * @return string
      */
     public function getCurrentModuleName() {
-        return($this->indexModule);
+        return ($this->indexModule);
     }
 
     /**
@@ -535,7 +542,7 @@ class YALFCore {
      * @return string
      */
     public function getLangPath() {
-        return(self::LANG_PATH . $this->language . '/');
+        return (self::LANG_PATH . $this->language . '/');
     }
 
     /**
@@ -544,7 +551,7 @@ class YALFCore {
      * @return string
      */
     public function getCurLang() {
-        return(substr($this->language, 0, '2'));
+        return (substr($this->language, 0, '2'));
     }
 
     /**
@@ -553,7 +560,7 @@ class YALFCore {
      * @return string
      */
     public function getCurLangName() {
-        return($this->language);
+        return ($this->language);
     }
 
     /**
@@ -562,7 +569,7 @@ class YALFCore {
      * @return string
      */
     public function getSkinPath() {
-        return(self::SKINS_PATH . $this->skin . '/');
+        return (self::SKINS_PATH . $this->skin . '/');
     }
 
     /**
@@ -571,7 +578,7 @@ class YALFCore {
      * @return string
      */
     public function getRenderer() {
-        return($this->renderer);
+        return ($this->renderer);
     }
 
     /**
@@ -580,7 +587,7 @@ class YALFCore {
      * @return string
      */
     public function getPageTitle() {
-        return($this->pageTitle);
+        return ($this->pageTitle);
     }
 
     /**
@@ -602,7 +609,7 @@ class YALFCore {
     public function renderLogo() {
         $result = '';
         if (isset($this->config['YALF_LOGO'])) {
-            if ((!empty($this->config['YALF_APP'])) AND ( !empty($this->config['YALF_URL'])) AND ( (!empty($this->config['YALF_LOGO'])))) {
+            if ((!empty($this->config['YALF_APP'])) and (!empty($this->config['YALF_URL'])) and ((!empty($this->config['YALF_LOGO'])))) {
                 $rawUrl = strtolower($this->config['YALF_URL']);
                 if (stripos($rawUrl, 'http') === false) {
                     $rawUrl = 'http://' . $rawUrl;
@@ -664,7 +671,7 @@ class YALFCore {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -673,7 +680,7 @@ class YALFCore {
      * @return bool
      */
     public function getGlobalMenuFlag() {
-        return($this->globalMenuEnabled);
+        return ($this->globalMenuEnabled);
     }
 
     /**
@@ -715,7 +722,7 @@ class YALFCore {
             if (is_string($_COOKIE[$this->cookie_user])) {
                 $cookie_data = explode(':', $_COOKIE[$this->cookie_user], 2);
             } else {
-                $cookie_data =array();
+                $cookie_data = array();
             }
 
             if (!$skipcheck) {
@@ -723,13 +730,13 @@ class YALFCore {
                 // If this cookie is invalid - we exiting destroying cookie and exiting with error
                 if (sizeof($cookie_data) != 2) {
                     setcookie($this->cookie_user, '', time() - 3600);
-                    return(false);
+                    return (false);
                 }
                 // Now we must validate user's data
                 if (!$this->checkUserData($cookie_data[0], $cookie_data[1], 'user_init', true, $this->user)) {
                     setcookie($this->cookie_user, '', time() - 3600);
                     $this->loggedIn = false;
-                    return(false);
+                    return (false);
                 }
             }
 
@@ -810,7 +817,7 @@ class YALFCore {
      * @return array
      */
     public function getRightsDatabase() {
-        return($this->rights_database);
+        return ($this->rights_database);
     }
 
     /**
@@ -819,9 +826,15 @@ class YALFCore {
      * @return bool
      */
     protected function logOutUser() {
-        setcookie($this->cookie_user, '', time() - 3600);
-        $_COOKIE[$this->cookie_user] = '';
-        $this->initializeUser(false);
+        //normal user logout
+        if (!@$_COOKIE[$this->cookie_ghost]) {
+            setcookie($this->cookie_user, '', time() - 3600);
+            $_COOKIE[$this->cookie_user] = '';
+            $this->initializeUser(false);
+        } else {
+            //ghostmode logout
+            $this->deinitGhostMode();
+        }
         return (true);
     }
 
@@ -840,7 +853,7 @@ class YALFCore {
             return false;
         }
 
-        if (!$this->loggedIn AND $this->checkUserData($username, $password, 'user_login', false, $userdata)) {
+        if (!$this->loggedIn and $this->checkUserData($username, $password, 'user_login', false, $userdata)) {
             // OK... Let's allow user to log in :)
             setcookie($this->cookie_user, $username . ':' . $userdata['password'], ($remember) ? time() + 3600 * 24 * 365 : 0);
             $_COOKIE[$this->cookie_user] = $username . ':' . $userdata['password'];
@@ -857,7 +870,7 @@ class YALFCore {
      * @return bool
      */
     public function getLoggedInState() {
-        return($this->loggedIn);
+        return ($this->loggedIn);
     }
 
     /**
@@ -866,7 +879,7 @@ class YALFCore {
      * @return bool
      */
     public function getAuthEnabled() {
-        return($this->authEnabled);
+        return ($this->authEnabled);
     }
 
     /**
@@ -915,7 +928,7 @@ class YALFCore {
      * @return string
      */
     public function getLoggedInUsername() {
-        return($this->user['username']);
+        return ($this->user['username']);
     }
 
     /**
@@ -944,7 +957,7 @@ class YALFCore {
             case 'fake':
                 //just do nothing ^_^
                 break;
-            default :
+            default:
                 die('Wrong logging type');
                 break;
         }
@@ -973,7 +986,7 @@ class YALFCore {
             }
         }
 
-        return $root OR ( $right == '-any-' && !empty($rights)) OR ! empty($rights[$right]);
+        return $root or ($right == '-any-' && !empty($rights)) or ! empty($rights[$right]);
     }
 
     /**
@@ -1015,7 +1028,48 @@ class YALFCore {
         if (isset($this->config[$optionName])) {
             $result = $this->config[$optionName];
         }
-        return($result);
+        return ($result);
     }
 
+    /**
+     * Inits ghost mode for some administrator login
+     * 
+     * @param string $adminLogin
+     * 
+     * @return void
+     */
+    public function initGhostMode($adminLogin) {
+        if (file_exists(USERS_PATH . $adminLogin)) {
+            $userData = $this->getUserData($adminLogin);
+            if (!empty($userData)) {
+                $myLogin = whoami();
+                $myData = $this->getUserData($myLogin);
+                //current login data is used for ghost mode identification
+                setcookie($this->cookie_ghost, $myLogin . ':' . $myData['password'], 0);
+                $_COOKIE[$this->cookie_ghost] = $myLogin . ':' . $myData['password'];
+                //login of another admin
+                log_register('GHOSTMODE {' . $myLogin . '} LOGIN AS {' . $adminLogin . '}');
+                setcookie($this->cookie_user, $adminLogin . ':' . $userData['password'], 0);
+                $_COOKIE[$this->cookie_user] = $adminLogin . ':' . $userData['password'];
+            }
+        }
+    }
+    /**
+     * Deinits ghost mode for current ghost administrator
+     * 
+     * @return void
+     */
+    public function deinitGhostMode() {
+        global $system;
+        if (@$_COOKIE[$this->cookie_ghost]) {
+            $ghostData = explode(':', $_COOKIE[$this->cookie_ghost]);
+            //cleanup ghostmode data
+            setcookie($this->cookie_ghost, '', 0);
+            $_COOKIE[$this->cookie_ghost] = '';
+
+            //login of another admin
+            setcookie($this->cookie_user, $ghostData[0] . ':' . $ghostData[1], 0);
+            $_COOKIE[$this->cookie_user] = $ghostData[0] . ':' . $ghostData[1];
+        }
+    }
 }

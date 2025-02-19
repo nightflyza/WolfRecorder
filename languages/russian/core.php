@@ -46,3 +46,5 @@ $lang['def']['PHP extension not found'] = 'Расширение PHP не най�
 $lang['def']['PHP extension loaded'] = 'Расширения PHP загружены';
 $lang['def']['May require manual installation'] = 'Может потребовать ручной установки';
 $lang['def']['Information about PHP version'] = 'Информация о версии PHP';
+$lang['def']['Login as'] = 'Залогиниться как';
+$lang['def']['in ghost mode'] = 'в режиме призрака';

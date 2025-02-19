@@ -5,6 +5,17 @@ if ($system->getAuthEnabled()) {
 
         $userManager = new UserManager();
 
+        //ghostmode init
+        if (ubRouting::checkGet($userManager::ROUTE_GHOSTMODE)) {
+            if (cfr('ROOT')) {
+                $system->initGhostMode(ubRouting::get($userManager::ROUTE_GHOSTMODE));
+                ubRouting::nav('index.php');
+            } else {
+                show_error(__('Access denied'));
+            }
+        }
+
+
         //User deletion
         if (ubRouting::checkGet($userManager::ROUTE_DELETE)) {
             $userManager->deleteUser(ubRouting::get($userManager::ROUTE_DELETE));
@@ -51,7 +62,7 @@ if ($system->getAuthEnabled()) {
             }
         }
 
-        if (!ubRouting::checkGet($userManager::ROUTE_EDIT) AND ! ubRouting::checkGet($userManager::ROUTE_PERMISSIONS) AND ! ubRouting::checkGet($userManager::ROUTE_NEWUSER)) {
+        if (!ubRouting::checkGet($userManager::ROUTE_EDIT) and ! ubRouting::checkGet($userManager::ROUTE_PERMISSIONS) and ! ubRouting::checkGet($userManager::ROUTE_NEWUSER)) {
             //rendering existing users list
             show_window(__('Available users'), $userManager->renderUsersList());
         } else {
@@ -65,7 +76,16 @@ if ($system->getAuthEnabled()) {
             //rendering user permissions edit interface
             if (ubRouting::checkGet($userManager::ROUTE_PERMISSIONS)) {
                 show_window(__('Edit user permissions') . ' ' . ubRouting::get($userManager::ROUTE_PERMISSIONS), $userManager->renderPermissionsForm(ubRouting::get($userManager::ROUTE_PERMISSIONS)));
-                show_window('', wf_BackLink($userManager::URL_ME));
+                $permControls = wf_BackLink($userManager::URL_ME);
+                if (cfr('ROOT')) {
+                    $myLogin = whoami();
+                    $userLogin = ubRouting::get($userManager::ROUTE_PERMISSIONS);
+                    if ($userLogin != $myLogin) {
+                        $ghostModeLabel = __('Login as') . ' ' . $userLogin . ' ' . __('in ghost mode');
+                        $permControls .= ' ' . wf_Link($userManager::URL_ME . '&' . $userManager::ROUTE_GHOSTMODE . '=' . $userLogin, wf_img('skins/ghost.png') . ' ' . $ghostModeLabel, false, ' ubButton');
+                    }
+                }
+                show_window('', $permControls);
             }
 
             //rendering new user creation form
