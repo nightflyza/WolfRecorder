@@ -330,7 +330,7 @@ class Recorder {
                         }
 
                         //looks familiar?
-                        if (ispos($eachProcess, $camIp) and ispos($eachProcess, $camLogin) and ispos($eachProcess, $camPass) and ispos($eachProcess, ':' . $camPort)) {
+                        if (ispos($eachProcess, $camIp . ':' . $camPort) and ispos($eachProcess, $camLogin) and ispos($eachProcess, $camPass)) {
                             $result[$eachCameraId] = $eachPid;
                         }
                     }

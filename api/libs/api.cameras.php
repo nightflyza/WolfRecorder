@@ -606,7 +606,7 @@ class Cameras {
                         }
 
                         //looks familiar?
-                        if (ispos($eachProcess, $camIp) and ispos($eachProcess, $camLogin) and ispos($eachProcess, $camPass) and ispos($eachProcess, ':' . $camPort)) {
+                        if (ispos($eachProcess, $camIp . ':' . $camPort) and ispos($eachProcess, $camLogin) and ispos($eachProcess, $camPass)) {
                             $result[$eachCameraId] = $eachPid;
                         }
                     }
@@ -661,7 +661,7 @@ class Cameras {
                         }
 
                         //looks familiar?
-                        if (ispos($eachProcess, $camIp) and ispos($eachProcess, $camLogin) and ispos($eachProcess, $camPass) and ispos($eachProcess, ':' . $camPort)) {
+                        if (ispos($eachProcess, $camIp . ':' . $camPort) and ispos($eachProcess, $camLogin) and ispos($eachProcess, $camPass)) {
                             $result[$eachCameraId] = $eachPid;
                         }
                     }
@@ -716,7 +716,7 @@ class Cameras {
                         }
 
                         //looks familiar?
-                        if (ispos($eachProcess, $camIp) and ispos($eachProcess, $camLogin) and ispos($eachProcess, $camPass) and ispos($eachProcess, ':' . $camPort)) {
+                        if (ispos($eachProcess, $camIp . ':' . $camPort) and ispos($eachProcess, $camLogin) and ispos($eachProcess, $camPass)) {
                             $result[$eachCameraId] = $eachPid;
                         }
                     }
@@ -844,7 +844,7 @@ class Cameras {
             if ($streamStopResult) {
                 log_register('LIVESTREAM STOPPED [' . $cameraId . ']');
             }
-            if ($streamStopResult) {
+            if ($subStreamStopResult) {
                 log_register('SUBSTREAM STOPPED [' . $cameraId . ']');
             }
             //disabling camera activity flag
@@ -1263,7 +1263,7 @@ class Cameras {
             $rows .= wf_TableRow($cells, 'row3');
 
             $cells = wf_TableCell(__('Password'), '', 'row2');
-            $cells .= wf_TableCell(wf_ShowHide($cameraData['password'],__('Show')));
+            $cells .= wf_TableCell(wf_ShowHide($cameraData['password'], __('Show')));
             $rows .= wf_TableRow($cells, 'row3');
 
 
