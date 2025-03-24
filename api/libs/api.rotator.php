@@ -153,7 +153,7 @@ class Rotator {
                 }
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -176,7 +176,7 @@ class Rotator {
                 $result = $oldestChunk;
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -192,7 +192,7 @@ class Rotator {
         if ($channelPid->isRunning()) {
             $result = false;
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -207,7 +207,7 @@ class Rotator {
         $bytesFree = 0;
         $chunksDeleted = 0;
 
-        if ((!empty($chunksList)) AND ( $expectedSize > 0)) {
+        if ((!empty($chunksList)) and ($expectedSize > 0)) {
             foreach ($chunksList as $eachTimeStamp => $chunksData) {
                 if ($bytesFree < $expectedSize) {
                     unlink($chunksData['path']);
@@ -218,7 +218,7 @@ class Rotator {
         }
 
         $result = array('count' => $chunksDeleted, 'free' => $bytesFree);
-        return($result);
+        return ($result);
     }
 
     /**
@@ -266,7 +266,9 @@ class Rotator {
                                         $eachChannelSize = $this->storages->calcChunksListSize($eachChannelChunksAlloc);
                                         //this channel is exhausted his reserved size?
                                         if ($eachChannelSize > $maxChannelAllocSize) {
-                                            file_put_contents(self::DEBUG_LOG, curdatetime() . ' ' . wr_convertSize($eachChannelSize) . ' > OF ' . wr_convertSize($maxChannelAllocSize) . ' ' . $eachChannel . PHP_EOL, FILE_APPEND);
+                                            if ($this->debugFlag) {
+                                                file_put_contents(self::DEBUG_LOG, curdatetime() . ' ' . wr_convertSize($eachChannelSize) . ' > OF ' . wr_convertSize($maxChannelAllocSize) . ' ' . $eachChannel . PHP_EOL, FILE_APPEND);
+                                            }
                                             $requiredToFree = $eachChannelSize - $maxChannelAllocSize;
                                             $cleanResult = $this->flushChunksBySize($eachChannelChunksAlloc, $requiredToFree);
                                             if ($this->debugFlag) {
@@ -314,5 +316,4 @@ class Rotator {
             $rotatorProcess->stop();
         }
     }
-
 }
