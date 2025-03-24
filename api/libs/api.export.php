@@ -685,6 +685,7 @@ class Export {
                 unlink($exportListPath);
             } else {
                 $result .= __('Something went wrong');
+                log_register('EXPORT FAILED [' . $taskId . '] CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '` EMPTY CHUNKS LIST');
             }
             $exportProcess->stop();
             log_register('EXPORT FINISHED [' . $taskId . '] CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '`');
