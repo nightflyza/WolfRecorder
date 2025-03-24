@@ -671,15 +671,16 @@ class Export {
                 if (!file_exists($fullRecordFilePath)) {
                     $command = $this->ffmpgPath . ' -loglevel error -f concat -safe 0 -i ' . $exportListPath . ' -c copy ' . $fullRecordFilePath;
                     shell_exec($command);
-
-                    //mark export schedule task as done
-                    $this->scheduleDb->where('id', '=', $taskId);
-                    $this->scheduleDb->data('done', 1);
-                    $this->scheduleDb->data('finishdate', curdatetime());
-                    $this->scheduleDb->save();
                 } else {
                     log_register('EXPORT SKIPPED [' . $taskId . '] CAMERA [' . $cameraId . '] CHANNEL `' . $channelId . '` ALREADY EXISTS');
                 }
+
+                //mark export schedule task as done
+                $this->scheduleDb->where('id', '=', $taskId);
+                $this->scheduleDb->data('done', 1);
+                $this->scheduleDb->data('finishdate', curdatetime());
+                $this->scheduleDb->save();
+
                 //cleanup export list
                 unlink($exportListPath);
             } else {
