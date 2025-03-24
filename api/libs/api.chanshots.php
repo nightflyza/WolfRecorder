@@ -110,7 +110,7 @@ class ChanShots {
      */
     protected $lastCheckedShot = '';
 
-     /**
+    /**
      * Contains embedded channel shots watermark path
      *
      * @var string
@@ -322,13 +322,22 @@ class ChanShots {
     protected function takeChunkScreenshot($chunkPath, $channel) {
         $result = '';
         if (!empty($channel) and file_exists($chunkPath)) {
+            $tmpFileName =  'tmp_' . $channel . self::SHOTS_EXT;
+            $fullTmpShotPath = $this->screenshotsPath . $tmpFileName;
+
             $fileName = $channel . self::SHOTS_EXT;
             $fullScreenShotPath = $this->screenshotsPath . $fileName;
-            //old screenshot cleanup
-            $this->flushOldScreenshot($channel);
+
+
             //taking new screenshot for this channel
-            $command = $this->ffmpgPath . ' -ss ' . $this->timeOffset . ' -i ' . $chunkPath . ' ' . $this->screenshotOpts . ' ' . $fullScreenShotPath;
+            $command = $this->ffmpgPath . ' -ss ' . $this->timeOffset . ' -i ' . $chunkPath . ' ' . $this->screenshotOpts . ' ' . $fullTmpShotPath;
             $result = shell_exec($command);
+            if (file_exists($fullTmpShotPath)) {
+                //old screenshot cleanup
+                $this->flushOldScreenshot($channel);
+                //replacing with new channel shot
+                rename($fullTmpShotPath, $fullScreenShotPath);
+            }
         }
         return ($result);
     }
@@ -359,7 +368,7 @@ class ChanShots {
                             $chunksCount = sizeof($allCameraChunks);
                             //dont shot single chunk - it may be unfinished
                             if ($chunksCount > 1) {
-                                $lastChunk = array_pop($allCameraChunks);
+                                $lastChunk = array_pop($allCameraChunks); //used only for shift chunk index
                                 $secondLastChunk = array_pop($allCameraChunks);
                                 //taking screenshot from second last channel chunk
                                 $this->takeChunkScreenshot($secondLastChunk, $channel);
@@ -374,5 +383,4 @@ class ChanShots {
             $process->stop();
         }
     }
-
 }
