@@ -316,10 +316,7 @@ class YALFCore {
                         if (file_exists(self::LANG_PATH . $customLocale)) {
                             $this->language = $customLocale;
                             setcookie($this->cookie_locale, $customLocale, time() + 2592000);
-                            $currentUrlCallback = $_SERVER['REQUEST_URI'];
-                            $currentUrlCallback = str_replace('&yalfswitchlocale=' . $rawLocale, '', $currentUrlCallback);
-                            $currentUrlCallback = str_replace('?yalfswitchlocale=' . $rawLocale, '', $currentUrlCallback);
-                            rcms_redirect($currentUrlCallback, true); //back to the same URL witchout switch param
+                            rcms_redirect('index.php');
                         }
                     }
                 }
