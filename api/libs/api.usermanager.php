@@ -94,6 +94,7 @@ class UserManager {
         $this->rolesRights['ADMINISTRATOR'] = '*';
     }
 
+
     /**
      * Inits current system core instance for further usage
      * 
@@ -224,6 +225,50 @@ class UserManager {
     }
 
     /**
+     * Returns role name by its short ID
+     *
+     * @param string $roleId
+     * @return void
+     */
+    protected function getUserRoleName($roleId = '') {
+        $result = '';
+        if (isset($this->userRoles[$roleId])) {
+            $result = $this->userRoles[$roleId];
+        }
+        return ($result);
+    }
+
+    /**
+     * Returns user role ID depends on assigned permissions array
+     *
+     * @param string $userPermissions
+     * @return void
+     */
+    protected function getUserRoleSet($userPermissions) {
+        $result = '';
+        $permSets = array_flip($this->rolesRights);
+        if (!empty($userPermissions)) {
+            // Sort both permission strings to ensure consistent comparison
+            $userPermsArray = str_split($userPermissions);
+            sort($userPermsArray);
+            $normalizedUserPerms = implode('', $userPermsArray);
+
+            foreach ($permSets as $permString => $roleId) {
+                $permArray = str_split($permString);
+                sort($permArray);
+                $normalizedPermString = implode('', $permArray);
+
+                if ($normalizedUserPerms === $normalizedPermString) {
+                    $result = $roleId;
+                    break;
+                }
+            }
+        }
+
+        return ($result);
+    }
+
+    /**
      * Renders list of available users with some controls
      * 
      * @return string
@@ -235,6 +280,7 @@ class UserManager {
         if (!empty($allUsers)) {
             $cells = wf_TableCell(__('User'));
             $cells .= wf_TableCell(__('Size'));
+            $cells .= wf_TableCell(__('Set of rights'));
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
             foreach ($allUsers as $index => $eachUser) {
@@ -251,6 +297,21 @@ class UserManager {
                         $actControls .= wf_JSAlert(self::URL_ME . '&' . self::ROUTE_GHOSTMODE . '=' . $eachUser, wf_img('skins/ghost.png', $ghostModeLabel), $ghostModeLabel . '?');
                     }
                 }
+
+                $userProfileData = $this->system->getUserData($eachUser);
+                $userAssignedRights = $userProfileData['admin'];
+
+
+                $userRightsLabel = '⚙️' . ' ' . __('Another');
+
+                if (!empty($userProfileData['admin'])) {
+                    $roleId = $this->getUserRoleSet($userAssignedRights);
+                    if (!empty($roleId)) {
+                        $userRightsLabel = __($this->getUserRoleName($roleId));
+                    }
+                }
+
+                $cells .= wf_TableCell($userRightsLabel);
                 $cells .= wf_TableCell($actControls);
                 $rows .= wf_TableRow($cells, 'row5');
             }

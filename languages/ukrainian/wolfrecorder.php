@@ -305,6 +305,8 @@ $lang['def']['With this tool, you can filter out only scenes with motion and sav
 $lang['def']['Not enough free space'] = 'Недостатньо вільного простору';
 $lang['def']['right to use motion detection'] = 'Право використовувати розпізнавання руху';
 $lang['def']['Quick search'] = 'Швидкий пошук';
+$lang['def']['Set of rights'] = 'Набір привілеїв';
+$lang['def']['Another'] = 'Інший';
 $lang['def'][''] = '';
 
 
