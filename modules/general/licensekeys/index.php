@@ -1,7 +1,7 @@
 <?php
 
 if (cfr('ROOT')) {
-
+if ($ubillingConfig->getAlterParam('LICENSES_ENABLED')) {
     //key deletion
     if (ubRouting::checkGet('licensedelete')) {
         $avarice = new Avarice();
@@ -38,6 +38,9 @@ if (cfr('ROOT')) {
     }
 
     wr_Stats();
+} else {
+    show_error(__('This module is disabled'));
+}
 } else {
     show_error(__('Access denied'));
 }
