@@ -320,6 +320,8 @@ $lang['def']['License keys module enabled'] = 'Модуль ліцензійни
 $lang['def']['MySQL dumps max age in days before rotation'] = 'Максимальний вік дампів MySQL у днях перед ротацією';
 $lang['def']['Core'] = 'Основне';
 $lang['def']['Behavior'] = 'Поведінка';
+$lang['def']['Default locale'] = 'Мова за замовчуваням';
+$lang['def']['Allow locale switch'] = 'Дозволити змінювати мову';
 
 
 
