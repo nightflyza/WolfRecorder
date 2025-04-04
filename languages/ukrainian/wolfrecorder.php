@@ -309,15 +309,17 @@ $lang['def']['Set of rights'] = 'Набір привілеїв';
 $lang['def']['Another'] = 'Інший';
 $lang['def']['Live wall feature'] = 'Функція живої стіни';
 $lang['def']['Motion detection and filtering feature'] = 'Функція виявлення та фільтрації руху';
-$lang['def']['Force background schedule run on video export task creation'] = 'Примусовий запуск фонової задачі при експорті відео';
+$lang['def']['Forced schedule on video export'] = 'Примусовий запуск задачі при експорті';
 $lang['def']['Quick camera search feature'] = 'Функція швидкого пошуку камер';
 $lang['def']['Channel shots validation'] = 'Перевірка знімків каналів';
-$lang['def']['Embed channel screenshots into page body'] = 'Вбудовування знімків каналів у тіло сторінки';
+$lang['def']['Embed channel screenshots into page body'] = 'Вбудовування знімків каналів у сторінку';
 $lang['def']['Write recorder debug'] = 'Запис журналу відладки рекордера';
 $lang['def']['Write rotator debug log'] = 'Запис журналу відладки ротатора';
-$lang['def']['Run recorder on demand due to camera activation event'] = 'Запуск рекордера за потребою при активації камери';
+$lang['def']['Run recording when camera is activated'] = 'Запуск запису при активації камери';
 $lang['def']['License keys module enabled'] = 'Модуль ліцензійних ключів увімкнено';
 $lang['def']['MySQL dumps max age in days before rotation'] = 'Максимальний вік дампів MySQL у днях перед ротацією';
+$lang['def']['Core'] = 'Основне';
+$lang['def']['Behavior'] = 'Поведінка';
 
 
 

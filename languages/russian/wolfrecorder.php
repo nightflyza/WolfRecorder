@@ -307,14 +307,4 @@ $lang['def']['right to use motion detection'] = 'Право использова
 $lang['def']['Quick search'] = 'Быстрый поиск';
 $lang['def']['Set of rights'] = 'Набор прав';
 $lang['def']['Another'] = 'Другой';
-$lang['def']['Live wall feature'] = 'Функция живой стены';
-$lang['def']['Motion detection and filtering feature'] = 'Функция обнаружения и фильтрации движения';
-$lang['def']['Force background schedule run on video export task creation'] = 'Принудительный запуск фоновой задачи при экспорте видео';
-$lang['def']['Quick camera search feature'] = 'Функция быстрого поиска камер';
-$lang['def']['Channel shots validation'] = 'Проверка снимков каналов';
-$lang['def']['Embed channel screenshots into page body'] = 'Встраивание снимков каналов в тело страницы';
-$lang['def']['Write recorder debug'] = 'Запись журнала отладки рекордера';
-$lang['def']['Write rotator debug log'] = 'Запись журнала отладки ротатора';
-$lang['def']['Run recorder on demand due to camera activation event'] = 'Запуск рекордера по запросу при активации камеры';
-$lang['def']['License keys module enabled'] = 'Модуль лицензионных ключей включен';
-$lang['def']['MySQL dumps max age in days before rotation'] = 'Максимальный возраст дампов MySQL в днях перед ротацией';
+

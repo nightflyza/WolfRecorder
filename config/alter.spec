@@ -12,7 +12,7 @@ DEFAULT="1"
 
 [export_forced_schedule]
 OPTION=EXPORT_FORCED_SCHED
-LABEL="Force background schedule run on video export task creation"
+LABEL="Forced schedule on video export"
 TYPE="CHECKBOX"
 DEFAULT="1"
 
@@ -48,7 +48,7 @@ DEFAULT="0"
 
 [recorder_on_camera_activation]
 OPTION=RECORDER_ON_CAMERA_ACTIVATION
-LABEL="Run recorder on demand due to camera activation event"
+LABEL="Run recording when camera is activated"
 TYPE="CHECKBOX"
 DEFAULT="1"
 
