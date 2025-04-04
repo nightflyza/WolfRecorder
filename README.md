@@ -8,4 +8,4 @@ Please visit our official resources:
   * [Documentation](https://wolfrecorder.com/wiki/)
   * [Community chat](https://t.me/wolfrecorder)
 
-![wrtaskbar](https://github.com/nightflyza/WolfRecorder/assets/1496954/15b37117-6187-45ca-a425-ee9fcf38d545)
+![wrtaskbar014](https://github.com/user-attachments/assets/8b566a1e-a6e7-46b2-ad9e-217842a7b588)
