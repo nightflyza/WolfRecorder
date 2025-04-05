@@ -10,15 +10,21 @@ LABEL="Motion detection and filtering feature"
 TYPE="CHECKBOX"
 DEFAULT="1"
 
+[quick_search_feature]
+OPTION=QUICKSEARCH_ENABLED
+LABEL="Quick camera search feature"
+TYPE="CHECKBOX"
+DEFAULT="1"
+
 [export_forced_schedule]
 OPTION=EXPORT_FORCED_SCHED
 LABEL="Forced schedule on video export"
 TYPE="CHECKBOX"
 DEFAULT="1"
 
-[quick_search_feature]
-OPTION=QUICKSEARCH_ENABLED
-LABEL="Quick camera search feature"
+[recorder_on_camera_activation]
+OPTION=RECORDER_ON_CAMERA_ACTIVATION
+LABEL="Run recording when camera is activated"
 TYPE="CHECKBOX"
 DEFAULT="1"
 
@@ -46,12 +52,6 @@ LABEL="Write rotator debug log"
 TYPE="CHECKBOX"
 DEFAULT="0"
 
-[recorder_on_camera_activation]
-OPTION=RECORDER_ON_CAMERA_ACTIVATION
-LABEL="Run recording when camera is activated"
-TYPE="CHECKBOX"
-DEFAULT="1"
-
 [licenses]
 OPTION=LICENSES_ENABLED
 LABEL="License keys module enabled"
@@ -60,7 +60,7 @@ DEFAULT="0"
 
 [backups_age]
 OPTION=BACKUPS_MAX_AGE
-LABEL="MySQL dumps max age in days before rotation"
+LABEL="DB backups max age in days"
 TYPE="SELECT"
 VALUES="1,3,5,7,9"
 DEFAULT="7"

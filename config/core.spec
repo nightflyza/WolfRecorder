@@ -36,3 +36,12 @@ LABEL="App title"
 TYPE="text"
 DEFAULT="WolfRecorder"
 SAVEFILTER="safe"
+
+[branding_logo]
+OPTION="YALF_LOGO"
+LABEL="Service logo"
+TYPE="TEXT"
+PATTERN="pathorurl"
+DEFAULT="skins/wrcolor.png"
+VALIDATOR="isLogoAcceptable"
+ONINVALID="Logo URL is invalid or not contain valid image"
