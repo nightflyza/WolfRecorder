@@ -12,4 +12,8 @@ class CoreForge extends ConfigForge {
         }
         return ($result);
     }
+
+    protected function isUrlValid($url) {
+        return filter_var($url, FILTER_VALIDATE_URL) !== false;
+    }
 }
