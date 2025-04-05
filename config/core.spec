@@ -11,6 +11,8 @@ OPTION=YALF_LANG_SWITCHABLE
 LABEL="Allow locale switch"
 TYPE="CHECKBOX"
 DEFAULT="1"
+VALIDATOR="is_numeric"
+ONINVALID=""
 
 
 

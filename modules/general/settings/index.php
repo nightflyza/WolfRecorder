@@ -4,17 +4,18 @@ if ($system->getAuthEnabled()) {
     if (cfr('ROOT')) {
 
         // Core config routines
-        $coreAlter = new CoreForge('config/yalf.ini', 'config/core.spec');
-        $coreAlter->setFormClass('glamforge');
+        $settingsCore = new CoreForge('config/yalf.ini', 'config/core.spec');
+        $settingsCore->setFormClass('glamforge');
 
-        $processCoreResult = $coreAlter->process();
+        $processCoreResult = $settingsCore->process();
+
         if (!empty($processCoreResult)) {
             show_error($processCoreResult);
-        } elseif (ubRouting::checkPost(ConfigForge::FORM_SUBMIT_KEY)) {
-            ubRouting::nav($coreAlter::URL_ME);
+        } elseif (ubRouting::post(ConfigForge::FORM_SUBMIT_KEY) == $settingsCore->getInstanceId()) {
+            ubRouting::nav($settingsCore::URL_ME);
         }
 
-        $coreForm = $coreAlter->renderEditor();
+        $coreForm = $settingsCore->renderEditor();
 
         // Alter editor routines
         $settingsAlter = new AlterForge('config/alter.ini', 'config/alter.spec');
@@ -23,7 +24,7 @@ if ($system->getAuthEnabled()) {
         $processAlterResult = $settingsAlter->process();
         if (!empty($processAlterResult)) {
             show_error($processAlterResult);
-        } elseif (ubRouting::checkPost(ConfigForge::FORM_SUBMIT_KEY)) {
+        } elseif (ubRouting::post(ConfigForge::FORM_SUBMIT_KEY)==$settingsAlter->getInstanceId()) {
             ubRouting::nav($settingsAlter::URL_ME);
         }
 
@@ -32,7 +33,6 @@ if ($system->getAuthEnabled()) {
         //forms rendering
         show_window(__('Core'), $coreForm);
         show_window(__('Behavior'), $alterForm);
-    
     } else {
         show_error(__('Access denied'));
     }
