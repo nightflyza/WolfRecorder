@@ -317,7 +317,7 @@ $lang['def']['Write recorder debug'] = 'Запис журналу відладк
 $lang['def']['Write rotator debug log'] = 'Запис журналу відладки ротатора';
 $lang['def']['Run recording when camera is activated'] = 'Запуск запису при активації камери';
 $lang['def']['License keys module enabled'] = 'Модуль ліцензійних ключів увімкнено';
-$lang['def']['DB backups max age in days'] = 'Максимальний вік бекапів БД';
+$lang['def']['DB backups max age in days'] = 'Днів зберігання бекапів БД';
 $lang['def']['Core'] = 'Основне';
 $lang['def']['Behavior'] = 'Поведінка';
 $lang['def']['Default locale'] = 'Мова за замовчуваням';
@@ -326,6 +326,7 @@ $lang['def']['Service URL'] = 'Посилання послуги';
 $lang['def']['Service name'] = 'Назва послуги';
 $lang['def']['App title'] = 'Заголовок додатку';
 $lang['def']['Service logo'] = 'Логотип послуги';
+$lang['def']['Logo URL is invalid or not contain valid image'] = 'Посилання на логотип не є дійсним або не містить вірного зображення';
 $lang['def'][''] = '';
 
 
