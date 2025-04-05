@@ -4,7 +4,8 @@ LABEL="Default locale"
 TYPE="SELECT"
 VALUES="english,ukrainian,romanian,russian"
 DEFAULT="english"
-
+VALIDATOR="isLocaleExists"
+ONINVALID="Locale not exists"
 
 [locale_switchable]
 OPTION=YALF_LANG_SWITCHABLE
@@ -12,7 +13,6 @@ LABEL="Allow locale switch"
 TYPE="CHECKBOX"
 DEFAULT="1"
 VALIDATOR="is_numeric"
-ONINVALID=""
 
 
 
