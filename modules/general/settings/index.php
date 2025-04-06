@@ -11,7 +11,9 @@ if ($system->getAuthEnabled()) {
 
         if (!empty($processCoreResult)) {
             show_error($processCoreResult);
+            log_register('SETTINGS CORE SAVE FAILED');
         } elseif (ubRouting::post(ConfigForge::FORM_SUBMIT_KEY) == $settingsCore->getInstanceId()) {
+            log_register('SETTINGS CORE SAVED');
             ubRouting::nav($settingsCore::URL_ME);
         }
 
@@ -24,7 +26,9 @@ if ($system->getAuthEnabled()) {
         $processAlterResult = $settingsAlter->process();
         if (!empty($processAlterResult)) {
             show_error($processAlterResult);
+            log_register('SETTINGS ALTER SAVE FAILED');
         } elseif (ubRouting::post(ConfigForge::FORM_SUBMIT_KEY)==$settingsAlter->getInstanceId()) {
+            log_register('SETTINGS ALTER SAVED');
             ubRouting::nav($settingsAlter::URL_ME);
         }
 
@@ -33,6 +37,7 @@ if ($system->getAuthEnabled()) {
         //forms rendering
         show_window(__('Core'), $coreForm);
         show_window(__('Behavior'), $alterForm);
+        wr_Stats();
     } else {
         show_error(__('Access denied'));
     }
