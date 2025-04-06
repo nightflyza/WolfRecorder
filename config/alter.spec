@@ -34,6 +34,12 @@ LABEL="Channel shots validation"
 TYPE="CHECKBOX"
 DEFAULT="1"
 
+[page_load_indicator]
+OPTION="PAGE_LOAD_INDICATOR"
+LABEL="Page load indicator"
+TYPE="CHECKBOX"
+DEFAULT="1"
+
 [channel_shots_embed]
 OPTION=CHANSHOTS_EMBED
 LABEL="Embed channel screenshots into page body"

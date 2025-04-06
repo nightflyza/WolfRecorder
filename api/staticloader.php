@@ -6,6 +6,7 @@
 require_once('api/libs/api.compat.php');
 require_once('api/libs/api.yalfcore.php');
 require_once('api/libs/api.quicksearch.php');
+require_once('api/libs/api.yalfloader.php');
 
 //preventing loading of icecream on PHP < 5.6
 if (PHP_VERSION_ID >= 50638) {

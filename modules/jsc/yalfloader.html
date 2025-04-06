@@ -1,0 +1,76 @@
+<div id="yalf-loader" style="
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+">
+  <div style="
+    width: 40px; height: 40px;
+    border: 4px solid #999;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: yalf-spin 1s linear infinite;
+  "></div>
+</div>
+
+<style>
+  @keyframes yalf-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  body.yalf-loading {
+    cursor: progress;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const loader = document.getElementById('yalf-loader');
+
+    function showLoaderWithVisibilityFallback() {
+      loader.style.display = 'flex';
+      document.body.classList.add('yalf-loading');
+
+      const timeout = setTimeout(() => {
+        loader.style.display = 'none';
+        document.body.classList.remove('yalf-loading');
+      }, 3000);
+
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'hidden') {
+          clearTimeout(timeout);
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        } else {
+          loader.style.display = 'none';
+          document.body.classList.remove('yalf-loading');
+          document.removeEventListener('visibilitychange', handleVisibilityChange);
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    document.querySelectorAll('a[href]').forEach(link => {
+      link.addEventListener('click', function (e) {
+        if (
+          this.target === '_blank' ||
+          this.hasAttribute('download') ||
+          e.ctrlKey || e.metaKey || e.shiftKey ||
+          this.href.includes('#')
+        ) return;
+
+        showLoaderWithVisibilityFallback();
+      });
+    });
+
+    document.querySelectorAll('form[method="post"]').forEach(form => {
+      form.addEventListener('submit', function () {
+        showLoaderWithVisibilityFallback();
+      });
+    });
+  });
+</script>

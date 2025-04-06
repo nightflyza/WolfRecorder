@@ -334,7 +334,7 @@ $lang['def']['PWA icon 192x192'] = 'Іконка додатку (192x192)';
 $lang['def']['PWA icon 512x512'] = 'Іконка додатку (512x512)';
 $lang['def']['Icon URL is invalid or not contain valid PNG image 192x192'] = 'Посилання на іконку не є дійсним або не містить вірного PNG зображення 192x192';
 $lang['def']['Icon URL is invalid or not contain valid PNG image 512x512'] = 'Посилання на іконку не є дійсним або не містить вірного PNG зображення 512x512';
-
+$lang['def']['Page load indicator'] = 'Індикатор завантаження сторінки';
 
 
 
