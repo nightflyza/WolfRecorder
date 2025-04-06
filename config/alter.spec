@@ -66,3 +66,37 @@ VALUES="1,3,5,7,9"
 DEFAULT="7"
 VALIDATOR="is_numeric"
 ONINVALID="Wrong days count"
+
+[pwa_name]
+OPTION="WA_NAME"
+LABEL="PWA short name"
+TYPE="TEXT"
+DEFAULT="WolfRecorder"
+SAVEFILTER="safe"
+
+[pwa_icon_192]
+OPTION="WA_ICON_192"
+LABEL="PWA icon 192x192"
+TYPE="TEXT"
+DEFAULT="skins/webapp/wa192.png"
+PATTERN="pathorurl"
+VALIDATOR="isPwaIconAcceptable192"
+ONINVALID="Icon URL is invalid or not contain valid PNG image 192x192"
+
+[pwa_icon_512]
+OPTION="WA_ICON_512"
+LABEL="PWA icon 512x512"
+TYPE="TEXT"
+DEFAULT="skins/webapp/wa512.png"
+PATTERN="pathorurl"
+VALIDATOR="isPwaIconAcceptable512"
+ONINVALID="Icon URL is invalid or not contain valid PNG image 512x512"
+
+[exports_reserve]
+OPTION="EXPORTS_RESERVED_SPACE"
+LABEL="Space % reserved for exported users videos"
+TYPE="SLIDER"
+DEFAULT="10"
+VALUES="5..80"
+VALIDATOR="is_numeric"
+ONINVALID="Wrong allocated space percent value"

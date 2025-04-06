@@ -327,4 +327,13 @@ $lang['def']['Service name'] = 'Название сервиса';
 $lang['def']['App title'] = 'Заголовок приложения';
 $lang['def']['Service logo'] = 'Логотип сервиса';
 $lang['def']['Logo URL is invalid or not contain valid image'] = 'Ссылка на логотип недействительна или не содержит допустимого изображения';
+$lang['def']['Space % reserved for exported users videos'] = 'Выделенный процент места для экспорта видео пользователями';
+$lang['def']['Wrong allocated space percent value'] = 'Неверное значение выделенного места';
+$lang['def']['PWA short name'] = 'Короткое название PWA';
+$lang['def']['PWA icon 192x192'] = 'Иконка PWA (192x192)';
+$lang['def']['PWA icon 512x512'] = 'Иконка PWA (512x512)';
+$lang['def']['Icon URL is invalid or not contain valid PNG image 192x192'] = 'Ссылка на иконку недействительна или не содержит допустимого PNG изображения 192x192';    
+$lang['def']['Icon URL is invalid or not contain valid PNG image 512x512'] = 'Ссылка на иконку недействительна или не содержит допустимого PNG изображения 512x512';
+
+
 

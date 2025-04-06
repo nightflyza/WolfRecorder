@@ -327,7 +327,18 @@ $lang['def']['Service name'] = 'Назва послуги';
 $lang['def']['App title'] = 'Заголовок додатку';
 $lang['def']['Service logo'] = 'Логотип послуги';
 $lang['def']['Logo URL is invalid or not contain valid image'] = 'Посилання на логотип не є дійсним або не містить вірного зображення';
-$lang['def'][''] = '';
+$lang['def']['Space % reserved for exported users videos'] = 'Відсоток від загального простору, який резервується для експорту відео користувачами'; 
+$lang['def']['Wrong allocated space percent value'] = 'Невірне значення відсотка зарезервованого простору';
+$lang['def']['PWA short name'] = 'Коротка назва PWA';
+$lang['def']['PWA icon 192x192'] = 'Іконка додатку (192x192)';
+$lang['def']['PWA icon 512x512'] = 'Іконка додатку (512x512)';
+$lang['def']['Icon URL is invalid or not contain valid PNG image 192x192'] = 'Посилання на іконку не є дійсним або не містить вірного PNG зображення 192x192';
+$lang['def']['Icon URL is invalid or not contain valid PNG image 512x512'] = 'Посилання на іконку не є дійсним або не містить вірного PNG зображення 512x512';
+
+
+
+
+
 
 
 
