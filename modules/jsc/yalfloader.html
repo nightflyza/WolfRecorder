@@ -35,14 +35,8 @@
       loader.style.display = 'flex';
       document.body.classList.add('yalf-loading');
 
-      const timeout = setTimeout(() => {
-        loader.style.display = 'none';
-        document.body.classList.remove('yalf-loading');
-      }, 3000);
-
       const handleVisibilityChange = () => {
         if (document.visibilityState === 'hidden') {
-          clearTimeout(timeout);
           document.removeEventListener('visibilitychange', handleVisibilityChange);
         } else {
           loader.style.display = 'none';
@@ -54,13 +48,28 @@
       document.addEventListener('visibilitychange', handleVisibilityChange);
     }
 
+    function isExcludedLink(href) {
+      if (!href) return false;
+
+      const excludePatterns = [
+        'howl/recdl',
+        'backups&download',
+        'downloadplaylist=true'
+      ];
+
+      return excludePatterns.some(pattern => href.includes(pattern));
+    }
+
     document.querySelectorAll('a[href]').forEach(link => {
       link.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+
         if (
           this.target === '_blank' ||
           this.hasAttribute('download') ||
           e.ctrlKey || e.metaKey || e.shiftKey ||
-          this.href.includes('#')
+          href.includes('#') ||
+          isExcludedLink(href)
         ) return;
 
         showLoaderWithVisibilityFallback();

@@ -12,9 +12,7 @@ function wr_YalfLoaderRender() {
     $result = '';
 
     if ($ubillingConfig->getAlterParam('PAGE_LOAD_INDICATOR')) {
-        if (ubRouting::checkGet('module')) {
-        $result=file_get_contents('modules/jsc/yalfloader.html');
-    }
+        $result = file_get_contents('modules/jsc/yalfloader.html');
     }
     return ($result);
 }
