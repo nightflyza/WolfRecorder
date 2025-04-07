@@ -12,7 +12,10 @@ function wr_YalfLoaderRender() {
     $result = '';
 
     if ($ubillingConfig->getAlterParam('PAGE_LOAD_INDICATOR')) {
-        $result = file_get_contents('modules/jsc/yalfloader.html');
+        $uiLoader = 'modules/jsc/yalfloader.html';
+        if (file_exists($uiLoader)) {
+            $result = file_get_contents($uiLoader);
+        }
     }
     return ($result);
 }
