@@ -199,7 +199,7 @@ cp -R dist/landing/bg.gif ${APACHE_DATA_PATH}/
 # database specific issues handling
 
 # MySQL 8.0 requires custom config
-cp -R dist/presets/freebsd/80_my.cnf /usr/local/etc/mysql/my.cnf 
+cp -R dist/presets/freebsd/f80_my.cnf /usr/local/etc/mysql/my.cnf 
 $DIALOG --infobox "MySQL 8.0 config replaced" 4 60
 
 # start reqired services
