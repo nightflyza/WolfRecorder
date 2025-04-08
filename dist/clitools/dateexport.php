@@ -64,11 +64,26 @@ function createConcatFile($filesToConcat, $concatFilePath) {
 }
 
 function concatenateVideos($concatFilePath, $outputFile) {
-    print("🎬 Starting FFmpeg concatenation..." . PHP_EOL);
+    print("🎬 Video chunks concatenation..." . PHP_EOL);
     $command = "ffmpeg -y -f concat -safe 0 -i " . escapeshellarg($concatFilePath) . " -c copy " . escapeshellarg($outputFile) . " 2>/dev/null";
     system($command, $returnCode);
     if ($returnCode !== 0) {
         die("❌ Error: FFmpeg concatenation failed" . PHP_EOL);
+    }
+}
+
+function formatDuration($seconds) {
+    if ($seconds < 60) {
+        return round($seconds, 2) . " seconds";
+    } elseif ($seconds < 3600) {
+        $minutes = floor($seconds / 60);
+        $remainingSeconds = $seconds % 60;
+        return $minutes . " minutes " . round($remainingSeconds, 2) . " seconds";
+    } else {
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        $remainingSeconds = $seconds % 60;
+        return $hours . " hours " . $minutes . " minutes " . round($remainingSeconds, 2) . " seconds";
     }
 }
 
@@ -109,8 +124,10 @@ function main() {
     concatenateVideos($concatFilePath, $outputFile);
 
     unlink($concatFilePath);
-    $executionTime = round(microtime(true) - $startTime, 2);
-    print("✨ Export complete: $outputFile (took {$executionTime}s)" . PHP_EOL);
+    $executionTime = microtime(true) - $startTime;
+    $formattedTime = formatDuration($executionTime);
+    print("⏱️ Processing time: " . $formattedTime . PHP_EOL);
+    print("✨ Export complete: $outputFile" . PHP_EOL);
 }
 
 main();
