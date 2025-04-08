@@ -3,9 +3,9 @@ set_time_limit(0);
 
 function showHelp() {
     $today = date("Y-m-d");
-    $help = '+------------------------------------------------------------------------------+' . PHP_EOL;
-    $help .= '|                    🐺 WolfRecorder Export Tool 📅                             |' . PHP_EOL;
-    $help .= '+------------------------------------------------------------------------------+' . PHP_EOL;
+    $help = '╔══════════════════════════════════════════════════════════════════════════════╗' . PHP_EOL;
+    $help .= '║                    🐺 WolfRecorder Export Tool 📅                            ║' . PHP_EOL;
+    $help .= '╚══════════════════════════════════════════════════════════════════════════════╝' . PHP_EOL;
     $help .= 'Exports video chunks for a specific date into a single MP4 file.' . PHP_EOL . PHP_EOL;
     $help .= 'Usage:' . PHP_EOL;
     $help .= '    php dateexport.php <input_dir> <date> <output_file>' . PHP_EOL . PHP_EOL;
@@ -14,11 +14,12 @@ function showHelp() {
     $help .= '    date        - Target date in YYYY-MM-DD format' . PHP_EOL;
     $help .= '    output_file - Path to output MP4 file' . PHP_EOL . PHP_EOL;
     $help .= 'Examples:' . PHP_EOL;
-    $help .= '    # Export to current directory:' . PHP_EOL;
+    $help .= '    📁 Export to current directory:' . PHP_EOL;
     $help .= '    php dateexport.php /wrstorage/ab4k8dj2m5n/ ' . $today . ' ./camera.mp4' . PHP_EOL . PHP_EOL;
-    $help .= '    # Export with absolute path:' . PHP_EOL;
-    $help .= '    php dateexport.php /wrstorage/n5m2k8w3v6y/ ' . $today . ' /home/user/videos/export.mp4' . PHP_EOL;
-    $help .= '+------------------------------------------------------------------------------+';
+    $help .= '    💾 Export with absolute path:' . PHP_EOL;
+    $help .= '    php dateexport.php /wrstorage/n5m2k8w3v6y/ ' . $today . ' /home/user/video.mp4' . PHP_EOL;
+    $help .= '╔══════════════════════════════════════════════════════════════════════════════╗' . PHP_EOL;
+    $help .= '╚══════════════════════════════════════════════════════════════════════════════╝';
     die($help . PHP_EOL);
 }
 
