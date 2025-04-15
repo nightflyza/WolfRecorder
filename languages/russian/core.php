@@ -48,3 +48,4 @@ $lang['def']['May require manual installation'] = 'Может потребова
 $lang['def']['Information about PHP version'] = 'Информация о версии PHP';
 $lang['def']['Login as'] = 'Залогиниться как';
 $lang['def']['in ghost mode'] = 'в режиме призрака';
+$lang['def']['Stay logged in'] = 'Запомнить меня';

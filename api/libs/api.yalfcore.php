@@ -769,6 +769,9 @@ class YALFCore {
         if ($this->config['YALF_AUTH_ENABLED']) {
             if (!empty($_POST['login_form'])) {
                 $this->logInUser(@$_POST['username'], @$_POST['password'], !empty($_POST['remember']) ? true : false);
+                if (!$this->getConfigOption('YALF_AUTH_NOREDIR')) {
+                    rcms_redirect('index.php', true);
+                }
             }
             //default POST logout
             if (!empty($_POST['logout_form'])) {

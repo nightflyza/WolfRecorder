@@ -1,19 +1,70 @@
 <?php
 
 /**
- * Ubilling administrative interface login form
+ * YALF login form implementation
  */
 class YalfLoginForm {
 
+    /**
+     * Contains login form body
+     *
+     * @var string
+     */
     protected $form = '';
+
+    /**
+     * Preset value for the login field
+     *
+     * @var string
+     */
     protected $loginPreset = '';
+
+    /**
+     * Preset value for the password field
+     *
+     * @var string
+     */
     protected $passwordPreset = '';
+
+    /**
+     * Determines whether to add line breaks between form elements
+     *
+     * @var bool
+     */
     protected $breaks = true;
+
+    /**
+     * Determines whether to wrap the form in a container
+     *
+     * @var bool
+     */
     protected $container = true;
+
+    /**
+     * Size of the input fields
+     *
+     * @var int
+     */
     protected $inputSize = 20;
 
+    /**
+     * Is stay logged in checkbox shown?
+     *
+     * @var bool
+     */
+    protected $stayLogInFlag = false;
+
+    /**
+     * Delimiter used for pre-filling login and password fields
+     *
+     * @var string
+     */
+    protected $prefillDelimiter = '_';
+
     public function __construct($br = true, $container = true) {
-        $this->loadForm($br, $container);
+       global $system;
+       $this->stayLogInFlag=$system->getConfigOption('YALF_AUTH_KEEP_CB');
+       $this->loadForm($br, $container);
     }
 
     /**
@@ -34,7 +85,7 @@ class YalfLoginForm {
         }
 
         if (ubRouting::checkGet('authprefill')) {
-            $prefillRaw = explode('_', ubRouting::get('authprefill'));
+            $prefillRaw = explode($this->prefillDelimiter, ubRouting::get('authprefill'));
             if (isset($prefillRaw[1])) {
                 $this->loginPreset = trim($prefillRaw[0]);
                 $this->passwordPreset = trim($prefillRaw[1]);
@@ -48,6 +99,9 @@ class YalfLoginForm {
         $inputs = wf_HiddenInput('login_form', '1');
         $inputs .= wf_TextInput('username', __('Login'), $this->loginPreset, $this->breaks, $this->inputSize);
         $inputs .= wf_PasswordInput('password', __('Password'), $this->passwordPreset, $this->breaks, $this->inputSize, false);
+        if ($this->stayLogInFlag) {
+            $inputs .= wf_CheckInput('remember', __('Stay logged in'), $this->breaks, false);
+        }
         $inputs .= wf_Submit(__('Log in'));
         $this->form .= wf_Form("", 'POST', $inputs, 'loginform');
 
