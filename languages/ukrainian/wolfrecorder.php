@@ -335,6 +335,9 @@ $lang['def']['PWA icon 512x512'] = 'Іконка додатку (512x512)';
 $lang['def']['Icon URL is invalid or not contain valid PNG image 192x192'] = 'Посилання на іконку не є дійсним або не містить вірного PNG зображення 192x192';
 $lang['def']['Icon URL is invalid or not contain valid PNG image 512x512'] = 'Посилання на іконку не є дійсним або не містить вірного PNG зображення 512x512';
 $lang['def']['Page load indicator'] = 'Індикатор завантаження сторінки';
+$lang['def']['Keep user logged in by default'] = 'Пам`ятати вхід користувача';
+$lang['def']['Show stay logged in checkbox in login form'] = 'Відображати чекбокс пам`яті на формі';
+$lang['def']['Do not redirect after logging in'] = 'Не перенаправляти після входу';
 
 
 

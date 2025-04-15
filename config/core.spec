@@ -14,6 +14,27 @@ TYPE="CHECKBOX"
 DEFAULT="1"
 VALIDATOR="is_numeric"
 
+[authkeepdefault]
+OPTION="YALF_AUTH_KEEP_DEFAULT"
+LABEL="Keep user logged in by default"
+TYPE="CHECKBOX"
+DEFAULT="1"
+VALIDATOR="is_numeric"
+
+[authkeepcbflag]
+OPTION="YALF_AUTH_KEEP_CB"
+LABEL="Show stay logged in checkbox in login form"
+TYPE="CHECKBOX"
+DEFAULT="0"
+VALIDATOR="is_numeric"
+
+[authoknoredir]
+OPTION="YALF_AUTH_NOREDIR"
+LABEL="Do not redirect after logging in"
+TYPE="CHECKBOX"
+DEFAULT="0"
+VALIDATOR="is_numeric"
+
 [bnranding_url]
 OPTION="YALF_URL"
 LABEL="Service URL"
