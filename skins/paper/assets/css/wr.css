@@ -191,7 +191,7 @@
 }
 
 .recording-item:hover {
-    background: #f0f4f8;
+    background: #f1f2f3;
 }
 
 .recording-info {
@@ -220,15 +220,26 @@
     margin-top: 0.5rem;
 }
 
+.record-actions a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.record-actions a:hover {
+    background-color: rgba(0, 122, 204, 0.1);
+    box-shadow: 0 0 4px rgba(0, 122, 204, 0.2);
+}
+
 .record-actions a img {
     width: 16px;
     height: 16px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.record-actions a:hover img {
-    transform: scale(1.2);
+    display: block;
 }
 
 @media (max-width: 600px) {
