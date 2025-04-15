@@ -768,7 +768,22 @@ class YALFCore {
     protected function performUserAuth() {
         if ($this->config['YALF_AUTH_ENABLED']) {
             if (!empty($_POST['login_form'])) {
-                $this->logInUser(@$_POST['username'], @$_POST['password'], !empty($_POST['remember']) ? true : false);
+                $remember=false;
+                $keepLoggedDefault=$this->getConfigOption('YALF_AUTH_KEEP_DEFAULT') ? true : false;
+                $stayLogInFlagCB=$this->getConfigOption('YALF_AUTH_KEEP_CB') ? true : false;
+                if ($keepLoggedDefault) {
+                    $remember=true;
+                } 
+                
+                if ($stayLogInFlagCB) {
+                    if (!empty($_POST['remember'])) {
+                        $remember=true;
+                    } else {
+                        $remember=false;
+                    }
+                }
+
+                $this->logInUser(@$_POST['username'], @$_POST['password'], $remember);
                 if (!$this->getConfigOption('YALF_AUTH_NOREDIR')) {
                     rcms_redirect('index.php', true);
                 }

@@ -55,6 +55,13 @@ class YalfLoginForm {
     protected $stayLogInFlag = false;
 
     /**
+     * Is "stay logged in" an default behaviour.
+     *
+     * @var bool
+     */
+    protected $keepLoggedDefault = false;
+
+    /**
      * Delimiter used for pre-filling login and password fields
      *
      * @var string
@@ -62,9 +69,10 @@ class YalfLoginForm {
     protected $prefillDelimiter = '_';
 
     public function __construct($br = true, $container = true) {
-       global $system;
-       $this->stayLogInFlag=$system->getConfigOption('YALF_AUTH_KEEP_CB');
-       $this->loadForm($br, $container);
+        global $system;
+        $this->stayLogInFlag = $system->getConfigOption('YALF_AUTH_KEEP_CB');
+        $this->keepLoggedDefault = $system->getConfigOption('YALF_AUTH_KEEP_DEFAULT');
+        $this->loadForm($br, $container);
     }
 
     /**
@@ -100,7 +108,7 @@ class YalfLoginForm {
         $inputs .= wf_TextInput('username', __('Login'), $this->loginPreset, $this->breaks, $this->inputSize);
         $inputs .= wf_PasswordInput('password', __('Password'), $this->passwordPreset, $this->breaks, $this->inputSize, false);
         if ($this->stayLogInFlag) {
-            $inputs .= wf_CheckInput('remember', __('Stay logged in'), $this->breaks, false);
+            $inputs .= wf_CheckInput('remember', __('Stay logged in'), $this->breaks,  $this->keepLoggedDefault);
         }
         $inputs .= wf_Submit(__('Log in'));
         $this->form .= wf_Form("", 'POST', $inputs, 'loginform');
