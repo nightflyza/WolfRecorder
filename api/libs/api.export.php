@@ -1171,7 +1171,7 @@ class Export {
      * 
      * @return string
      */
-    public function renderAvailableRecords($channelId = '') {
+    public function renderAvailableRecordsOld($channelId = '') {
         $result = '';
         $sysProc = new SysProc();
         $moDet = new MoDet();
@@ -1255,6 +1255,162 @@ class Export {
                 $rows .= wf_TableRow($cells, 'row5');
             }
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table sortable');
+
+            //catching auto-update requests
+            if (!$channelId) {
+                if (ubRouting::checkGet(self::ROUTE_REFRESH)) {
+                    if ($processingFilesCount == 0) {
+                        ubRouting::nav(self::URL_RECORDS);
+                    }
+                } else {
+                    if ($processingFilesCount > 0) {
+                        ubRouting::nav(self::URL_RECORDS . '&' . self::ROUTE_REFRESH . '=true');
+                    }
+                }
+            }
+        } else {
+            $noRecordsNotice = __('You have no saved records yet');
+            if ($channelId) {
+                $noRecordsNotice .= ' ' . __('for this camera');
+            }
+            $result .= $this->messages->getStyledMessage($noRecordsNotice, 'info');
+        }
+        $maxUserSpace = $this->getUserMaxSpace();
+        $usedSpaceByMe = $this->getUserUsedSpace($userRecordingsDir);
+        $scheduledExportsForecast = $this->scheduleGetForecastSize($this->myLogin);
+        $spaceFree = $maxUserSpace - $usedSpaceByMe - $scheduledExportsForecast;
+        if ($spaceFree > 0) {
+            $spaceLabel = wr_convertSize($spaceFree);
+            $notificationType = 'info';
+            if ($usedSpaceByMe == 0) {
+                $notificationType = 'success';
+            }
+        } else {
+            $spaceLabel = __('Exhausted') . ' :(';
+            $notificationType = 'warning';
+        }
+
+        $result .= $this->messages->getStyledMessage(__('Free space for saving your records') . ': ' . $spaceLabel, $notificationType);
+        return ($result);
+    }
+
+    /**
+     * Returns list of available records
+     * 
+     * @param string $channelId
+     * 
+     * @return string
+     */
+    public function renderAvailableRecords($channelId = '') {
+        $result = '';
+        $sysProc = new SysProc();
+        $moDet = new MoDet();
+        $userRecordingsDir = $this->prepareRecordingsDir();
+        $recordsExtFilter = '*' . self::RECORDS_EXT;
+        $allRecords = rcms_scandir($userRecordingsDir, $recordsExtFilter);
+        $moDetFlag = (@$this->altCfg[$moDet::OPTION_ENABLE]) ? true : false;
+        $processingFilesCount = 0;
+        //channel filter applied?
+        if ($channelId) {
+            if (!empty($allRecords)) {
+                $cameraId = $this->cameras->getCameraIdByChannel($channelId);
+                $filteredRecordMask = '_' . $cameraId . self::RECORDS_EXT;
+                foreach ($allRecords as $io => $each) {
+                    if (!ispos($each, $filteredRecordMask)) {
+                        unset($allRecords[$io]);
+                    }
+                }
+            }
+        }
+
+        if (!empty($allRecords)) {
+            $result .= wf_tag('div', false, 'recordings-list');
+
+            foreach ($allRecords as $io => $eachFile) {
+                $actLinks = '';
+                $moControls = '';
+                $fileNameParts = $this->parseRecordFileName($eachFile);
+                $recordSize = filesize($userRecordingsDir . $eachFile);
+                $recordSizeLabel = wr_convertSize($recordSize);
+                $fileName = $eachFile;
+                $fileUrl = $userRecordingsDir . $eachFile;
+                $previewUrl = self::URL_RECORDS . '&' . self::ROUTE_PREVIEW . '=' . base64_encode($fileName);
+                $cameraComment = $this->cameras->getCameraCommentById($fileNameParts['cameraid']);
+                $recDate = date("Y-m-d", strtotime($fileNameParts['from']));
+                $recTimeFrom = date("H:i:s", strtotime($fileNameParts['from']));
+                $recTimeTo = date("H:i:s", strtotime($fileNameParts['to']));
+                $fileInUseFlag = $sysProc->isFileInUse($fileName);
+                $fileMarker = $fileNameParts['marker'];
+
+                if ($channelId) {
+                    $previewUrl .= '&' . self::ROUTE_BACK_EXPORT . '=' . $channelId;
+                }
+
+                if (empty($channelId)) {
+                    if ($fileMarker == $moDet::FILTERED_MARK) {
+                        $cameraComment .= ' ' . wf_img('skins/motion_filtered.png', __('Motion filtered'));
+                    } else {
+                        if ($moDetFlag) {
+                            if (cfr('MOTION')) {
+                                $modetForm = $this->renderMoDetScheduleForm($fileName);
+                                $moControls .= wf_modalAuto(wf_img('skins/motion.png', __('Motion')), __('Motion filtering'), $modetForm);
+                            }
+                        }
+                    }
+                }
+
+                $actLinks .= wf_Link($previewUrl, wf_img('skins/icon_play_small.png', __('Show'))) . ' ';
+                $actLinks .= $moControls;
+                $actLinks .= wf_Link($fileUrl, web_icon_download()) . ' ';
+                $actLinks .= $this->renderRecDelDialog($eachFile) . ' ';
+
+                //locking all operations if some of files in processing now
+                if ($fileInUseFlag) {
+                    $actLinks = wf_img_sized('skins/ajaxloader.gif', __('Record') . ' ' . __('is currently being processed'), 110);
+                    $processingFilesCount++;
+                }
+
+                $result .= wf_tag('div', false, 'recording-item');
+                $result .= wf_tag('div', false, 'recording-info');
+
+                $result .= wf_tag('p', false);
+                $result .= wf_tag('strong', false);
+                $result .= __('Camera') . ': ';
+                $result .= wf_tag('strong', true);
+                $result .= $cameraComment;
+                $result .= wf_tag('p', true);
+
+                $result .= wf_tag('p', false);
+                $result .= wf_tag('strong', false);
+                $result .= __('Date') . ': ';
+                $result .= wf_tag('strong', true);
+                $result .= $recDate;
+                $result .= wf_tag('p', true);
+
+                $result .= wf_tag('p', false);
+                $result .= wf_tag('strong', false);
+                $result .= __('Time') . ': ';
+                $result .= wf_tag('strong', true);
+                $result .= $recTimeFrom . ' – ' . $recTimeTo;
+                $result .= wf_tag('p', true);
+
+                $result .= wf_tag('p', false);
+                $result .= wf_tag('strong', false);
+                $result .= __('Size') . ': ';
+                $result .= wf_tag('strong', true);
+                $result .= $recordSizeLabel;
+                $result .= wf_tag('p', true);
+
+                $result .= wf_tag('div', true);
+
+                $result .= wf_tag('div', false, 'record-actions');
+                $result .= $actLinks;
+                $result .= wf_tag('div', true);
+
+                $result .= wf_tag('div', true);
+            }
+
+            $result .= wf_tag('div', true);
 
             //catching auto-update requests
             if (!$channelId) {

@@ -164,5 +164,81 @@
 }
 
 .copyright a {
-    color:#1a1a1a;
+    color: #1a1a1a;
+}
+
+.recordings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.recording-item {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: #f9f9f9;
+    border-left: 4px solid #007acc;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s;
+    width: 100%;
+}
+
+.recording-item:hover {
+    background: #f0f4f8;
+}
+
+.recording-info {
+    flex: 1 1 60%;
+    min-width: 250px;
+}
+
+.recording-info p {
+    margin: 0.3rem 0;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.recording-info strong {
+    color: #555;
+    margin-right: 0.3rem;
+}
+
+.record-actions {
+    display: flex;
+    flex: 1 1 30%;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 120px;
+    margin-top: 0.5rem;
+}
+
+.record-actions a img {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.record-actions a:hover img {
+    transform: scale(1.2);
+}
+
+@media (max-width: 600px) {
+    .recording-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .record-actions {
+        justify-content: flex-start;
+        margin-top: 1rem;
+    }
 }
