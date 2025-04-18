@@ -13,7 +13,7 @@ function wr_QuickSearchRenderForm() {
     $result = '';
 
     if ($ubillingConfig->getAlterParam('QUICKSEARCH_ENABLED')) {
-        if (ubRouting::checkGet('module')) {
+        if (LOGGED_IN and ubRouting::checkGet('module')) {
             $modList = array_flip($modList);
             $curModule = ubRouting::get('module', 'gigasafe');
             $skipRenderFlag = (ubRouting::checkGet($denyList, true, true)) ? true : false;
