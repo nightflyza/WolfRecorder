@@ -163,7 +163,7 @@ class Archive {
             if (!empty($allStotagesData)) {
                 if (!empty($this->allCamerasData)) {
                     $screenshots = new ChanShots();
-                    $result.=wf_tag('div',false,'cameraslist');
+                    $result .= wf_tag('div', false, 'cameraslist');
                     foreach ($this->allCamerasData as $io => $each) {
                         $eachCamId = $each['CAMERA']['id'];
                         if ($this->acl->isMyCamera($eachCamId)) {
@@ -191,17 +191,21 @@ class Archive {
                                 $chanShot = $screenshots::ERR_DISABLD;
                             }
 
-                            $camPreview = wf_img($chanShot,$eachCamDesc);
-                            $containerId='wrcamcont_'.$eachCamDesc;
-                        
-                        $result.=wf_tag('div',false,'','id="'.$containerId.'"');
-                        $camInfo=wf_tag('div',false,'camera-info').$eachCamDesc.wf_tag('div',true);
-                        $result.=wf_Link($eachCamUrl, $camPreview . $camInfo, false, 'camera-item');
-                        $result.=wf_tag('div',true);
+                            $camPreview = wf_img($chanShot, $eachCamDesc);
+                            $cameraQsString = $eachCamDesc;
+                            if (!empty($eachCamDesc)) {
+                                $cameraQsString .= zb_TranslitString($eachCamDesc);
+                            }
+                            $containerId = 'wrcamcont_' . $cameraQsString;
+
+                            $result .= wf_tag('div', false, '', 'id="' . $containerId . '"');
+                            $camInfo = wf_tag('div', false, 'camera-info') . $eachCamDesc . wf_tag('div', true);
+                            $result .= wf_Link($eachCamUrl, $camPreview . $camInfo, false, 'camera-item');
+                            $result .= wf_tag('div', true);
                         }
                     }
-                    $result.=wf_tag('div',true);
-                    $result.=wf_AjaxContainer('wrqsstatus','','');
+                    $result .= wf_tag('div', true);
+                    $result .= wf_AjaxContainer('wrqsstatus', '', '');
                 } else {
                     $result .= $this->messages->getStyledMessage(__('Cameras') . ': ' . __('Nothing to show'), 'warning');
                 }

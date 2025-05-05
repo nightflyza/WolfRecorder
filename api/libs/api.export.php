@@ -286,7 +286,11 @@ class Export {
                             }
 
                             $camPreview = wf_img($chanShot, $eachCamDesc);
-                            $containerId = 'wrcamcont_' . $eachCamDesc;
+                            $cameraQsString = $eachCamDesc;
+                            if (!empty($eachCamDesc)) {
+                                $cameraQsString .= zb_TranslitString($eachCamDesc);
+                            }
+                            $containerId = 'wrcamcont_' . $cameraQsString;
 
                             $result .= wf_tag('div', false, '', 'id="' . $containerId . '"');
                             $camInfo = wf_tag('div', false, 'camera-info') . $eachCamDesc . wf_tag('div', true);

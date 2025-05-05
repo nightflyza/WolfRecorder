@@ -253,7 +253,11 @@ class LiveCams {
                         $cameraChannel = $eachCameraData['CAMERA']['channel'];
                         $channelScreenshot = $this->chanshots->getChannelScreenShot($cameraChannel);
                         $cameraLabel = $this->cameras->getCameraComment($cameraChannel);
-                        $containerId = ' id="' . self::CAM_CONT_ID . $cameraLabel . '" ';
+                        $cameraQsString = $cameraLabel;
+                        if (!empty($cameraLabel)) {
+                            $cameraQsString .= zb_TranslitString($cameraQsString);
+                        }
+                        $containerId = ' id="' . self::CAM_CONT_ID . $cameraQsString . '" ';
                         if (empty($channelScreenshot)) {
                             $channelScreenshot = $this->chanshots::ERR_NOSIG;
                         } else {
