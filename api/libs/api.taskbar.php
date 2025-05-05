@@ -13,6 +13,13 @@ class Taskbar {
     protected $altCfg = array();
 
     /**
+     * Contains current instance user login
+     *
+     * @var string
+     */
+    protected $myLogin = '';
+
+    /**
      * Message helper object placeholder
      *
      * @var object
@@ -265,19 +272,6 @@ class Taskbar {
                     }
                 } else {
                     $this->currentAlerts .= $this->messages->getStyledMessage(__('Wrong element format') . ': ' . $eachfilename, 'warning');
-                }
-            }
-
-            //injecting optional ReportMaster reports here
-            if ($category == 'reports') {
-                if (@$this->altCfg['TB_REPORTMASTER']) {
-                    $reportMaster = new ReportMaster();
-                    $availableReports = $reportMaster->getTaskBarReports();
-                    if (!empty($availableReports)) {
-                        foreach ($availableReports as $eachReportId => $eachReportElement) {
-                            $categoryContent .= $this->buildElement($eachReportElement);
-                        }
-                    }
                 }
             }
 
