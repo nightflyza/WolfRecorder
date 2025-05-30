@@ -19,7 +19,9 @@
 
 <style>
   @keyframes yalf-spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   body.yalf-loading {
@@ -82,5 +84,13 @@
         showLoaderWithVisibilityFallback();
       });
     });
+  });
+
+  window.addEventListener('pageshow', function (event) {
+    const loader = document.getElementById('yalf-loader');
+    if (loader) {
+      loader.style.display = 'none';
+      document.body.classList.remove('yalf-loading');
+    }
   });
 </script>
