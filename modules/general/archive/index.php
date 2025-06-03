@@ -24,6 +24,7 @@ if (cfr('ARCHIVE')) {
             $channelName = $archive->getCameraComment($channelId);
             show_window(__('View') . ': ' . $channelName, $archive->renderLookup($channelId));
         } else {
+            log_register('ARCHIVE FAIL CHANNEL `'.$channelId.'` ACCESS VIOLATION');
             show_error(__('Access denied'));
         }
     }

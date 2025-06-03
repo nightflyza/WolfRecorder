@@ -52,6 +52,7 @@ if (cfr('EXPORT')) {
             //already saved records here
             show_window(__('Your saved records'), $export->renderAvailableRecords($channelId));
         } else {
+            log_register('EXPORT FAIL CHANNEL `'.$channelId.'` ACCESS VIOLATION');
             show_error(__('Access denied'));
         }
     }

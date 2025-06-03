@@ -27,6 +27,7 @@ if (cfr('LIVECAMS')) {
             $channelName = $liveCams->getCameraComment($channelId);
             show_window(__('Live') . ': ' . $channelName, $liveCams->renderLive($channelId));
         } else {
+            log_register('LIVE FAIL CHANNEL `'.$channelId.'` ACCESS VIOLATION');
             show_error(__('Access denied'));
         }
     } else {
