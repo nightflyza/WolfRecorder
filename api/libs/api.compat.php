@@ -18,9 +18,8 @@ if (!function_exists('__')) {
                 $str = $lang['def'][$str];
             }
         }
-        return($str);
+        return ($str);
     }
-
 }
 
 
@@ -37,7 +36,6 @@ if (!function_exists('log_register')) {
         global $system;
         $system->logEvent($data);
     }
-
 }
 
 if (!function_exists('cfr')) {
@@ -52,9 +50,8 @@ if (!function_exists('cfr')) {
      */
     function cfr($right) {
         global $system;
-        return($system->checkForRight($right));
+        return ($system->checkForRight($right));
     }
-
 }
 
 if (!function_exists('whoami')) {
@@ -68,9 +65,8 @@ if (!function_exists('whoami')) {
      */
     function whoami() {
         global $system;
-        return($system->getLoggedInUsername());
+        return ($system->getLoggedInUsername());
     }
-
 }
 
 /**
@@ -85,7 +81,7 @@ function rcms_date_localise($str) {
     if (isset($lang['datetime'][$str])) {
         $str = $lang['datetime'][$str];
     }
-    return($str);
+    return ($str);
 }
 
 /**
@@ -96,7 +92,7 @@ function rcms_date_localise($str) {
 function curlang() {
     global $system;
     $locale = $system->getCurLang();
-    return($locale);
+    return ($locale);
 }
 
 if (!function_exists('curdatetime')) {
@@ -108,9 +104,8 @@ if (!function_exists('curdatetime')) {
      */
     function curdatetime() {
         $currenttime = date("Y-m-d H:i:s");
-        return($currenttime);
+        return ($currenttime);
     }
-
 }
 
 if (!function_exists('rcms_redirect')) {
@@ -128,7 +123,6 @@ if (!function_exists('rcms_redirect')) {
             echo '<script language="javascript">document.location.href="' . $url . '";</script>';
         }
     }
-
 }
 
 
@@ -143,12 +137,11 @@ if (!function_exists('ispos')) {
      */
     function ispos($string, $search) {
         if (strpos($string, $search) === false) {
-            return(false);
+            return (false);
         } else {
-            return(true);
+            return (true);
         }
     }
-
 }
 
 if (!function_exists('zb_convertSize')) {
@@ -199,7 +192,6 @@ if (!function_exists('zb_convertSize')) {
             return ($fs);
         }
     }
-
 }
 
 if (!function_exists('zb_TraffToGb')) {
@@ -215,7 +207,6 @@ if (!function_exists('zb_TraffToGb')) {
         $fs = round($fs / 1073741824, 2) . ' Gb';
         return ($fs);
     }
-
 }
 
 /**
@@ -336,7 +327,6 @@ if (!function_exists('vf')) {
                 break;
         }
     }
-
 }
 
 /**
@@ -366,7 +356,7 @@ function debarr($data) {
  */
 function curdatetime() {
     $currenttime = date("Y-m-d H:i:s");
-    return($currenttime);
+    return ($currenttime);
 }
 
 /**
@@ -376,7 +366,7 @@ function curdatetime() {
  */
 function curtime() {
     $currenttime = date("H:i:s");
-    return($currenttime);
+    return ($currenttime);
 }
 
 /**
@@ -386,7 +376,7 @@ function curtime() {
  */
 function curdate() {
     $currentdate = date("Y-m-d");
-    return($currentdate);
+    return ($currentdate);
 }
 
 /**
@@ -396,7 +386,7 @@ function curdate() {
  */
 function curmonth() {
     $currentmonth = date("Y-m");
-    return($currentmonth);
+    return ($currentmonth);
 }
 
 /**
@@ -416,7 +406,7 @@ function prevmonth() {
  */
 function curyear() {
     $currentyear = date("Y");
-    return($currentyear);
+    return ($currentyear);
 }
 
 /**
@@ -465,8 +455,9 @@ function months_array_wz() {
         '9' => 'September',
         '10' => 'October',
         '11' => 'November',
-        '12' => 'December');
-    return($months);
+        '12' => 'December'
+    );
+    return ($months);
 }
 
 /**
@@ -485,7 +476,7 @@ function web_bar($count, $total) {
     }
 
     $code = wf_img_sized($barurl, '', $width . '%', '14');
-    return($code);
+    return ($code);
 }
 
 /**
@@ -531,85 +522,159 @@ function zb_TranslitString($string, $caseSensetive = false) {
         $replace = array(
             "'" => "",
             "`" => "",
-            "а" => "a", "А" => "A",
-            "б" => "b", "Б" => "B",
-            "в" => "v", "В" => "V",
-            "г" => "g", "Г" => "G",
-            "д" => "d", "Д" => "D",
-            "е" => "e", "Е" => "E",
-            "ё" => "e", "Ё" => "E",
-            "ж" => "zh", "Ж" => "Zh",
-            "з" => "z", "З" => "Z",
-            "и" => "i", "И" => "I",
-            "й" => "y", "Й" => "Y",
-            "к" => "k", "К" => "K",
-            "л" => "l", "Л" => "L",
-            "м" => "m", "М" => "M",
-            "н" => "n", "Н" => "N",
-            "о" => "o", "О" => "O",
-            "п" => "p", "П" => "P",
-            "р" => "r", "Р" => "R",
-            "с" => "s", "С" => "S",
-            "т" => "t", "Т" => "T",
-            "у" => "u", "У" => "U",
-            "ф" => "f", "Ф" => "F",
-            "х" => "h", "Х" => "H",
-            "ц" => "c", "Ц" => "C",
-            "ч" => "ch", "Ч" => "Ch",
-            "ш" => "sh", "Ш" => "Sh",
-            "щ" => "sch", "Щ" => "Sch",
-            "ъ" => "", "Ъ" => "",
-            "ы" => "y", "Ы" => "Y",
-            "ь" => "", "Ь" => "",
-            "э" => "e", "Э" => "E",
-            "ю" => "yu", "Ю" => "Yu",
-            "я" => "ya", "Я" => "Ya",
-            "і" => "i", "І" => "I",
-            "ї" => "yi", "Ї" => "Yi",
-            "є" => "e", "Є" => "E",
-            "ґ" => "g", "Ґ" => "G"
+            "а" => "a",
+            "А" => "A",
+            "б" => "b",
+            "Б" => "B",
+            "в" => "v",
+            "В" => "V",
+            "г" => "g",
+            "Г" => "G",
+            "д" => "d",
+            "Д" => "D",
+            "е" => "e",
+            "Е" => "E",
+            "ё" => "e",
+            "Ё" => "E",
+            "ж" => "zh",
+            "Ж" => "Zh",
+            "з" => "z",
+            "З" => "Z",
+            "и" => "i",
+            "И" => "I",
+            "й" => "y",
+            "Й" => "Y",
+            "к" => "k",
+            "К" => "K",
+            "л" => "l",
+            "Л" => "L",
+            "м" => "m",
+            "М" => "M",
+            "н" => "n",
+            "Н" => "N",
+            "о" => "o",
+            "О" => "O",
+            "п" => "p",
+            "П" => "P",
+            "р" => "r",
+            "Р" => "R",
+            "с" => "s",
+            "С" => "S",
+            "т" => "t",
+            "Т" => "T",
+            "у" => "u",
+            "У" => "U",
+            "ф" => "f",
+            "Ф" => "F",
+            "х" => "h",
+            "Х" => "H",
+            "ц" => "c",
+            "Ц" => "C",
+            "ч" => "ch",
+            "Ч" => "Ch",
+            "ш" => "sh",
+            "Ш" => "Sh",
+            "щ" => "sch",
+            "Щ" => "Sch",
+            "ъ" => "",
+            "Ъ" => "",
+            "ы" => "y",
+            "Ы" => "Y",
+            "ь" => "",
+            "Ь" => "",
+            "э" => "e",
+            "Э" => "E",
+            "ю" => "yu",
+            "Ю" => "Yu",
+            "я" => "ya",
+            "Я" => "Ya",
+            "і" => "i",
+            "І" => "I",
+            "ї" => "yi",
+            "Ї" => "Yi",
+            "є" => "e",
+            "Є" => "E",
+            "ґ" => "g",
+            "Ґ" => "G"
         );
     } else {
         $replace = array(
             "'" => "",
             "`" => "",
-            "а" => "a", "А" => "a",
-            "б" => "b", "Б" => "b",
-            "в" => "v", "В" => "v",
-            "г" => "g", "Г" => "g",
-            "д" => "d", "Д" => "d",
-            "е" => "e", "Е" => "e",
-            "ё" => "e", "Ё" => "e",
-            "ж" => "zh", "Ж" => "zh",
-            "з" => "z", "З" => "z",
-            "и" => "i", "И" => "i",
-            "й" => "y", "Й" => "y",
-            "к" => "k", "К" => "k",
-            "л" => "l", "Л" => "l",
-            "м" => "m", "М" => "m",
-            "н" => "n", "Н" => "n",
-            "о" => "o", "О" => "o",
-            "п" => "p", "П" => "p",
-            "р" => "r", "Р" => "r",
-            "с" => "s", "С" => "s",
-            "т" => "t", "Т" => "t",
-            "у" => "u", "У" => "u",
-            "ф" => "f", "Ф" => "f",
-            "х" => "h", "Х" => "h",
-            "ц" => "c", "Ц" => "c",
-            "ч" => "ch", "Ч" => "ch",
-            "ш" => "sh", "Ш" => "sh",
-            "щ" => "sch", "Щ" => "sch",
-            "ъ" => "", "Ъ" => "",
-            "ы" => "y", "Ы" => "y",
-            "ь" => "", "Ь" => "",
-            "э" => "e", "Э" => "e",
-            "ю" => "yu", "Ю" => "yu",
-            "я" => "ya", "Я" => "ya",
-            "і" => "i", "І" => "i",
-            "ї" => "yi", "Ї" => "yi",
-            "є" => "e", "Є" => "e",
-            "ґ" => "g", "Ґ" => "g"
+            "а" => "a",
+            "А" => "a",
+            "б" => "b",
+            "Б" => "b",
+            "в" => "v",
+            "В" => "v",
+            "г" => "g",
+            "Г" => "g",
+            "д" => "d",
+            "Д" => "d",
+            "е" => "e",
+            "Е" => "e",
+            "ё" => "e",
+            "Ё" => "e",
+            "ж" => "zh",
+            "Ж" => "zh",
+            "з" => "z",
+            "З" => "z",
+            "и" => "i",
+            "И" => "i",
+            "й" => "y",
+            "Й" => "y",
+            "к" => "k",
+            "К" => "k",
+            "л" => "l",
+            "Л" => "l",
+            "м" => "m",
+            "М" => "m",
+            "н" => "n",
+            "Н" => "n",
+            "о" => "o",
+            "О" => "o",
+            "п" => "p",
+            "П" => "p",
+            "р" => "r",
+            "Р" => "r",
+            "с" => "s",
+            "С" => "s",
+            "т" => "t",
+            "Т" => "t",
+            "у" => "u",
+            "У" => "u",
+            "ф" => "f",
+            "Ф" => "f",
+            "х" => "h",
+            "Х" => "h",
+            "ц" => "c",
+            "Ц" => "c",
+            "ч" => "ch",
+            "Ч" => "ch",
+            "ш" => "sh",
+            "Ш" => "sh",
+            "щ" => "sch",
+            "Щ" => "sch",
+            "ъ" => "",
+            "Ъ" => "",
+            "ы" => "y",
+            "Ы" => "y",
+            "ь" => "",
+            "Ь" => "",
+            "э" => "e",
+            "Э" => "e",
+            "ю" => "yu",
+            "Ю" => "yu",
+            "я" => "ya",
+            "Я" => "ya",
+            "і" => "i",
+            "І" => "i",
+            "ї" => "yi",
+            "Ї" => "yi",
+            "є" => "e",
+            "Є" => "e",
+            "ґ" => "g",
+            "Ґ" => "g"
         );
     }
     return $str = iconv("UTF-8", "UTF-8//IGNORE", strtr($string, $replace));
@@ -640,7 +705,7 @@ function zb_rand_string($size = 4) {
  */
 function multinet_cidr2mask($mask_bits) {
     if ($mask_bits > 31 || $mask_bits < 0)
-        return("0.0.0.0");
+        return ("0.0.0.0");
     $host_bits = 32 - $mask_bits;
     $num_hosts = pow(2, $host_bits) - 1;
     $netmask = ip2int("255.255.255.255") - $num_hosts;
@@ -699,7 +764,7 @@ function zb_DownloadFile($filePath, $contentType = '') {
         if (file_exists($filePath)) {
             log_register("DOWNLOAD FILE `" . $filePath . "`");
 
-            if (($contentType == '') OR ( $contentType == 'default')) {
+            if (($contentType == '') or ($contentType == 'default')) {
                 $contentType = 'application/octet-stream';
             } else {
                 //additional content types
@@ -754,7 +819,7 @@ function zb_DownloadFile($filePath, $contentType = '') {
  */
 function zb_ParseTagData($openTag, $closeTag, $stringToParse = '', $mutipleResults = false) {
     $result = '';
-    if (!empty($openTag) AND !empty($closeTag) AND !empty($stringToParse)) {
+    if (!empty($openTag) and !empty($closeTag) and !empty($stringToParse)) {
         $replacements = array(
             '(' => '\(',
             ')' => '\)',
@@ -788,7 +853,7 @@ function zb_ParseTagData($openTag, $closeTag, $stringToParse = '', $mutipleResul
             }
         }
     }
-    return($result);
+    return ($result);
 }
 
 /**
@@ -806,17 +871,17 @@ function zb_formatTime($seconds) {
     $seconds = (round($seconds) % 60);
 
     if ($init < 3600) {
-//less than 1 hour
+        //less than 1 hour
         if ($init < 60) {
-//less than minute
+            //less than minute
             $result = $seconds . ' ' . __('sec.');
         } else {
-//more than one minute
+            //more than one minute
             $result = $minutes . ' ' . __('minutes') . ' ' . $seconds . ' ' . __('seconds');
         }
     } else {
         if ($init < 86400) {
-//more than hour
+            //more than hour
             $result = $hours . ' ' . __('hour') . ' ' . $minutes . ' ' . __('minutes') . ' ' . $seconds . ' ' . __('seconds');
         } else {
             $hoursLeft = $hours - ($days * 24);
@@ -841,17 +906,17 @@ function wr_formatTimeArchive($seconds) {
     $seconds = $seconds % 60;
 
     if ($init < 3600) {
-//less than 1 hour
+        //less than 1 hour
         if ($init < 60) {
-//less than minute
+            //less than minute
             $result = $seconds . ' ' . __('sec.');
         } else {
-//more than one minute
+            //more than one minute
             $result = $minutes . ' ' . __('minutes');
         }
     } else {
         if ($init < 86400) {
-//more than hour
+            //more than hour
             $result = $hours . ' ' . __('hour') . ' ' . $minutes . ' ' . __('minutes');
         } else {
             $hoursLeft = $hours - ($days * 24);
@@ -920,10 +985,10 @@ function zb_isDateBetween($fromDate, $toDate, $checkDate) {
     $checkDate = strtotime($checkDate);
     $checkDate = date("Y-m-d", $checkDate);
     $checkDate = strtotime($checkDate);
-    if ($checkDate >= $fromDate AND $checkDate <= $toDate) {
+    if ($checkDate >= $fromDate and $checkDate <= $toDate) {
         $result = true;
     }
-    return($result);
+    return ($result);
 }
 
 /**
@@ -937,8 +1002,44 @@ function zb_isDateBetween($fromDate, $toDate, $checkDate) {
  */
 function zb_isTimeStampBetween($fromTime, $toTime, $checkTime) {
     $result = false;
-    if ($checkTime >= $fromTime AND $checkTime <= $toTime) {
+    if ($checkTime >= $fromTime and $checkTime <= $toTime) {
         $result = true;
     }
     return ($result);
+}
+
+if (!function_exists('json_validate')) {
+    /**
+     * Validates a JSON string. PHP <8.3 replacement. Compatible with PHP 5.3+.
+     *
+     * @param string $json The JSON string to validate.
+     * @param int $depth Maximum depth (only used in PHP >=5.2.1).
+     * @param int $flags Bitmask of JSON decode options (only used in PHP >=5.4.0).
+     * @return bool Returns true if the string is a valid JSON, otherwise false.
+     */
+    function json_validate($json, $depth = 512, $flags = 0) {
+        if (!is_string($json) || trim($json) === '') {
+            return false;
+        }
+
+        // PHP >= 7.3 supports JSON_THROW_ON_ERROR
+        if (defined('JSON_THROW_ON_ERROR')) {
+            try {
+                json_decode($json, false, $depth, $flags | JSON_THROW_ON_ERROR);
+                return true;
+            } catch (Exception $e) {
+                return false;
+            }
+        }
+
+        // For older PHP versions (including 5.3.29)
+        // json_decode accepts only up to 3 parameters before PHP 5.4
+        if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+            json_decode($json, false, $depth, $flags);
+        } else {
+            json_decode($json);
+        }
+
+        return json_last_error() === JSON_ERROR_NONE;
+    }
 }
