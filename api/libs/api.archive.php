@@ -271,7 +271,15 @@ class Archive {
      */
     protected function renderDayRecordsAvailTimeline($chunksList, $date) {
         $result = '';
+        $tsegPosition = '';
         if (!empty($chunksList)) {
+            //tseg playhead shift
+            if (ubRouting::checkGet(self::ROUTE_TIMESEGMENT)) {
+                $tsegPosition = ubRouting::get(self::ROUTE_TIMESEGMENT);
+                $tsegTime = strtotime($date . ' ' . $tsegPosition . ':00');
+                $fewMinBeforePlayhead = strtotime("-3 minute", $tsegTime);
+                $fewMinAfterPlayhead = strtotime("+3 minute", $tsegTime);
+            }
             $dayMinAlloc = $this->allocDayTimeline();
             $chunksByDay = 0;
             $curDate = curdate();
@@ -297,12 +305,22 @@ class Archive {
                     $result = wf_tag('div', false, 'rectimeline', '');
                     foreach ($dayMinAlloc as $eachMin => $recAvail) {
                         $recAvailBar = ($recAvail) ? 'skins/rec_avail.png' : 'skins/rec_unavail.png';
+                        //highlighting current time on timeline
                         if ($curDate == $date) {
                             $eachMinTs = strtotime($date . ' ' . $eachMin . ':00');
                             if (zb_isTimeStampBetween($fewMinAgo, $fewMinLater, $eachMinTs)) {
                                 $recAvailBar = 'skins/rec_now.png';
                             }
                         }
+
+                        //highlighting playhead position on timeline
+                        if ($tsegPosition) {
+                            $eachMinTs = strtotime($date . ' ' . $eachMin . ':00');
+                            if (zb_isTimeStampBetween($fewMinBeforePlayhead, $fewMinAfterPlayhead, $eachMinTs)) {
+                                $recAvailBar = 'skins/rec_playhead.png';
+                            }
+                        }
+
                         $recAvailTitle = ($recAvail) ? $eachMin : $eachMin . ' - ' . __('No record');
                         $timeBarLabel = wf_img($recAvailBar, $recAvailTitle, $barStyle);
                         if ($recAvail) {
