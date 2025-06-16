@@ -64,6 +64,12 @@ LABEL="License keys module enabled"
 TYPE="CHECKBOX"
 DEFAULT="0"
 
+[stardustflock]
+OPTION=STARDUST_FLOCK_FORCE
+LABEL="StarDust flock mode"
+TYPE="CHECKBOX"
+DEFAULT="0"
+
 [backups_age]
 OPTION=BACKUPS_MAX_AGE
 LABEL="DB backups max age in days"
