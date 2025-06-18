@@ -1093,28 +1093,36 @@ class Cameras {
             $enabledCount = 0;
             $recorderCount = 0;
             $liveCount = 0;
+            $subCount = 0;
             $allRunningRecorders = $this->getRunningRecorders();
             $allLiveStreams = $this->getRunningStreams();
+            $allSubStreams = $this->getRunningSubStreams();
+
             $cells = wf_TableCell(__('ID'));
             $cells .= wf_TableCell(__('IP'));
             $cells .= wf_TableCell(__('Enabled'));
             $cells .= wf_TableCell(__('Recording'));
             $cells .= wf_TableCell(__('Live'));
+            $cells .= wf_TableCell(__('Substream'));
             $cells .= wf_TableCell(__('Description'));
             $cells .= wf_TableCell(__('Actions'));
             $rows = wf_TableRow($cells, 'row1');
             foreach ($this->allCameras as $io => $each) {
+                $recordingFlag = isset($allRunningRecorders[$each['id']]) ? 1 : 0;
+                $liveFlag = isset($allLiveStreams[$each['id']]) ? 1 : 0;
+                $subFlag = isset($allSubStreams[$each['id']]) ? 1 : 0;
+
                 $cells = wf_TableCell($each['id']);
                 $cells .= wf_TableCell($each['ip'], '', '', 'sorttable_customkey="' . ip2int($each['ip']) . '"');
                 $cells .= wf_TableCell(web_bool_led($each['active']), '', '', 'sorttable_customkey="' . $each['active'] . '"');
-                $recordingFlag = isset($allRunningRecorders[$each['id']]) ? 1 : 0;
                 $cells .= wf_TableCell(web_bool_led($recordingFlag), '', '', 'sorttable_customkey="' . $recordingFlag . '"');
-                $liveFlag = isset($allLiveStreams[$each['id']]) ? 1 : 0;
                 $cells .= wf_TableCell(web_bool_led($liveFlag), '', '', 'sorttable_customkey="' . $liveFlag . '"');
+                $cells .= wf_TableCell(web_bool_led($subFlag), '', '', 'sorttable_customkey="' . $subFlag . '"');
                 $cells .= wf_TableCell($each['comment']);
                 $actLinks = wf_Link(self::URL_ME . '&' . self::ROUTE_EDIT . '=' . $each['id'], web_edit_icon(), false);
                 $cells .= wf_TableCell($actLinks);
                 $rows .= wf_TableRow($cells, 'row5');
+
                 $totalCount++;
                 if ($each['active']) {
                     $enabledCount++;
@@ -1124,13 +1132,17 @@ class Cameras {
                     if ($liveFlag) {
                         $liveCount++;
                     }
+                    if ($subFlag) {
+                        $subCount++;
+                    }
                 }
             }
             $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
             $result .= wf_tag('b') . __('Total') . ': ' . $totalCount . wf_tag('b', true);
             if ($totalCount) {
                 $result .= wf_delimiter(0);
-                $result .= __('Enabled') . '/' . __('Recording') . '/' . __('Live') . ': (' . $enabledCount . '/' . $recorderCount . '/' . $liveCount . ')';
+                $result .= __('Enabled') . '/' . __('Recording') . '/' . __('Live') . '/' . __('Substream');
+                $result .= ': (' . $enabledCount . '/' . $recorderCount . '/' . $liveCount . '/' . $subCount . ')';
             }
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'info');
