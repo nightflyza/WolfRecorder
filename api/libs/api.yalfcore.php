@@ -308,7 +308,7 @@ class YALFCore {
                 $this->langSwitchAllowed = true;
 
                 //setting new locale on GET request
-                if (isset($_GET['yalfswitchlocale'])) {
+                if (isset($_GET['yalfswitchlocale']) and is_string($_GET['yalfswitchlocale'])) {
                     $rawLocale = $_GET['yalfswitchlocale'];
                     $customLocale = preg_replace('/\0/s', '', $rawLocale);
                     $customLocale = preg_replace("#[^a-z0-9A-Z]#Uis", '', $customLocale);
@@ -768,18 +768,18 @@ class YALFCore {
     protected function performUserAuth() {
         if ($this->config['YALF_AUTH_ENABLED']) {
             if (!empty($_POST['login_form'])) {
-                $remember=false;
-                $keepLoggedDefault=$this->getConfigOption('YALF_AUTH_KEEP_DEFAULT') ? true : false;
-                $stayLogInFlagCB=$this->getConfigOption('YALF_AUTH_KEEP_CB') ? true : false;
+                $remember = false;
+                $keepLoggedDefault = $this->getConfigOption('YALF_AUTH_KEEP_DEFAULT') ? true : false;
+                $stayLogInFlagCB = $this->getConfigOption('YALF_AUTH_KEEP_CB') ? true : false;
                 if ($keepLoggedDefault) {
-                    $remember=true;
-                } 
-                
+                    $remember = true;
+                }
+
                 if ($stayLogInFlagCB) {
                     if (!empty($_POST['remember'])) {
-                        $remember=true;
+                        $remember = true;
                     } else {
-                        $remember=false;
+                        $remember = false;
                     }
                 }
 
@@ -863,7 +863,7 @@ class YALFCore {
      * @return bool
      */
     protected function logInUser($username, $password, $remember) {
-        $username = basename($username);
+        $username = (is_string($username)) ? basename($username) : 'guest';
         if ($username == 'guest') {
             return false;
         }
