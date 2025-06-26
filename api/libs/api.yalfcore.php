@@ -225,8 +225,8 @@ class YALFCore {
      */
     protected function isModuleValid($moduleName) {
         $result = false;
-        $moduleName = preg_replace('/\0/s', '', $moduleName);
-        if (!empty($moduleName)) {
+        if (!empty($moduleName) and is_string($moduleName)) {
+            $moduleName = preg_replace('/\0/s', '', $moduleName);
             //already preloaded from filesystem
             if (isset($this->loadableModules[$moduleName])) {
                 //check for module dir
@@ -398,7 +398,7 @@ class YALFCore {
 
         //is module public and excluded from forced auth?
         if ($forceLoginForm) {
-            if (isset($_GET[self::ROUTE_MODULE_LOAD])) {
+            if (isset($_GET[self::ROUTE_MODULE_LOAD]) and is_string($_GET[self::ROUTE_MODULE_LOAD])) {
                 $moduleName = $_GET[self::ROUTE_MODULE_LOAD];
                 $moduleName = preg_replace('/\0/s', '', $moduleName);
                 if (isset($this->noAuthModules[$moduleName])) {
@@ -413,7 +413,7 @@ class YALFCore {
 
         if (!$forceLoginForm) {
             //switching module if set some required route
-            if (isset($_GET[self::ROUTE_MODULE_LOAD])) {
+            if (isset($_GET[self::ROUTE_MODULE_LOAD]) and is_string($_GET[self::ROUTE_MODULE_LOAD])) {
                 $moduleName = $_GET[self::ROUTE_MODULE_LOAD];
                 $moduleName = preg_replace('/\0/s', '', $moduleName);
                 if ($this->isModuleValid($moduleName)) {
