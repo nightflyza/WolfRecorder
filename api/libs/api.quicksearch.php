@@ -14,18 +14,19 @@ function wr_QuickSearchRenderForm() {
 
     if ($ubillingConfig->getAlterParam('QUICKSEARCH_ENABLED')) {
         if (LOGGED_IN and ubRouting::checkGet('module')) {
-            $modList = array_flip($modList);
-            $curModule = ubRouting::get('module', 'gigasafe');
-            $skipRenderFlag = (ubRouting::checkGet($denyList, true, true)) ? true : false;
-            if (isset($modList[$curModule]) and !$skipRenderFlag) {
-                $result .= wf_tag('div', false, 'searchform');
-                $result .= wf_TextInput('camsearch', ' ' . '', '', false, 15, '', '', 'camsearch', 'placeholder="' . __('Quick search') . '...' . '"');
+            if (is_string(ubRouting::get('module'))) {
+                $modList = array_flip($modList);
+                $curModule = ubRouting::get('module', 'gigasafe');
+                $skipRenderFlag = (ubRouting::checkGet($denyList, true, true)) ? true : false;
+                if (isset($modList[$curModule]) and !$skipRenderFlag) {
+                    $result .= wf_tag('div', false, 'searchform');
+                    $result .= wf_TextInput('camsearch', ' ' . '', '', false, 15, '', '', 'camsearch', 'placeholder="' . __('Quick search') . '...' . '"');
 
-                $result .= wf_tag('button', false, 'clear-btn', 'type="button" aria-label="Clear search"') . '&times;' . wf_tag('button', true);
-                $result .= wf_tag('div', true);
+                    $result .= wf_tag('button', false, 'clear-btn', 'type="button" aria-label="Clear search"') . '&times;' . wf_tag('button', true);
+                    $result .= wf_tag('div', true);
 
-                $result .= wf_tag('script');
-                $result .= "
+                    $result .= wf_tag('script');
+                    $result .= "
                     document.getElementById('camsearch').addEventListener('input', function () {
                         const searchValue = this.value.toLowerCase();
                         const cameras = document.querySelectorAll('[id^=\"wrcamcont_\"]');
@@ -76,7 +77,8 @@ function wr_QuickSearchRenderForm() {
                         });
                     });
                 ";
-                $result .= wf_tag('script', true);
+                    $result .= wf_tag('script', true);
+                }
             }
         }
     }
