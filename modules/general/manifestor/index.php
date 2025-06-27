@@ -1,10 +1,11 @@
 <?php
 
-$altCfg=$ubillingConfig->getAlter();
+$altCfg = $ubillingConfig->getAlter();
 
 $customAppIcons = array();
 $appName = $system->getPageTitle();
 $shortName = $appName;
+$displayMode = 'standalone';
 
 if (isset($altCfg['WA_NAME'])) {
     if (!empty($altCfg['WA_NAME'])) {
@@ -22,11 +23,18 @@ if (isset($altCfg['WA_ICON_192']) and isset($altCfg['WA_ICON_512'])) {
     }
 }
 
+if (isset($altCfg['WA_DISPLAY'])) {
+    if (!empty($altCfg['WA_DISPLAY'])) {
+        $displayMode = $altCfg['WA_DISPLAY'];
+    }
+}
+
 $manifestor = new Manifestator();
 if ($customAppIcons) {
     $manifestor->setIcons($customAppIcons);
 }
 
+$manifestor->setDisplay($displayMode);
 $manifestor->setName($appName);
 $manifestor->setShortName($appName);
 $manifestor->render();

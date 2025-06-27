@@ -338,4 +338,5 @@ $lang['def']['Page load indicator'] = 'Индикатор загрузки ст�
 $lang['def']['Keep user logged in by default'] = 'Помнить вход пользователя';
 $lang['def']['Show stay logged in checkbox in login form'] = 'Показывать чекбокс входа на форме';
 $lang['def']['Do not redirect after logging in'] = 'Не перенаправлять после входа';
-
+$lang['def']['PWA display mode'] = 'Режим показа PWA';
+$lang['def']['StarDust flock mode'] = 'flock режим StarDust';

@@ -104,6 +104,16 @@ PATTERN="pathorurl"
 VALIDATOR="isPwaIconAcceptable512"
 ONINVALID="Icon URL is invalid or not contain valid PNG image 512x512"
 
+[pwa_display]
+OPTION=WA_DISPLAY
+LABEL="PWA display mode"
+TYPE="SELECT"
+VALUES="standalone,fullscreen"
+DEFAULT="standalone"
+VALIDATOR="is_string"
+SAVEFILTER="safe"
+ONINVALID="Wrong display mode"
+
 [exports_reserve]
 OPTION="EXPORTS_RESERVED_SPACE"
 LABEL="Space % reserved for exported users videos"
