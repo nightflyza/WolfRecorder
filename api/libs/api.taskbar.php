@@ -140,7 +140,7 @@ class Taskbar {
         $result = '';
         $name = __($elementName);
         $icon = 'skins/taskbar/' . $elementIcon;
-        $result = '<div class="dashtask" style="height:' . ($this->iconSize + 38) . 'px; width:' . ($this->iconSize + 38) . 'px;"> <a href="' . $url . '"><img  src="' . $icon . '" border="0" width="' . $this->iconSize . '"  height="' . $this->iconSize . '" alt="' . $name . '" title="' . $name . '"></a> <br><br>' . $name . ' </div>';
+        $result = '<div class="dashtask" style="height:' . ($this->iconSize + 38) . 'px; width:' . ($this->iconSize + 38) . 'px; padding: 5px;"> <a href="' . $url . '"><img  src="' . $icon . '" border="0" width="' . $this->iconSize . '"  height="' . $this->iconSize . '" alt="' . $name . '" title="' . $name . '"></a> <br><br>' . $name . ' </div>';
         return ($result);
     }
 

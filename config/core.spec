@@ -2,7 +2,7 @@
 OPTION=YALF_LANG
 LABEL="Default locale"
 TYPE="SELECT"
-VALUES="english,ukrainian,romanian,russian"
+VALUES="english,ukrainian,portuguese,romanian,russian"
 DEFAULT="english"
 VALIDATOR="isLocaleExists"
 ONINVALID="Locale not exists"
