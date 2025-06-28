@@ -155,8 +155,6 @@ then
 echo "OK: new WolfRecorder serial ${NEW_WRSERIAL}" 
 else
 echo "No new WolfRecorder serial generated: ${NEW_WRSERIAL}"
-echo "Installation failed and aborted. Empty WolfRecorder serial. Retry your attempt."
-echo "FATAL: empty new WolfRecorder serial" 
 exit
 fi
 
