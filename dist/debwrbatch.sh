@@ -24,6 +24,7 @@ apt -y upgrade
 echo "Installing basic software required.."
 apt install -y net-tools 
 apt install -y gnupg2 
+apt install -y dialog
 
 
 GEN_MYS_PASS=`dd if=/dev/urandom count=128 bs=1 2>&1 | md5sum | cut -b-8`
