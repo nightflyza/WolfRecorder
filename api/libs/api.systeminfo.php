@@ -201,7 +201,7 @@ class SystemInfo {
         $cpuCores = $this->hwInfo->getCpuCores();
         $memTotal = $this->hwInfo->getMemTotal();
         $uptime = $this->hwInfo->getUptime();
-        $osLabel = $this->hwInfo->getOs() . ' ' . $this->hwInfo->getOsRelease() . ', ';
+        $osLabel = $this->hwInfo->getOs() . ' ' . $this->hwInfo->getOsRelease() . ', ' . $this->hwInfo->getMachineArch() . ',';
         $phpLabel = __('PHP') . ': ' . $this->hwInfo->getPhpVersion() . ', ';
         $memLabel = wr_convertSize($memTotal) . ' ' . __('RAM') . '.';
         $uptimeLabel = __('Uptime') . ': ' . zb_formatTime($uptime);
