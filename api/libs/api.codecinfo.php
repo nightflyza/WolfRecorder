@@ -89,7 +89,7 @@ class CodecInfo {
                     'size' => @$info['format']['size'],
                     'width' => @$videoStream['width'],
                     'height' => @$videoStream['height'],
-                    'mpix' => $this->dimensionsToMP(@$videoStream['width'], @$videoStream['height']),
+                    'mpix' => @$this->dimensionsToMP($videoStream['width'], $videoStream['height']),
                     'codec' => @$videoStream['codec_name'],
                     'fullcodec' => @$videoStream['codec_long_name'],
                     'fpsReal' => $fpsAvg,
