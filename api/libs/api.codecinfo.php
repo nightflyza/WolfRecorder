@@ -85,18 +85,18 @@ class CodecInfo {
                 $fpsAvg= ($videoStream['avg_frame_rate']) ? $this->parseFps($videoStream['avg_frame_rate']) : 0;
                 
                 $result=array(
-                    'filename' => $info['format']['filename'],
-                    'size' => $info['format']['size'],
-                    'width' => $videoStream['width'],
-                    'height' => $videoStream['height'],
-                    'mpix' => $this->dimensionsToMP($videoStream['width'], $videoStream['height']),
-                    'codec' => $videoStream['codec_name'],
-                    'fullcodec' => $videoStream['codec_long_name'],
+                    'filename' => @$info['format']['filename'],
+                    'size' => @$info['format']['size'],
+                    'width' => @$videoStream['width'],
+                    'height' => @$videoStream['height'],
+                    'mpix' => $this->dimensionsToMP(@$videoStream['width'], @$videoStream['height']),
+                    'codec' => @$videoStream['codec_name'],
+                    'fullcodec' => @$videoStream['codec_long_name'],
                     'fpsReal' => $fpsAvg,
                     'fpsDeclared' => $fpsDeclared,
-                    'duration' => $info['format']['duration'],
-                    'bitrate' => $info['format']['bit_rate'],
-                    'format' => $info['format']['format_name'],
+                    'duration' => @$info['format']['duration'],
+                    'bitrate' => @$info['format']['bit_rate'],
+                    'format' => @$info['format']['format_name'],
                 );    
             }
             }
