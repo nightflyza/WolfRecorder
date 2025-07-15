@@ -340,6 +340,8 @@ $lang['def']['Show stay logged in checkbox in login form'] = 'Відобража
 $lang['def']['Do not redirect after logging in'] = 'Не перенаправляти після входу';
 $lang['def']['PWA display mode'] = 'Режим відображення PWA';
 $lang['def']['StarDust flock mode'] = 'flock режим StarDust';
+$lang['def']['Codec'] = 'Кодек';
+$lang['def']['FPS'] = 'FPS';
 
 
 

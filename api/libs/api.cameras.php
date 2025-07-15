@@ -1151,6 +1151,53 @@ class Cameras {
     }
 
     /**
+     * Returns previous to last chunk path
+     *
+     * @param array $allCameraChunks
+     * @return void
+     */
+    protected function getLatestChunkName($allCameraChunks) {
+        $result='';
+        $chunksCount = sizeof($allCameraChunks);
+        if ($chunksCount > 1) {
+            $lastChunk = array_pop($allCameraChunks); //used only for shift chunk index
+            $secondLastChunk = array_pop($allCameraChunks);
+            //returning second last channel chunk path
+            $result=$secondLastChunk;
+        }
+        return($result);
+    }
+    
+    /**
+     * Renders codec info for latest second chunk
+     * 
+     * @param array $allCameraChunks
+     * 
+     * @return string
+     */
+    protected function renderChunksCodecInfo($allCameraChunks) {
+        $result='';
+        $rows='';
+        $latestChunkName=$this->getLatestChunkName($allCameraChunks);
+        if (!empty($latestChunkName)) {
+            $codecInfo=new CodecInfo();
+            $chunkInfo=$codecInfo->getFileData($latestChunkName);
+            if (is_array($chunkInfo) and !empty($chunkInfo)) {
+                $cells = wf_TableCell(__('Resolution'), '', 'row2');
+                $cells .= wf_TableCell($chunkInfo['width'].'x'.$chunkInfo['height'].' ('.$chunkInfo['mpix'].'MP) / '.$chunkInfo['fpsReal'].' '.__('FPS'));
+                $rows .= wf_TableRow($cells, 'row3');
+
+                $cells = wf_TableCell(__('Codec'), '40%', 'row2');
+                $cells .= wf_TableCell($chunkInfo['codec'].' ('.$chunkInfo['fullcodec'].')');
+                $rows .= wf_TableRow($cells, 'row3');
+
+                $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
+            }
+        }
+        return($result);
+    }
+
+    /**
      * Renders camera archive stats, like depth, bitrate, size...
      * 
      * @param array $cameraId
@@ -1194,6 +1241,10 @@ class Cameras {
             $cells .= wf_TableCell($chanSizeLabel);
             $rows .= wf_TableRow($cells, 'row3');
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
+
+            if ($chunksCount > 3) {
+                $result.=$this->renderChunksCodecInfo($channelChunks);
+            }
         }
         return ($result);
     }

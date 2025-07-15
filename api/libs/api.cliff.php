@@ -27,6 +27,13 @@ class CliFF {
     protected $ffmpgPath = '';
 
     /**
+     * Contains ffprobe binary path. Assumed to be in the same directory as ffmpeg
+     *
+     * @var string
+     */
+    protected $ffprobePath = '';
+
+    /**
      * Default chunk time in seconds
      * 
      * @var int
@@ -62,6 +69,7 @@ class CliFF {
     protected $audioCapture = '';
     protected $liveOptsPrefix = '';
     protected $liveOptsSuffix = '';
+    protected $codecInfoOpts = '';
 
     /**
      * Current instance ffmpeg version as three-digits integer
@@ -92,6 +100,7 @@ class CliFF {
         $this->altCfg = $ubillingConfig->getAlter();
         $this->ffmpgPath = $this->binPaths['FFMPG_PATH'];
         $this->chunkTime = $this->altCfg['RECORDER_CHUNK_TIME'];
+        $this->ffprobePath = str_replace('ffmpeg', 'ffprobe', $this->ffmpgPath);
     }
 
     /**
@@ -128,6 +137,7 @@ class CliFF {
         $this->audioCapture = '-acodec copy' . ' ';
         $this->liveOptsPrefix = '-stimeout 5000000 -loglevel error -rtsp_transport tcp -f rtsp -i';
         $this->liveOptsSuffix = '-strict -2 -vcodec copy -hls_wrap 10';
+        $this->codecInfoOpts = '-v quiet -print_format json -show_format -show_streams';
 
         // burn cpu burn! lol
         //$this->liveOptsSuffix = '-strict -2 -vcodec libx264 -preset ultrafast -hls_wrap 10';
@@ -194,6 +204,24 @@ class CliFF {
      */
     public function getFFmpegPath() {
         return ($this->ffmpgPath);
+    }
+
+    /**
+     * Returns ffprobe binary path
+     *
+     * @return string
+     */
+    public function getFFprobePath() {
+        return ($this->ffprobePath);
+    }
+
+    /**
+     * Returns codec info options
+     *
+     * @return string
+     */
+    public function getCodecInfoOpts() {
+        return ($this->codecInfoOpts);
     }
 
     /**
