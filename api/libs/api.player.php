@@ -61,8 +61,8 @@ class Player {
      * 
      * @return void
      */
-    public function setPlayerLib($lib='w4') {
-        $this->playerLib= 'modules/jsc/playerjs/'.$lib.'_playerjs.js';
+    public function setPlayerLib($lib='w6') {
+        $this->playerLib= 'modules/jsc/playerjs/'.$lib.'.js';
     }
 
     /**

@@ -376,7 +376,7 @@ class LiveCams {
                                 //seems live stream now live
                                 $playerId = 'lqplayer_' . $cameraChannel;
                                 $player = new Player('350px', true);
-                                $player->setPlayerLib('w5');
+                                $player->setPlayerLib('lq');
                                 $result .= $player->renderLivePlayer($streamUrl, $playerId);
                                 $result .= $this->renderSubKeepAliveCallback($cameraId);
                             } else {
