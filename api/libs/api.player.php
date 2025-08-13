@@ -17,6 +17,13 @@ class Player {
     protected $autoPlayFlag = false;
 
     /**
+     * Contains current locale in 2 letters format
+     *
+     * @var string
+     */
+    protected $lang = 'en';
+
+    /**
      * Player JS lib implementation URL
      *
      * @var string
@@ -25,6 +32,7 @@ class Player {
 
     public function __construct($width = '', $autoPlay = false) {
         $this->setPlayerLib();
+        $this->setLang();
         if ($width) {
             $this->setWidth($width);
         }
@@ -52,8 +60,36 @@ class Player {
     protected function setAutoplay($state) {
         $this->autoPlayFlag = $state;
     }
-    
-    
+
+    /**
+     * Sets current locale code in two letter format
+     *
+     * @return void
+     */
+    protected function setLang() {
+        global $system;
+        $currentLocale = $system->getCurLangName();
+        $langCode = 'en';
+        switch ($currentLocale) {
+            case 'ukrainian':
+                $langCode = 'uk';
+                break;
+            case 'english':
+                $langCode = 'en';
+                break;
+            case 'portuguese':
+                $langCode = 'pt';
+                break;
+            case 'spanish':
+                $langCode = 'es';
+                break;
+            case 'russian':
+                $langCode = 'ru';
+                break;
+        }
+        $this->lang = $langCode;
+    }
+
     /**
      * Sets player lib property
      * 
@@ -61,8 +97,8 @@ class Player {
      * 
      * @return void
      */
-    public function setPlayerLib($lib='w6') {
-        $this->playerLib= 'modules/jsc/playerjs/'.$lib.'.js';
+    public function setPlayerLib($lib = 'w6') {
+        $this->playerLib = 'modules/jsc/playerjs/' . $lib . '.js';
     }
 
     /**
@@ -79,22 +115,23 @@ class Player {
         $autoPlay = ($this->autoPlayFlag) ? 'true' : 'false';
         $playerId = ($playerId) ? $playerId : 'plplayer' . wf_InputId();
         $poster = ($poster) ? ' poster:"' . $poster . '",' : '';
+        $lang = 'lang: "' . $this->lang . '", ';
         $result = '';
         $result .= wf_tag('script', false, '', 'src="' . $this->playerLib . '"') . wf_tag('script', true);
         $result .= wf_tag('div', false, '', 'style="float:left; width:' . $this->width . '; margin:5px;"');
         $result .= wf_tag('div', false, 'archplayercontainer', 'id = "' . $playerId . '"') . wf_tag('div', true);
         $result .= wf_tag('script');
-        $result .= 'var player = new Playerjs({id:"' . $playerId . '", ' . $poster . ' file:"' . $playlistPath . '", autoplay:' . $autoPlay . ' ' . $plStart . '});';
+        $result .= 'var player = new Playerjs({id:"' . $playerId . '", ' . $lang . ' ' . $poster . ' file:"' . $playlistPath . '", autoplay:' . $autoPlay . ' ' . $plStart . '});';
         $result .= wf_tag('script', true);
         $result .= wf_tag('div', true);
         $result .= wf_CleanDiv();
-        return($result);
+        return ($result);
     }
 
     /**
      * Renders web player for some single file
      * 
-     * @param string $playlistPath - full playlist path
+     * @param string $filePath - full file path
      * @param string $playerId - must be equal to channel name to access playlist in DOM
      * @param string $poster - optional channel screenshot
      * @return string
@@ -103,22 +140,23 @@ class Player {
         $autoPlay = ($this->autoPlayFlag) ? 'true' : 'false';
         $playerId = ($playerId) ? $playerId : 'singleplayer' . wf_InputId();
         $poster = ($poster) ? ' poster:"' . $poster . '",' : '';
+        $lang = 'lang: "' . $this->lang . '", ';
         $result = '';
         $result .= wf_tag('script', false, '', 'src="' . $this->playerLib . '"') . wf_tag('script', true);
         $result .= wf_tag('div', false, '', 'style="float:left; width:' . $this->width . '; margin:5px;"');
         $result .= wf_tag('div', false, '', 'id = "' . $playerId . '" style="width:90%;"') . wf_tag('div', true);
         $result .= wf_tag('script');
-        $result .= 'var player = new Playerjs({id:"' . $playerId . '", ' . $poster . ' file:"' . $filePath . '", autoplay:' . $autoPlay . '});';
+        $result .= 'var player = new Playerjs({id:"' . $playerId . '", ' . $lang . ' ' . $poster . ' file:"' . $filePath . '", autoplay:' . $autoPlay . '});';
         $result .= wf_tag('script', true);
         $result .= wf_tag('div', true);
         $result .= wf_CleanDiv();
-        return($result);
+        return ($result);
     }
-    
-      /**
+
+    /**
      * Renders web player for some single file
      * 
-     * @param string $playlistPath - full playlist path
+     * @param string $filePath - full file path
      * @param string $playerId - must be equal to channel name to access playlist in DOM
      * @param string $poster - optional channel screenshot
      * @return string
@@ -127,16 +165,16 @@ class Player {
         $autoPlay = ($this->autoPlayFlag) ? 'true' : 'false';
         $playerId = ($playerId) ? $playerId : 'singleplayer' . wf_InputId();
         $poster = ($poster) ? ' poster:"' . $poster . '",' : '';
+        $lang = 'lang: "' . $this->lang . '", ';
         $result = '';
         $result .= wf_tag('script', false, '', 'src="' . $this->playerLib . '"') . wf_tag('script', true);
         $result .= wf_tag('div', false, '', 'style="float:left; width:' . $this->width . '; margin:5px;"');
         $result .= wf_tag('div', false, '', 'id = "' . $playerId . '" style="width:90%;"') . wf_tag('div', true);
         $result .= wf_tag('script');
-        $result .= 'var player = new Playerjs({id:"' . $playerId . '", ' . $poster . ' file:"' . $filePath . '", autoplay:' . $autoPlay . '});';
+        $result .= 'var player = new Playerjs({id:"' . $playerId . '", ' . $lang . ' ' . $poster . ' file:"' . $filePath . '", autoplay:' . $autoPlay . '});';
         $result .= wf_tag('script', true);
         $result .= wf_tag('div', true);
         $result .= wf_CleanDiv();
-        return($result);
+        return ($result);
     }
-
 }
