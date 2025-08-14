@@ -66,7 +66,7 @@ class Rotator {
      */
     const ROTATOR_PID = 'ROTATOR';
     const DEBUG_LOG = 'exports/rotator_debug.log';
-    const RETENTION_TOLERANCE = 0.1; // 0.1 days tolerance for retention cleanup
+    const RETENTION_TOLERANCE = 0.1; 
 
     public function __construct() {
         $this->loadConfigs();
