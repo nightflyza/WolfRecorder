@@ -13,8 +13,9 @@ if (cfr('CAMERAS')) {
         $newStorageId = ubRouting::post($cameras::PROUTE_NEWSTORAGE);
         $newComment = ubRouting::post($cameras::PROUTE_NEWCOMMENT);
         $newCustPort = ubRouting::post($cameras::PROUTE_NEWCUSTPORT);
+        $newMaxRetDays = ubRouting::post($cameras::PROUTE_NEWMAXRETDAYS);
 
-        $creationResult = $cameras->create($newModelId, $newIp, $newLogin, $newPass, $newAct, $newStorageId, $newComment, $newCustPort);
+        $creationResult = $cameras->create($newModelId, $newIp, $newLogin, $newPass, $newAct, $newStorageId, $newComment, $newCustPort, $newMaxRetDays);
         if ($creationResult) {
             show_error($creationResult);
         } else {
@@ -62,9 +63,10 @@ if (cfr('CAMERAS')) {
         $edLogin = ubRouting::post($cameras::PROUTE_ED_LOGIN);
         $edPass = ubRouting::post($cameras::PROUTE_ED_PASS);
         $edPort = ubRouting::post($cameras::PROUTE_ED_CUSTPORT);
+        $edMaxRetDays = ubRouting::post($cameras::PROUTE_ED_MAXRETDAYS);
         $edStorageId = ubRouting::post($cameras::PROUTE_ED_STORAGE);
         $edComment = ubRouting::post($cameras::PROUTE_ED_COMMENT);
-        $editingResult = $cameras->save($edCameraId, $edModelId, $edIp, $edLogin, $edPass, $edStorageId, $edComment, $edPort);
+        $editingResult = $cameras->save($edCameraId, $edModelId, $edIp, $edLogin, $edPass, $edStorageId, $edComment, $edPort, $edMaxRetDays);
 
         if ($editingResult) {
             show_error($editingResult);

@@ -342,3 +342,5 @@ $lang['def']['PWA display mode'] = 'Режим показа PWA';
 $lang['def']['StarDust flock mode'] = 'flock режим StarDust';
 $lang['def']['Codec'] = 'Кодек';
 $lang['def']['FPS'] = 'FPS';
+$lang['def']['Maximum retention']='Максимальный срок хранения';
+$lang['def']['Retention']='Хранение';

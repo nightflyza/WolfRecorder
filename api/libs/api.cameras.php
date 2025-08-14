@@ -84,12 +84,14 @@ class Cameras {
     const PROUTE_NEWSTORAGE = 'newcamerastorageid';
     const PROUTE_NEWCOMMENT = 'newcameracomment';
     const PROUTE_NEWCUSTPORT = 'newcameracustomport';
+    const PROUTE_NEWMAXRETDAYS = 'newcameramaxretentiondays';
     const PROUTE_ED_CAMERAID = 'editcameraid';
     const PROUTE_ED_MODEL = 'editcameramodelid';
     const PROUTE_ED_IP = 'editcameraip';
     const PROUTE_ED_LOGIN = 'editcameralogin';
     const PROUTE_ED_PASS = 'editcamerapassword';
     const PROUTE_ED_CUSTPORT = 'editcamerartspport';
+    const PROUTE_ED_MAXRETDAYS = 'editcameramaxretentiondays';
     const PROUTE_ED_STORAGE = 'editcamerastorageid';
     const PROUTE_ED_COMMENT = 'editcameracomment';
     const PROUTE_ED_CAMERAID_ACT = 'renamecameraid';
@@ -233,10 +235,11 @@ class Cameras {
      * @param int $storageId
      * @param string $comment
      * @param int $customPort
+     * @param int $maxRetDays
      * 
      * @return void/string on error
      */
-    public function save($cameraId, $modelId, $ip, $login, $password, $storageId, $comment = '', $customPort = 0) {
+    public function save($cameraId, $modelId, $ip, $login, $password, $storageId, $comment = '', $customPort = 0, $maxRetDays = 0) {
         $result = '';
         $cameraId = ubRouting::filters($cameraId, 'int');
         $modelId = ubRouting::filters($modelId, 'int');
@@ -295,6 +298,9 @@ class Cameras {
 
                                         //updating custom port
                                         $this->saveCamoptsRtspPort($cameraId, $customPort);
+
+                                        //updating maximum retention days limit
+                                        $this->saveCamoptsMaxRetDays($cameraId, $maxRetDays);
 
                                         log_register('CAMERA EDIT [' . $cameraId . ']  MODEL [' . $modelId . '] IP `' . $ip . '` STORAGE [' . $storageId . '] COMMENT `' . $comment . '`');
                                     } else {
@@ -372,6 +378,25 @@ class Cameras {
 
         if (isset($this->allCameras[$cameraId])) {
             $this->setCamOptsValue($cameraId, 'rtspport', $port);
+        }
+    }
+
+    /**
+     * Sets camera maximum retention days limit option
+     *
+     * @param int $cameraId
+     * @param int $days
+     * @return void
+     */
+    public function saveCamoptsMaxRetDays($cameraId, $days) {
+        $cameraId = ubRouting::filters($cameraId, 'int');
+        $days = ubRouting::filters($days, 'int');
+        if (!is_numeric($days)) {
+            $days = 0;
+        }
+
+        if (isset($this->allCameras[$cameraId])) {
+            $this->setCamOptsValue($cameraId, 'maxretdays', $days);
         }
     }
 
@@ -481,10 +506,11 @@ class Cameras {
      * @param int $storageId
      * @param string $comment
      * @param int $customPort
+     * @param int $maxRetDays
      * 
      * @return void|string on error
      */
-    public function create($modelId, $ip, $login, $password, $active, $storageId, $comment = '', $customPort = 0) {
+    public function create($modelId, $ip, $login, $password, $active, $storageId, $comment = '', $customPort = 0, $maxRetDays = 0) {
         $result = '';
         $modelId = ubRouting::filters($modelId, 'int');
         $ipF = ubRouting::filters($ip, 'mres');
@@ -493,6 +519,7 @@ class Cameras {
         $actF = ($active) ? 1 : 0;
         $storageId = ubRouting::filters($storageId, 'int');
         $customPort = ubRouting::filters($customPort, 'int');
+        $maxRetDays = ubRouting::filters($maxRetDays, 'int');
 
         //automatic storage selection?
         if ($storageId == 0) {
@@ -539,6 +566,11 @@ class Cameras {
                                 //set custom rtsp port if required
                                 if (!empty($customPort)) {
                                     $this->saveCamoptsRtspPort($newId, $customPort);
+                                }
+
+                                //sets maxumium retention days if not empty
+                                if (!empty($maxRetDays)) {
+                                    $this->saveCamoptsMaxRetDays($newId, $maxRetDays);
                                 }
                             } else {
                                 $result .= __('Login or password is empty');
@@ -791,6 +823,7 @@ class Cameras {
                 $result[$each['id']]['TEMPLATE'] = $allModelsTemplates[$each['modelid']];
                 $result[$each['id']]['STORAGE'] = $allStoragesData[$each['storageid']];
                 $result[$each['id']]['OPTS'] = $this->getCamOpts($each['id']);
+                $result[$each['id']]['CAMERA']['maxretention'] = 0;
 
                 //setting real rtsp port value depend on template and extopts
                 if (isset($result[$each['id']]['TEMPLATE']['RTSP_PORT'])) {
@@ -801,6 +834,13 @@ class Cameras {
                 if (isset($result[$each['id']]['OPTS']['rtspport'])) {
                     if (!empty($result[$each['id']]['OPTS']['rtspport'])) {
                         $result[$each['id']]['CAMERA']['realport'] = $result[$each['id']]['OPTS']['rtspport'];
+                    }
+                }
+
+                //retention days limit setup
+                if (isset($result[$each['id']]['OPTS']['maxretdays'])) {
+                    if (!empty($result[$each['id']]['OPTS']['maxretdays'])) {
+                        $result[$each['id']]['CAMERA']['maxretention'] = $result[$each['id']]['OPTS']['maxretdays'];
                     }
                 }
             }
@@ -998,6 +1038,7 @@ class Cameras {
                 $inputs .= wf_PasswordInput(self::PROUTE_NEWPASS, __('Password'), '', true, 14) . ' ';
                 $inputs .= wf_CheckInput(self::PROUTE_NEWACT, __('Enabled'), true, true) . ' ';
                 $inputs .= wf_TextInput(self::PROUTE_NEWCUSTPORT, __('Custom RTSP port'), '', true, 4, 'digits');
+                $inputs .= wf_TextInput(self::PROUTE_NEWMAXRETDAYS, __('Maximum retention') . ' (' . __('days') . ')', '', true, 4, 'digits');
                 $inputs .= wf_Selector(self::PROUTE_NEWSTORAGE, $storagesParams, __('Storage'), '', true) . ' ';
                 $inputs .= wf_TextInput(self::PROUTE_NEWCOMMENT, __('Description'), '', true, 18, '') . ' ';
                 $inputs .= wf_Submit(__('Create'));
@@ -1035,12 +1076,14 @@ class Cameras {
                 }
                 if (!empty($allModels)) {
                     $custRtspPort = (!empty($camOpts['rtspport'])) ? $camOpts['rtspport'] : '';
+                    $maxRetDays = (!empty($camOpts['maxretdays'])) ? $camOpts['maxretdays'] : '';
                     $inputs = wf_HiddenInput(self::PROUTE_ED_CAMERAID, $cameraId);
                     $inputs .= wf_Selector(self::PROUTE_ED_MODEL, $allModels, __('Model'), $cameraData['modelid'], true) . ' ';
                     $inputs .= wf_TextInput(self::PROUTE_ED_IP, __('IP'), $cameraData['ip'], true, 12, 'ip') . ' ';
                     $inputs .= wf_TextInput(self::PROUTE_ED_LOGIN, __('Login'), $cameraData['login'], true, 14, 'alphanumeric') . ' ';
                     $inputs .= wf_PasswordInput(self::PROUTE_ED_PASS, __('Password'), $cameraData['password'], true, 14) . ' ';
                     $inputs .= wf_TextInput(self::PROUTE_ED_CUSTPORT, __('Custom RTSP port'), $custRtspPort, true, 4, 'digits');
+                    $inputs .= wf_TextInput(self::PROUTE_ED_MAXRETDAYS, __('Maximum retention') . ' (' . __('days') . ')', $maxRetDays, true, 4, 'digits');
                     $inputs .= wf_Selector(self::PROUTE_ED_STORAGE, $storagesParams, __('Storage'), $cameraData['storageid'], true) . ' ';
                     $inputs .= wf_TextInput(self::PROUTE_ED_COMMENT, __('Description'), $cameraData['comment'], true, 18, '') . ' ';
                     $inputs .= wf_Submit(__('Save'));
@@ -1157,17 +1200,17 @@ class Cameras {
      * @return void
      */
     protected function getLatestChunkName($allCameraChunks) {
-        $result='';
+        $result = '';
         $chunksCount = sizeof($allCameraChunks);
         if ($chunksCount > 1) {
             $lastChunk = array_pop($allCameraChunks); //used only for shift chunk index
             $secondLastChunk = array_pop($allCameraChunks);
             //returning second last channel chunk path
-            $result=$secondLastChunk;
+            $result = $secondLastChunk;
         }
-        return($result);
+        return ($result);
     }
-    
+
     /**
      * Renders codec info for latest second chunk
      * 
@@ -1176,25 +1219,25 @@ class Cameras {
      * @return string
      */
     protected function renderChunksCodecInfo($allCameraChunks) {
-        $result='';
-        $rows='';
-        $latestChunkName=$this->getLatestChunkName($allCameraChunks);
+        $result = '';
+        $rows = '';
+        $latestChunkName = $this->getLatestChunkName($allCameraChunks);
         if (!empty($latestChunkName)) {
-            $codecInfo=new CodecInfo();
-            $chunkInfo=$codecInfo->getFileData($latestChunkName);
+            $codecInfo = new CodecInfo();
+            $chunkInfo = $codecInfo->getFileData($latestChunkName);
             if (is_array($chunkInfo) and !empty($chunkInfo)) {
                 $cells = wf_TableCell(__('Resolution'), '', 'row2');
-                $cells .= wf_TableCell($chunkInfo['width'].'x'.$chunkInfo['height'].' ('.$chunkInfo['mpix'].'MP) / '.$chunkInfo['fpsReal'].' '.__('FPS'));
+                $cells .= wf_TableCell($chunkInfo['width'] . 'x' . $chunkInfo['height'] . ' (' . $chunkInfo['mpix'] . 'MP) / ' . $chunkInfo['fpsReal'] . ' ' . __('FPS'));
                 $rows .= wf_TableRow($cells, 'row3');
 
                 $cells = wf_TableCell(__('Codec'), '40%', 'row2');
-                $cells .= wf_TableCell($chunkInfo['codec'].' ('.$chunkInfo['fullcodec'].')');
+                $cells .= wf_TableCell($chunkInfo['codec'] . ' (' . $chunkInfo['fullcodec'] . ')');
                 $rows .= wf_TableRow($cells, 'row3');
 
                 $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
             }
         }
-        return($result);
+        return ($result);
     }
 
     /**
@@ -1243,7 +1286,7 @@ class Cameras {
             $result .= wf_TableBody($rows, '100%', 0, 'resp-table');
 
             if ($chunksCount > 3) {
-                $result.=$this->renderChunksCodecInfo($channelChunks);
+                $result .= $this->renderChunksCodecInfo($channelChunks);
             }
         }
         return ($result);
@@ -1279,6 +1322,14 @@ class Cameras {
                 if ($camOpt['rtspport']) {
                     $rtspPort = $camOpt['rtspport'];
                     $portLabel = ' ⚙️';
+                }
+            }
+
+            //custom max retention days limit
+            $maxRetDaysLabel = '∞';
+            if (!empty($camOpt)) {
+                if ($camOpt['maxretdays']) {
+                    $maxRetDaysLabel = $camOpt['maxretdays'] . ' ' . __('days');
                 }
             }
 
@@ -1332,6 +1383,10 @@ class Cameras {
 
             $cells = wf_TableCell(__('RTSP') . ' ' . __('Port'), '', 'row2');
             $cells .= wf_TableCell($rtspPort . $portLabel);
+            $rows .= wf_TableRow($cells, 'row3');
+
+            $cells = wf_TableCell(__('Retention'), '', 'row2');
+            $cells .= wf_TableCell($maxRetDaysLabel);
             $rows .= wf_TableRow($cells, 'row3');
 
             $cells = wf_TableCell(__('Enabled'), '', 'row2');

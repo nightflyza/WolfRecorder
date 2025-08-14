@@ -97,3 +97,6 @@ CREATE TABLE IF NOT EXISTS `camopts` (
   PRIMARY KEY  (`id`),
   KEY `cameraid` (`cameraid`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+-- 0.1.7 update
+ALTER TABLE `camopts` ADD `maxretdays` INT(11) NULL DEFAULT 0 AFTER `order`;

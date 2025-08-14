@@ -222,6 +222,83 @@ class Rotator {
     }
 
     /**
+     * Cleanups channel chunks until total days depth will be less than expected
+     * 
+     * @param array $chunksList
+     * @param int $expectedDepth aproximate days depth
+     * 
+     * @return array
+     */
+    protected function flushChunksByDepth($chunksList, $expectedDepth) {
+        $bytesFree = 0;
+        $chunksDeleted = 0;
+        $chunksCount = sizeof($chunksList);
+        $chunkTime = $this->altCfg['RECORDER_CHUNK_TIME'];
+        $archiveSeconds = $chunkTime * $chunksCount;
+        $archiveDays = $archiveSeconds / 86400;
+        if ((!empty($chunksList)) and ($expectedDepth > 0)) {
+            //delete oldest chunks until depth will be less than expected
+            if ($archiveDays > $expectedDepth) {
+                $chunksCountToDelete = ceil(($archiveDays - $expectedDepth) * 86400 / $chunkTime);
+                if ($chunksCount>$chunksCountToDelete) {
+                    for ($i=0;$i<$chunksCountToDelete;$i++) {
+                        $oldestChunk = reset($chunksList);
+                        unlink($oldestChunk);
+                        $chunksDeleted++;
+                        $bytesFree += $oldestChunk['size'];
+                    }
+                }
+            }
+        }
+
+        $result = array('count' => $chunksDeleted, 'free' => $bytesFree);
+        return ($result);
+    }
+
+    /**
+     * Performs rotation of expired chunks for cameras for which max retention is set.
+     *
+     * @return void
+     */
+    public function rotateMaxRetentionCams() {
+        if (!empty($this->allCamerasData) and !empty($this->allStoragesData)) {
+            foreach ($this->allCamerasData as $eachCameraId=>$eachCameraData) {
+                if ($eachCameraData['CAMERA']['maxretention']>0) {
+                    $expectedDepth=$eachCameraData['CAMERA']['maxretention'];
+                    $eachCameraChannel=$eachCameraData['CAMERA']['channel'];
+                    $eachCameraStorage=$eachCameraData['STORAGE'];
+                    $eachCameraStorageId=$eachCameraStorage['id'];
+                    $cameraChunksAlloc=$this->storages->getChunksAllocSpaces($eachCameraStorageId, $eachCameraChannel);
+                    if ($this->channelNotLocked($eachCameraChannel)) {
+                        $chunksCount=sizeof($cameraChunksAlloc);
+                        $archiveSeconds=$this->altCfg['RECORDER_CHUNK_TIME']*$chunksCount;
+                        $archiveDays=$archiveSeconds/86400;
+                        //is cleanup required?
+                        if ($archiveDays>$expectedDepth) {
+                            if ($this->debugFlag) {
+                                file_put_contents(self::DEBUG_LOG, curdatetime() . ' ' . $archiveDays . ' DAYS > OF ' . $expectedDepth . ' RETENTION DAYS ' . $eachCameraChannel . PHP_EOL, FILE_APPEND);
+                            }
+                            $cleanResult=$this->flushChunksByDepth($cameraChunksAlloc, $expectedDepth);
+                            if ($this->debugFlag) {
+                                file_put_contents(self::DEBUG_LOG, curdatetime() . ' ' . wr_convertSize($cleanResult['free']) . ' CLEANED IN ' . $eachCameraChannel . ' DELETED ' . $cleanResult['count'] . ' CHUNKS' . PHP_EOL, FILE_APPEND);
+                            }
+                        } else {
+                            if ($this->debugFlag) {
+                                file_put_contents(self::DEBUG_LOG, curdatetime() . ' ' . $archiveDays . ' DAYS < OF ' . $expectedDepth . ' RETENTION DAYS ' . $eachCameraChannel . PHP_EOL, FILE_APPEND);
+                            }
+                        }
+                    } else {
+                        //and there some rotation skips on export logging
+                        if ($this->debugFlag) {
+                            file_put_contents(self::DEBUG_LOG, curdatetime() . ' SKIPPED CHANNEL LOCKED BY EXPORT ' . $eachCameraChannel . PHP_EOL, FILE_APPEND);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Performs old chunks rotation for all cameras
      * 
      * @return void
@@ -230,6 +307,10 @@ class Rotator {
         $rotatorProcess = new StarDust(self::ROTATOR_PID);
         if ($rotatorProcess->notRunning()) {
             $rotatorProcess->start();
+            //first of all, we must clean up cameras with max retention set
+            $this->rotateMaxRetentionCams();
+            
+            //then we must clean up storages
             if (!empty($this->allStoragesData)) {
                 foreach ($this->allStoragesData as $io => $eachStorage) {
                     $storageTotalSpace = disk_total_space($eachStorage['path']);
@@ -240,7 +321,7 @@ class Rotator {
                     $mustBeFree = $storageTotalSpace - $maxUsageSpace;
                     $allChannelsSpace = 0;
 
-                    //storage cleanup required?
+                    //storage space cleanup required?
                     if ($storageFreeSpace < $mustBeFree) {
                         $eachStorageChannels = $this->getStorageChannels($eachStorage['id']);
                         //this storage must be cleaned

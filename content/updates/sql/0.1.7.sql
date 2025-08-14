@@ -1,0 +1,1 @@
+ALTER TABLE `camopts` ADD `maxretdays` INT(11) NULL DEFAULT 0 AFTER `order`;
