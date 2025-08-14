@@ -476,7 +476,7 @@ class Storages {
      * @param int $storageId
      * @param string $channel
      * 
-     * @return string
+     * @return int
      */
     public function getChannelSize($storageId, $channel) {
         $result = 0;
@@ -486,7 +486,10 @@ class Storages {
             $channelChunks = $this->getChannelChunks($storageId, $channel);
             if (!empty($channelChunks)) {
                 foreach ($channelChunks as $io => $eachChunk) {
-                    $result += filesize($eachChunk);
+                    $tmpSize = @filesize($eachChunk);
+                    if ($tmpSize !== false) {
+                        $result += $tmpSize;
+                    }
                 }
             }
         }
