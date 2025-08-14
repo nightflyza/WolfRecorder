@@ -498,13 +498,16 @@ class Storages {
      * 
      * @param array $chunksList
      * 
-     * @return string
+     * @return int
      */
     public function getChannelChunksSize($chunksList) {
         $result = 0;
         if (!empty($chunksList)) {
             foreach ($chunksList as $io => $eachChunk) {
-                $result += filesize($eachChunk);
+                $tmpSize = @filesize($eachChunk);
+                if ($tmpSize !== false) {
+                    $result += $tmpSize;
+                }
             }
         }
         return ($result);
