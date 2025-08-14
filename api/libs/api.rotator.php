@@ -243,7 +243,7 @@ class Rotator {
                 if ($chunksCount>$chunksCountToDelete) {
                     for ($i=0;$i<$chunksCountToDelete;$i++) {
                         $oldestChunk = reset($chunksList);
-                        unlink($oldestChunk);
+                        unlink($oldestChunk['path']);
                         $chunksDeleted++;
                         $bytesFree += $oldestChunk['size'];
                     }
