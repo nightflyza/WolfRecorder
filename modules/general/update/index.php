@@ -13,15 +13,26 @@ if (cfr('ROOT')) {
         $latestNightlyBuild = wr_GetReleaseInfo('CURRENT');
         $latestReleaseLabel = wr_RenderUpdateInfo($latestRelease, 'STABLE');
         $latestNightlyBuildLabel = wr_RenderUpdateInfo($latestNightlyBuild, 'CURRENT');
-        $styleStable = ($localSystemVersion == $latestRelease) ? 'success' : 'warning';
-        $styleNightly = ($localSystemVersion == $latestNightlyBuild) ? 'success' : 'warning';
-        $stableUpbradable = ($localSystemVersion == $latestRelease) ? false : true;
-        $nightlyUpgradable = ($localSystemVersion == $latestNightlyBuild) ? false : true;
+        
+        $stableUpgradable = false;
+        $nightlyUpgradable = false;
+        
+        if ($latestRelease !== false and $localSystemVersion != $latestRelease) {
+            $stableUpgradable = true;
+        }
+        
+        if ($latestNightlyBuild !== false and $localSystemVersion != $latestNightlyBuild) {
+            $nightlyUpgradable = true;
+        }
+        
+        $styleStable = ($localSystemVersion == $latestRelease and $latestRelease !== false) ? 'success' : 'warning';
+        $styleNightly = ($localSystemVersion == $latestNightlyBuild and $latestNightlyBuild !== false) ? 'success' : 'warning';
+        
         $remoteReleasesInfo = $messages->getStyledMessage($latestReleaseLabel, $styleStable);
         $remoteReleasesInfo .= $messages->getStyledMessage($latestNightlyBuildLabel, $styleNightly);
         //upgrade controls here
         $upgradeControls = '';
-        if ($stableUpbradable) {
+        if ($stableUpgradable) {
             $upgradeControls .= wf_Link($updateManager::URL_ME . '&' . $updateManager::ROUTE_AUTOSYSUPGRADE . '=STABLE', wf_img('skins/icon_ok.gif') . ' ' . __('Upgrade to stable release'), false, 'ubButton') . ' ';
         }
         if ($nightlyUpgradable) {

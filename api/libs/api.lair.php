@@ -69,8 +69,11 @@ function wr_GetReleaseInfo($branch) {
     $remoteCallback = new OmaeUrl($release_url);
     $remoteCallback->setUserAgent($agent);
     $releaseInfo = $remoteCallback->response();
+    $httpCode = $remoteCallback->httpCode();
     if ($releaseInfo) {
-        $result = $releaseInfo;
+        if ($httpCode == 200) {
+            $result = $releaseInfo;
+        }
     }
     return ($result);
 }
