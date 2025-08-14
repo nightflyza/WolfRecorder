@@ -263,7 +263,7 @@ class Rotator {
     public function rotateMaxRetentionCams() {
         if (!empty($this->allCamerasData) and !empty($this->allStoragesData)) {
             foreach ($this->allCamerasData as $eachCameraId=>$eachCameraData) {
-                if ($eachCameraData['CAMERA']['maxretention']>0) {
+                if (isset($eachCameraData['CAMERA']['maxretention']) and $eachCameraData['CAMERA']['maxretention']>0) {
                     $expectedDepth=$eachCameraData['CAMERA']['maxretention'];
                     $eachCameraChannel=$eachCameraData['CAMERA']['channel'];
                     $eachCameraStorage=$eachCameraData['STORAGE'];
@@ -309,7 +309,7 @@ class Rotator {
             $rotatorProcess->start();
             //first of all, we must clean up cameras with max retention set
             $this->rotateMaxRetentionCams();
-            
+
             //then we must clean up storages
             if (!empty($this->allStoragesData)) {
                 foreach ($this->allStoragesData as $io => $eachStorage) {
