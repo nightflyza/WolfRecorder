@@ -995,7 +995,7 @@ class Export {
      */
     protected function renderRecordPlayer($filePath, $width = '600px', $autoPlay = false, $playerId = '') {
         $player = new Player($width, $autoPlay);
-        $result = $player->renderSinglePlayer($filePath, $playerId);
+        $result = $player->renderLivePlayer($filePath, $playerId);
         return ($result);
     }
 
