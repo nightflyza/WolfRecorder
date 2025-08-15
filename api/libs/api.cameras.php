@@ -1012,6 +1012,8 @@ class Cameras {
             $this->camoptsDb->data('cameraid', $cameraId);
             $this->camoptsDb->create();
             log_register('CAMOPTS CREATE [' . $cameraId . ']');
+            //load all camopts again
+            $this->loadAllCamOpts();
         }
     }
 
