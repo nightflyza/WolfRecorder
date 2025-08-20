@@ -336,14 +336,14 @@ apt install -y gnupg2 >> ${INSTALLER_LOG}  2>&1
 
 
 $DIALOG --menu "Choose your Linux distribution" 16 50 8 \
-                   DEB12 "Debian 12 Bookworm"\
+                   DEB13 "Debian 13 Trixie"\
         2> /tmp/wrarch
 clear
 
 ARCH=`cat /tmp/wrarch`
 
 case $ARCH in 
-DEB12)
+DEB13)
 #some remote paths here
 FETCH="/usr/bin/wget"
 APACHE_VERSION="apache24"
@@ -433,9 +433,6 @@ $DIALOG --infobox "Software installation is in progress. This takes a while." 4 
 #MariaDB setup
 apt install -y software-properties-common dirmngr >> ${INSTALLER_LOG} 2>&1
 $DIALOG --infobox "Installing MariaDB" 4 60
-$DIALOG --infobox "Installing MariaDB." 4 60
-$DIALOG --infobox "Installing MariaDB.." 4 60
-$DIALOG --infobox "Installing MariaDB..." 4 60
 apt install -y mariadb-server >> ${INSTALLER_LOG} 2>&1
 $DIALOG --infobox "Installing MariaDB...." 4 60
 apt install -y mariadb-client >> ${INSTALLER_LOG} 2>&1
@@ -459,7 +456,7 @@ apt install -y sudo >> ${INSTALLER_LOG} 2>&1
 apt install -y curl >> ${INSTALLER_LOG} 2>&1
 $DIALOG --infobox "Installing Apache server" 4 60
 apt install -y apache2 >> ${INSTALLER_LOG} 2>&1
-apt install -y libapache2-mod-php8.2 >> ${INSTALLER_LOG} 2>&1
+apt install -y libapache2-mod-php8.4 >> ${INSTALLER_LOG} 2>&1
 $DIALOG --infobox "Installing misc software" 4 60
 apt install -y build-essential >> ${INSTALLER_LOG} 2>&1
 apt install -y libxmlrpc-c++8-dev >> ${INSTALLER_LOG} 2>&1
@@ -468,33 +465,33 @@ $DIALOG --infobox "Installing memory caching servers" 4 60
 apt install -y memcached >> ${INSTALLER_LOG} 2>&1
 apt install -y redis >> ${INSTALLER_LOG} 2>&1
 $DIALOG --infobox "Installing PHP and required extensions" 4 60
-apt install -y php8.2-cli >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-mysql >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-mysqli >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-mbstring >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-bcmath >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-curl >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-gd >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-snmp >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-soap >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-zip >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-imap >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-json >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-tokenizer >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-xml >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-xmlreader >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-xmlwriter >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-simplexml >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-sqlite3 >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-sockets >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-opcache >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-json >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-pdo >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-pdo-sqlite >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-phar >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-posix >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-memcached >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.2-redis >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-cli >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-mysql >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-mysqli >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-mbstring >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-bcmath >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-curl >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-gd >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-snmp >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-soap >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-zip >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-imap >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-json >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-tokenizer >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-xml >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-xmlreader >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-xmlwriter >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-simplexml >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-sqlite3 >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-sockets >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-opcache >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-json >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-pdo >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-pdo-sqlite >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-phar >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-posix >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-memcached >> ${INSTALLER_LOG} 2>&1
+apt install -y php8.4-redis >> ${INSTALLER_LOG} 2>&1
 $DIALOG --infobox "Installing ffmpeg" 4 60
 apt install -y ffmpeg >> ${INSTALLER_LOG} 2>&1
 $DIALOG --infobox "Installing some optional software" 4 60
@@ -660,7 +657,7 @@ exit
 esac
 
 #
-# End of Debian 12 script here
+# End of Debian scripts here
 #
 ;;
 esac
