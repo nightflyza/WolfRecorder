@@ -129,7 +129,7 @@ echo "=== Setting FS permissions ==="
 chmod -R 777 content/ config/ exports/ howl/
 
 echo "=== Updating autoupdater ==="
-cp -R ./dist/presets/debian121/autowrupdate.sh /bin/
+cp -R ./dist/presets/debian/autowrupdate.sh /bin/
 
 echo "=== Executing post-install API callback ==="
 /bin/wrapi "autoupdatehook" 2>> ${LOG_FILE}
