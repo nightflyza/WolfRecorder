@@ -476,7 +476,6 @@ apt install -y php8.4-snmp >> ${INSTALLER_LOG} 2>&1
 apt install -y php8.4-soap >> ${INSTALLER_LOG} 2>&1
 apt install -y php8.4-zip >> ${INSTALLER_LOG} 2>&1
 apt install -y php8.4-imap >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.4-json >> ${INSTALLER_LOG} 2>&1
 apt install -y php8.4-tokenizer >> ${INSTALLER_LOG} 2>&1
 apt install -y php8.4-xml >> ${INSTALLER_LOG} 2>&1
 apt install -y php8.4-xmlreader >> ${INSTALLER_LOG} 2>&1
@@ -485,7 +484,6 @@ apt install -y php8.4-simplexml >> ${INSTALLER_LOG} 2>&1
 apt install -y php8.4-sqlite3 >> ${INSTALLER_LOG} 2>&1
 apt install -y php8.4-sockets >> ${INSTALLER_LOG} 2>&1
 apt install -y php8.4-opcache >> ${INSTALLER_LOG} 2>&1
-apt install -y php8.4-json >> ${INSTALLER_LOG} 2>&1
 apt install -y php8.4-pdo >> ${INSTALLER_LOG} 2>&1
 apt install -y php8.4-pdo-sqlite >> ${INSTALLER_LOG} 2>&1
 apt install -y php8.4-phar >> ${INSTALLER_LOG} 2>&1
