@@ -352,7 +352,7 @@ APACHE_CONFIG_DIR="/etc/apache2/"
 APACHE_INIT_SCRIPT="/usr/sbin/service apache2"
 APACHE_CONFIG_PRESET_NAME="debi12_apache2.conf"
 APACHE_CONFIG_NAME="apache2.conf"
-PHP_CONFIG_PRESET="php82.ini"
+PHP_CONFIG_PRESET="php8.ini"
 MYSQL_INIT_SCRIPT="/usr/sbin/service mariadb"
 CACHE_INIT_SCRIPT="/usr/sbin/service memcached"
 WR_WEB_DIR="wr/"
@@ -537,9 +537,9 @@ tar zxvf ${DL_WR_NAME} >> ${INSTALLER_LOG} 2>&1
 chmod -R 777 content/ config/ exports/ howl/
 
 # setting up config presets
-cp -R dist/presets/debian121/${APACHE_CONFIG_PRESET_NAME} ${APACHE_CONFIG_DIR}${APACHE_CONFIG_NAME}
-cp -R dist/presets/debian121/${PHP_CONFIG_PRESET} /etc/php/8.4/apache2/php.ini
-cp -R dist/presets/debian121/000-default.conf ${APACHE_CONFIG_DIR}sites-enabled/000-default.conf
+cp -R dist/presets/debian/${APACHE_CONFIG_PRESET_NAME} ${APACHE_CONFIG_DIR}${APACHE_CONFIG_NAME}
+cp -R dist/presets/debian/${PHP_CONFIG_PRESET} /etc/php/8.4/apache2/php.ini
+cp -R dist/presets/debian/000-default.conf ${APACHE_CONFIG_DIR}sites-enabled/000-default.conf
 
 # setting up default web awesomeness
 cp -R dist/landing/index.html ${APACHE_DATA_PATH}/index.html
@@ -562,7 +562,7 @@ perl -e "s/mylogin/root/g" -pi ./config/mysql.ini
 perl -e "s/newpassword/${MYSQL_PASSWD}/g" -pi ./config/mysql.ini
 
 # updating binary paths in binpaths.ini
-cp -R dist/presets/debian121/binpaths.ini ./config/binpaths.ini
+cp -R dist/presets/debian/binpaths.ini ./config/binpaths.ini
 
 # creating wr database
 $DIALOG --infobox "Creating initial WolfRecorder DB" 4 60
@@ -579,7 +579,7 @@ touch ./exports/FIRST_INSTALL
 chmod 777 ./exports/FIRST_INSTALL
 
 # unpacking wrapi preset
-cp -R dist/wrap/deb121_wrapi /bin/wrapi
+cp -R dist/wrap/deb_wrapi /bin/wrapi
 chmod a+x /bin/wrapi
 $DIALOG --infobox "remote API wrapper installed" 4 60
 
@@ -635,7 +635,7 @@ echo "Looks like this WolfRecorder release is not supporting automatic crontab c
 fi
 
 # Setting up autoupdate sctipt
-cp -R ./dist/presets/debian121/autowrupdate.sh /bin/
+cp -R ./dist/presets/debian/autowrupdate.sh /bin/
 chmod a+x /bin/autowrupdate.sh
 
 #cleaning up installer work directory
