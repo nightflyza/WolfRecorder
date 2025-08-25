@@ -165,17 +165,23 @@ class ModelCraft {
         return ($result);
     }
 
+
+    /**
+     * Renders template creation form depend on device data
+     *
+     * @param array $deviceData
+     * 
+     * @return string
+     */
     public function renderTemplateCreationForm($deviceData) {
         $result = '';
         $availableSources = array();
         $port = 554;
         $proto = 'rtsp';
-        $sound = 0;
-        $ptz = 0;
         if (!empty($deviceData)) {
             if (isset($deviceData['sources'])) {
-                $preselMain='';
-                $preselSub='';
+                $preselMain = '';
+                $preselSub = '';
                 foreach ($deviceData['sources'] as $io => $each) {
                     if (isset($each['profilename']) and isset($each['urldata'])) {
                         $profileLabel = $each['profilename'];
@@ -183,17 +189,20 @@ class ModelCraft {
                         if (!empty($each['urldata']['query'])) {
                             $shortUrl .= '?' . $each['urldata']['query'];
                         }
-                        $port = $each['urldata']['port'];
+                        $port = @$each['urldata']['port'];
+                        if (empty($port)) {
+                            $port = 554;
+                        }
                         $proto = $each['urldata']['scheme'];
                         if (empty($availableSources)) {
-                            $preselMain=$shortUrl; //first of available sources
+                            $preselMain = $shortUrl; //first of available sources
                         } else {
-                            $preselSub=$shortUrl; //last source
+                            $preselSub = $shortUrl; //last source
                         }
                         $availableSources[$shortUrl] = $profileLabel . ' (' . $each['width'] . 'x' . $each['height'] . ')';
                     }
                 }
-         
+
                 //some form here
                 $inputs = wf_TextInput(self::PROUTE_TPLCREATE_DEV, __('Template name'), '', true, 20, '');
                 $inputs .= wf_Selector(self::PROUTE_TPLCREATE_MAIN, $availableSources, __('Mainstream'), $preselMain, true);
@@ -247,7 +256,11 @@ class ModelCraft {
                     $cells .= wf_TableCell($each['fps']);
                     $cells .= wf_TableCell($each['bitrate'] . ' ' . __('Kbit/s'));
                     $cells .= wf_TableCell($each['urldata']['scheme']);
-                    $cells .= wf_TableCell($each['urldata']['port']);
+                    $port = @$each['urldata']['port'];
+                    if (empty($port)) {
+                        $port = 554;
+                    }
+                    $cells .= wf_TableCell($port);
                     $shortUrl = $each['urldata']['path'];
                     if (!empty($each['urldata']['query'])) {
                         $shortUrl .= '?' . $each['urldata']['query'];
