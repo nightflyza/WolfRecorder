@@ -6419,6 +6419,15 @@ License - nucleoapp.com/license/
 }
 
 @media screen and (max-width: 576px) {
+     h2,
+    .h2 {
+        font-size: 1.5em;
+        line-height: 1.2;
+        word-break: break-word;
+        hyphens: auto;
+        margin-bottom: 15px;
+    }
+
     .navbar[class*='navbar-toggleable-'] .container {
         margin-left: 0;
         margin-right: 0;
