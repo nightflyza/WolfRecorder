@@ -34,6 +34,13 @@ class SystemInfo {
     protected $storages = '';
 
     /**
+     * HyprSpace object instance for user saved records storage
+     *
+     * @var object
+     */
+    protected $hyprSpace = '';
+
+    /**
      * System messages helper instance placeholder
      *
      * @var object
@@ -44,6 +51,7 @@ class SystemInfo {
         $this->initMessages();
         $this->loadConfigs();
         $this->initStorages();
+        $this->initHyprSpace();
         $this->initHwInfo();
     }
 
@@ -85,6 +93,15 @@ class SystemInfo {
      */
     protected function initHwInfo() {
         $this->hwInfo = new SystemHwInfo();
+    }
+
+    /**
+     * Inits HyprSpace instance for further usage
+     *
+     * @return void
+     */
+    protected function initHyprSpace() {
+        $this->hyprSpace = new HyprSpace();
     }
 
     /**
@@ -132,6 +149,13 @@ class SystemInfo {
         //root fs
         $mountPoints[0] = '/';
         $mountPointNames['/'] = __('System');
+
+        //HyprSpace if in use
+        if ($this->hyprSpace->isInUse()) {
+            $hyprSpaceMountPoint = $this->hyprSpace->getMountpointRecords();
+            $mountPoints[-1] = $hyprSpaceMountPoint;
+            $mountPointNames[$hyprSpaceMountPoint] = __('HyprSpace');
+        }
 
         if (!empty($availableStorages)) {
             foreach ($availableStorages as $storageId => $each) {

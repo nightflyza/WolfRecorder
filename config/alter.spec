@@ -114,6 +114,12 @@ VALIDATOR="is_string"
 SAVEFILTER="safe"
 ONINVALID="Wrong display mode"
 
+[hyprspace]
+OPTION=HYPRSPACE_ENABLED
+LABEL="User exported videos in HyprSpace"
+TYPE="CHECKBOX"
+DEFAULT="0"
+
 [exports_reserve]
 OPTION="EXPORTS_RESERVED_SPACE"
 LABEL="Space % reserved for exported users videos"

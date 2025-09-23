@@ -96,6 +96,13 @@ class Export {
      */
     protected $scheduleForceFlag = false;
 
+    /**
+     * HyprSpace object instance for user saved records storage
+     *
+     * @var object
+     */
+    protected $hyprSpace = '';
+
 
     /**
      * other predefined stuff like routes
@@ -117,7 +124,6 @@ class Export {
     const PROUTE_DATE_EXPORT = 'dateexport';
     const PROUTE_TIME_FROM = 'timefrom';
     const PROUTE_TIME_TO = 'timeto';
-    const PATH_RECORDS = 'howl/recdl/';
     const PID_EXPORT = 'EXPORT_';
     const PID_SCHEDULE = 'EXPORTSCHEDULE';
     const RECORDS_EXT = '.mp4';
@@ -134,6 +140,7 @@ class Export {
         $this->setOptions();
         $this->initStarDust();
         $this->initStorages();
+        $this->initHyprSpace();
         $this->initCameras();
         $this->initArchive();
         $this->initScheduleDb();
@@ -228,6 +235,15 @@ class Export {
      */
     protected function initScheduleDb() {
         $this->scheduleDb = new NyanORM(self::TABLE_SCHED);
+    }
+
+    /**
+     * Inits HyprSpace instance for further usage
+     *
+     * @return void
+     */
+    protected function initHyprSpace() {
+        $this->hyprSpace = new HyprSpace();
     }
 
     /**
@@ -540,7 +556,7 @@ class Export {
     }
 
     /**
-     * Prepares per-user recordings space
+     * Prepares per-user recordings space. Just wrapper on top on HyprSpace method.
      * 
      * @param string $userLogin
      * 
@@ -552,24 +568,9 @@ class Export {
             //using current user`s instance
             $userLogin = $this->myLogin;
         }
+
         if (!empty($userLogin)) {
-            $fullUserPath = self::PATH_RECORDS . $userLogin;
-            //base recordings path
-            if (!file_exists(self::PATH_RECORDS)) {
-                //creating base path
-                mkdir(self::PATH_RECORDS, 0777);
-                chmod(self::PATH_RECORDS, 0777);
-            }
-
-            if (!file_exists($fullUserPath)) {
-                //and per-user path
-                mkdir($fullUserPath, 0777);
-                chmod($fullUserPath, 0777);
-            }
-
-            if (file_exists($fullUserPath)) {
-                $result = $fullUserPath . '/'; //with ending slash
-            }
+            $result = $this->hyprSpace->prepareRecordingsDir($userLogin);
         }
         return ($result);
     }
@@ -594,43 +595,6 @@ class Export {
         return ($result);
     }
 
-    /**
-     * Returns count of users registered in system
-     * 
-     * @return int
-     */
-    protected function getUserCount() {
-        $result = 0;
-        $allUsers = rcms_scandir(USERS_PATH);
-        if (!empty($allUsers)) {
-            $result = sizeof($allUsers);
-        }
-        return ($result);
-    }
-
-    /**
-     * Returns count bytes count allowed to each user to store his records
-     * 
-     * @return int
-     */
-    protected function getUserMaxSpace() {
-        $result = 0;
-        $storageTotalSpace = disk_total_space('/');
-        $storageFreeSpace = disk_free_space('/');
-        $usedStorageSpace = $storageTotalSpace - $storageFreeSpace;
-        if (isset($this->altCfg['EXPORTS_RESERVED_SPACE'])) {
-            $maxUsagePercent = 100 - ($this->altCfg['EXPORTS_RESERVED_SPACE']); // explict value
-        } else {
-            $maxUsagePercent = 100 - ($this->altCfg['STORAGE_RESERVED_SPACE'] / 2); // half of reserved space
-        }
-        $maxUsageSpace = zb_Percent($storageTotalSpace, $maxUsagePercent);
-        $mustBeFree = $storageTotalSpace - $maxUsageSpace;
-        $usersCount = $this->getUserCount();
-        if ($usersCount > 0) {
-            $result = $mustBeFree / $usersCount;
-        }
-        return ($result);
-    }
 
     /**
      * Performs export of some chunks list of some channel into selected directory
@@ -823,7 +787,7 @@ class Export {
                         if (!empty($chunksInRange)) {
                             $chunksSize = $this->storages->getChunksSize($chunksInRange); //total chunks size
                             $usedSpace = $this->getUserUsedSpace($userRecordingsDir); //space used by user
-                            $maxSpace = $this->getUserMaxSpace(); //max of reserved space for each user
+                            $maxSpace = $this->hyprSpace->getUserMaxSpace(); //max of reserved space for each user
                             $scheduleForecast = $this->scheduleGetForecastSize($this->myLogin); //already scheduled tasks forecast
                             $usageForecast = $usedSpace + $chunksSize + $scheduleForecast; //how much space will be with current export?
                             //checking is some of user space left?
@@ -1011,7 +975,7 @@ class Export {
         $webPlayer = '';
         $controls = '';
         $filePath = '';
-        $userRecordingsDir = $this->prepareRecordingsDir();
+        $userRecordingsWeb=$this->hyprSpace->getUrlRecords($this->myLogin);
 
         if (ubRouting::checkGet(self::ROUTE_BACK_EXPORT)) {
             //back to channel export interface
@@ -1025,7 +989,7 @@ class Export {
         if (!empty($fileName)) {
             @$fileName = base64_decode($fileName);
             if (!empty($fileName)) {
-                $filePath .= $userRecordingsDir . $fileName;
+                $filePath .= $userRecordingsWeb . $fileName;
             }
 
             if ($filePath and file_exists($filePath)) {
@@ -1153,7 +1117,7 @@ class Export {
         if ($fileName) {
             $filePath = $userRecordingsDir . $fileName;
             if (file_exists($filePath)) {
-                $maxUserSpace = $this->getUserMaxSpace();
+                $maxUserSpace = $this->hyprSpace->getUserMaxSpace();
                 $usedSpaceByMe = $this->getUserUsedSpace($userRecordingsDir);
                 $moDetForecast = filesize($filePath); //we hope that the filtered file will not be larger
                 $spaceLeft = $maxUserSpace - $usedSpaceByMe;
@@ -1279,7 +1243,7 @@ class Export {
             }
             $result .= $this->messages->getStyledMessage($noRecordsNotice, 'info');
         }
-        $maxUserSpace = $this->getUserMaxSpace();
+        $maxUserSpace = $this->hyprSpace->getUserMaxSpace();
         $usedSpaceByMe = $this->getUserUsedSpace($userRecordingsDir);
         $scheduledExportsForecast = $this->scheduleGetForecastSize($this->myLogin);
         $spaceFree = $maxUserSpace - $usedSpaceByMe - $scheduledExportsForecast;
@@ -1310,6 +1274,7 @@ class Export {
         $sysProc = new SysProc();
         $moDet = new MoDet();
         $userRecordingsDir = $this->prepareRecordingsDir();
+        $userRecordingsWebDir = $this->hyprSpace->getUrlRecords($this->myLogin);
         $recordsExtFilter = '*' . self::RECORDS_EXT;
         $allRecords = rcms_scandir($userRecordingsDir, $recordsExtFilter);
         $moDetFlag = (@$this->altCfg[$moDet::OPTION_ENABLE]) ? true : false;
@@ -1337,7 +1302,7 @@ class Export {
                 $recordSize = filesize($userRecordingsDir . $eachFile);
                 $recordSizeLabel = wr_convertSize($recordSize);
                 $fileName = $eachFile;
-                $fileUrl = $userRecordingsDir . $eachFile;
+                $fileUrl = $userRecordingsWebDir. $eachFile;
                 $previewUrl = self::URL_RECORDS . '&' . self::ROUTE_PREVIEW . '=' . base64_encode($fileName);
                 $cameraComment = $this->cameras->getCameraCommentById($fileNameParts['cameraid']);
                 $recDate = date("Y-m-d", strtotime($fileNameParts['from']));
@@ -1435,7 +1400,7 @@ class Export {
             }
             $result .= $this->messages->getStyledMessage($noRecordsNotice, 'info');
         }
-        $maxUserSpace = $this->getUserMaxSpace();
+        $maxUserSpace = $this->hyprSpace->getUserMaxSpace();
         $usedSpaceByMe = $this->getUserUsedSpace($userRecordingsDir);
         $scheduledExportsForecast = $this->scheduleGetForecastSize($this->myLogin);
         $spaceFree = $maxUserSpace - $usedSpaceByMe - $scheduledExportsForecast;

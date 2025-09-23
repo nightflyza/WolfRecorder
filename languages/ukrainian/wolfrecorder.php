@@ -344,6 +344,7 @@ $lang['def']['Codec'] = 'Кодек';
 $lang['def']['FPS'] = 'FPS';
 $lang['def']['Maximum retention']='Максимальний термін зберігання';
 $lang['def']['Retention']='Зберігання';
+$lang['def']['User exported videos in HyprSpace']='Записи користувачів в HyprSpace';
 
 
 

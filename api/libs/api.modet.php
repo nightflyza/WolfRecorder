@@ -18,6 +18,14 @@ class MoDet {
      */
     protected $process = '';
 
+
+    /**
+     * HyprSpace object instance for user saved records storage
+     *
+     * @var object
+     */
+    protected $hyprSpace = '';
+
     /**
      * some predefined stuff
      */
@@ -30,6 +38,7 @@ class MoDet {
     public function __construct() {
         $this->initStarDust();
         $this->initCliFF();
+        $this->initHyprSpace();
     }
 
     /**
@@ -48,6 +57,15 @@ class MoDet {
      */
     protected function initStarDust() {
         $this->process = new StarDust(self::PROCESS_PID);
+    }
+
+    /**
+     * Inits HyprSpace instance for further usage
+     *
+     * @return void
+     */
+    protected function initHyprSpace() {
+        $this->hyprSpace = new HyprSpace();
     }
 
     /**
@@ -74,7 +92,7 @@ class MoDet {
         $result = '';
         $userLogin = whoami();
         if (!empty($userLogin)) {
-            $fullUserPath = Export::PATH_RECORDS . $userLogin;
+            $fullUserPath = $this->hyprSpace->getPathRecords() . $userLogin;
             if (file_exists($fullUserPath)) {
                 $result = $fullUserPath . '/'; //with ending slash
             }

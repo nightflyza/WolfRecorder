@@ -34,6 +34,13 @@ class UserManager {
     protected $rolesRights = array();
 
     /**
+     * HyprSpace object instance for user saved records storage
+     *
+     * @var object
+     */
+    protected $hyprSpace = '';
+
+    /**
      * Some static routes etc
      */
     const URL_ME = '?module=usermanager';
@@ -64,6 +71,7 @@ class UserManager {
         $this->initMessages();
         $this->initSystemCore();
         $this->setUserRoles();
+        $this->initHyprSpace();
     }
 
     /**
@@ -114,6 +122,15 @@ class UserManager {
      */
     protected function initMessages() {
         $this->messages = new UbillingMessageHelper();
+    }
+
+    /**
+     * Inits HyprSpace instance for further usage
+     *
+     * @return void
+     */
+    protected function initHyprSpace() {
+        $this->hyprSpace = new HyprSpace();
     }
 
     /**
@@ -188,7 +205,7 @@ class UserManager {
     protected function getUserSize($userLogin) {
         $result = 0;
         if (!empty($userLogin)) {
-            $basePath = Export::PATH_RECORDS;
+            $basePath = $this->hyprSpace->getPathRecords();
             if (file_exists($basePath)) {
                 $userRecPath = $basePath . $userLogin . '/';
                 if (file_exists($userRecPath)) {
@@ -213,7 +230,7 @@ class UserManager {
      */
     protected function flushUserRecords($userName) {
         if (!empty($userName)) {
-            $basePath = Export::PATH_RECORDS;
+            $basePath =  $this->hyprSpace->getPathRecords();
             if (file_exists($basePath)) {
                 $userRecPath = $basePath . $userName . '/';
                 if (file_exists($userRecPath)) {
