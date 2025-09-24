@@ -345,3 +345,7 @@ $lang['def']['FPS'] = 'FPS';
 $lang['def']['Maximum retention']='Максимальный срок хранения';
 $lang['def']['Retention']='Хранение';
 $lang['def']['User exported videos in HyprSpace']='Записи пользователей в HyprSpace';
+$lang['def']['Storage of user exported videos']='Хранилище видео сохраненных пользователями';
+$lang['def']['Users']='Пользователи';
+$lang['def']['Used']='Использовано';
+$lang['def']['Per user']='На пользователя';

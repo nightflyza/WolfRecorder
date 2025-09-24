@@ -314,7 +314,7 @@ class Storages {
                 $stateIcon = web_bool_led($storageState);
                 if ($storageState) {
                     $diskStats = $hwInfo->getDiskStat($each['path']);
-                    $storageSizeLabel =  wr_convertSize( $diskStats['total']);
+                    $storageSizeLabel =  wr_convertSize($diskStats['total']);
                     $storageFreeLabel =  wr_convertSize($diskStats['free']);
                 }
                 $cells .= wf_TableCell($stateIcon);
@@ -331,6 +331,62 @@ class Storages {
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
         }
+        return ($result);
+    }
+
+
+    /**
+     * Renders exported videos storage parameters
+     * 
+     * @return string
+     */
+    public function renderRecDlStorage() {
+        $hyprSpace = new HyprSpace();
+        $usersCount = $hyprSpace->getUserCount();
+        $mountPoint = $hyprSpace->getMountpointRecords();
+        $recPath = $hyprSpace->getPathRecords();
+        $hyprSpaceInUse = $hyprSpace->isInUse();
+        $userMaxSpace = $hyprSpace->getUserMaxSpace();
+        $mpName = ($hyprSpaceInUse) ? '🚀 '.__('HyprSpace') : '⚙️ '.__('System');
+
+        $result = '';
+
+        $cells = wf_TableCell(__('Name'));
+        $cells .= wf_TableCell(__('Path'));
+        $cells .= wf_TableCell(__('State'));
+        $cells .= wf_TableCell(__('Users'));
+        $cells .= wf_TableCell(__('Per user'));
+        $cells .= wf_TableCell(__('Capacity'));
+        $cells .= wf_TableCell(__('Used'));
+        $cells .= wf_TableCell(__('Free'));
+        $rows = wf_TableRow($cells, 'row1');
+
+        $storageSizeLabel =  '-';
+        $storageFreeLabel = '-';
+        $storageUsedLabel = '-';
+
+        $cells = wf_TableCell($mpName);
+        $cells .= wf_TableCell($recPath);
+        $storageState = ($this->checkPath($recPath)) ? true : false;
+        $stateIcon = web_bool_led($storageState);
+        if ($storageState) {
+            $totalSpace = disk_total_space($mountPoint);
+            $freeSpace = disk_free_space($mountPoint);
+            $storageUsedLabel =  wr_convertSize(($totalSpace - $freeSpace));
+            $storageSizeLabel =  wr_convertSize($totalSpace);
+            $storageFreeLabel =  wr_convertSize($freeSpace);
+        }
+        $allocSizeLabel = wr_convertSize($userMaxSpace);
+        $cells .= wf_TableCell($stateIcon);
+        $cells .= wf_TableCell($usersCount);
+        $cells .= wf_TableCell($allocSizeLabel);
+        $cells .= wf_TableCell($storageSizeLabel);
+        $cells .= wf_TableCell($storageUsedLabel);
+        $cells .= wf_TableCell($storageFreeLabel);
+        $rows .= wf_TableRow($cells, 'row5');
+
+        $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
+
         return ($result);
     }
 

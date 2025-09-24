@@ -31,6 +31,7 @@ if (cfr('STORAGES')) {
 
     show_window(__('Create new storage'), $storages->renderCreationForm());
     show_window(__('Available storages'), $storages->renderList());
+    show_window(__('Storage of user exported videos'), $storages->renderRecDlStorage());
 } else {
     show_error(__('Access denied'));
 }

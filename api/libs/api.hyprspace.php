@@ -216,7 +216,7 @@ class HyprSpace {
      * 
      * @return int
      */
-    protected function getUserCount() {
+    public function getUserCount() {
         $result = 0;
         $allUsers = rcms_scandir(USERS_PATH);
         if (!empty($allUsers)) {
