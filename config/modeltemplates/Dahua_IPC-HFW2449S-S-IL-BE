@@ -1,0 +1,8 @@
+DEVICE="Dahua DH-IPC-HFW2449S-S-IL-BE"
+PROTO="rtsp"
+MAIN_STREAM="/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif"
+SUB_STREAM="/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif"
+RTSP_PORT=554
+HTTP_PORT=80
+SOUND=1
+PTZ=0

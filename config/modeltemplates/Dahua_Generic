@@ -1,0 +1,8 @@
+DEVICE="Dahua Generic"
+PROTO="rtsp"
+MAIN_STREAM="/cam/realmonitor?channel=1&subtype=0&unicast=true"
+SUB_STREAM="/cam/realmonitor?channel=1&subtype=1&unicast=true"
+RTSP_PORT=554
+HTTP_PORT=80
+SOUND=0
+PTZ=0
