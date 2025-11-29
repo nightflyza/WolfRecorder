@@ -124,7 +124,7 @@ case $ARCH in
 esac
 
 #botstrapping pkg ng
-pkg info
+ASSUME_ALWAYS_YES=yes pkg bootstrap -y
 
 #check is FreeBSD installation clean
 PKG_COUNT=`/usr/sbin/pkg info | /usr/bin/wc -l`
