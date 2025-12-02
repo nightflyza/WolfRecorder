@@ -9,7 +9,17 @@ OS_NAME=`uname`
 case $OS_NAME in
 FreeBSD)
 
-DIALOG=${DIALOG=dialog}
+if [ -z "$DIALOG" ]; then
+    if command -v dialog >/dev/null 2>&1; then
+        DIALOG=dialog
+    elif command -v bsddialog >/dev/null 2>&1; then
+        DIALOG=bsddialog
+    else
+        echo "Error: Neither 'dialog' (gnu-dialog) nor 'bsddialog' is available."
+        exit 1
+    fi
+fi
+
 FETCH="/usr/bin/fetch"
 APACHE_VERSION="apache24"
 APACHE_DATA_PATH="/usr/local/www/apache24/data/"
@@ -47,6 +57,7 @@ $DIALOG --menu "Type of WolfRecorder installation" 10 75 8 \
 clear
 
 $DIALOG --menu "Choose FreeBSD version and architecture" 16 50 8 \
+                   150_6M "FreeBSD 15.0 amd64"\
                    143_6M "FreeBSD 14.3 amd64"\
                    143_6L "FreeBSD 14.3 amd64"\
                    142_6L "FreeBSD 14.2 amd64"\
@@ -320,8 +331,8 @@ esac
 ;;
 
 Linux)
- # START of Linux installation scripts here
-    DIALOG="dialog"
+# START of Linux installation scripts here
+DIALOG="dialog"
 INSTALLER_LOG="/var/log/wrinstaller.log"
 
 #initial repos update
