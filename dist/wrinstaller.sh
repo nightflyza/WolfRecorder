@@ -6,6 +6,11 @@
 
 OS_NAME=`uname`
 
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Error: WRinstaller script must be run only as root user."
+    exit 1
+fi
+
 case $OS_NAME in
 FreeBSD)
 
