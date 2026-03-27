@@ -58,9 +58,9 @@ clear
 
 $DIALOG --menu "Choose FreeBSD version and architecture" 16 50 8 \
                    150_6M "FreeBSD 15.0 amd64"\
+                   144_6M "FreeBSD 14.4 amd64"\
                    143_6M "FreeBSD 14.3 amd64"\
                    143_6L "FreeBSD 14.3 amd64"\
-                   142_6L "FreeBSD 14.2 amd64"\
                    135_6L "FreeBSD 13.5 amd64"\
  	    2> /tmp/wrarch
 clear
