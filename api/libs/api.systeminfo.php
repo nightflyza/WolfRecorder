@@ -148,13 +148,13 @@ class SystemInfo {
 
         //root fs
         $mountPoints[0] = '/';
-        $mountPointNames['/'] = __('System');
+        $mountPointNames['/'] = '⚙️ '.__('System');
 
         //HyprSpace if in use
         if ($this->hyprSpace->isInUse()) {
             $hyprSpaceMountPoint = $this->hyprSpace->getMountpointRecords();
             $mountPoints[-1] = $hyprSpaceMountPoint;
-            $mountPointNames[$hyprSpaceMountPoint] = __('HyprSpace');
+            $mountPointNames[$hyprSpaceMountPoint] = '🚀 '.__('HyprSpace');
         }
 
         if (!empty($availableStorages)) {
