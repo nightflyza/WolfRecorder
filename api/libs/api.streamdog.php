@@ -109,7 +109,7 @@ class StreamDog {
      * Returns keep-alive JS code
      * 
      * @param string $url
-     * @param inst $timeout
+     * @param int $timeout
      * 
      * @return string
      */

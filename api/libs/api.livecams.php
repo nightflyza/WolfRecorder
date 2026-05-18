@@ -551,6 +551,8 @@ class LiveCams {
     /**
      * Allocates streams path, returns it if its writable
      * 
+     * @param string $channelId
+     * 
      * @return string|void on error
      */
     protected function allocateStreamPath($channelId) {
@@ -579,6 +581,8 @@ class LiveCams {
     /**
      * Allocates sub-streams path, returns it if its writable
      * 
+     * @param int $channelId
+     * 
      * @return string|void on error
      */
     protected function allocateSubStreamPath($channelId) {
@@ -606,6 +610,8 @@ class LiveCams {
 
     /**
      * Starts live stream capture
+     * 
+     * @param int $cameraId
      * 
      * @return void
      */
@@ -664,6 +670,8 @@ class LiveCams {
 
     /**
      * Starts live sub-stream capture
+     * 
+     * @param int $cameraId
      * 
      * @return void
      */
@@ -726,6 +734,8 @@ class LiveCams {
     /**
      * Destroys live stream. Returns true if stream was alive.
      * 
+     * @param int $cameraId
+     * 
      * @return bool
      */
     public function stopStream($cameraId) {
@@ -757,6 +767,8 @@ class LiveCams {
 
     /**
      * Destroys live sub-stream. Returns true if stream was alive.
+     * 
+     * @param int $cameraId
      * 
      * @return bool
      */
