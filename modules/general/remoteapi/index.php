@@ -51,6 +51,14 @@ if (ubRouting::checkGet('key')) {
 
             //render result
             die(substr($idserial, -4));
+        } else {
+            if (ubRouting::get('action') == 'clientrest') {
+                $clientRestApi = new ClientRestAPI();
+                $clientRestApi->catchRequest();
+            //    die();
+            } else {
+                die('ERROR:GET_UNKNOWN_ACTION');
+            }
         }
     } else {
         die('ERROR:GET_NO_KEY');
