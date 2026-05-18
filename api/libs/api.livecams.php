@@ -131,7 +131,7 @@ class LiveCams {
     const URL_PSEUDOSTREAM = '?module=pseudostream';
     const ROUTE_VIEW = 'livechannel';
     const ROUTE_PSEUDOLIVE = 'live';
-    const ROUTE_PSEUDOSUB = 'sublq';
+    const ROUTE_PSEUDOSUB = 'sub';
     const ROUTE_LIVEWALL = 'wall';
     const ROUTE_DL_PLAYLIST = 'downloadplaylist';
     const CAM_CONT_ID = 'wrcamcont_';
@@ -983,6 +983,40 @@ class LiveCams {
         }
         return ($result);
     }
+
+    /**
+     * Returns pseudo-live sub-stream HLS playlist
+     *
+     * @param string $channelId
+     *
+     * @return string
+     */
+    public function getPseudoSubStream($channelId) {
+        $result = '';
+        $streamUrl = $this->getSubStreamUrl($channelId);
+        if (!empty($streamUrl)) {
+            $cameraId = $this->cameras->getCameraIdByChannel($channelId);
+            $playlistBody = file_get_contents($streamUrl);
+            $prefix = Storages::PATH_HOWL . self::SUBSTREAMS_SUBDIR . $channelId . '/';
+            if (!empty($playlistBody)) {
+                $playlistBody = explodeRows($playlistBody);
+                foreach ($playlistBody as $io => $eachLine) {
+                    if (!empty($eachLine)) {
+                        if (!ispos($eachLine, '#')) {
+                            $eachLine = $prefix . $eachLine;
+                        }
+                        $result .= $eachLine . PHP_EOL;
+                    }
+                }
+                if ($cameraId) {
+                    $streamDog = new StreamDog();
+                    $streamDog->keepSubAlive($cameraId);
+                }
+            }
+        }
+        return ($result);
+    }
+
     /**
      * Returns the title controls based on the livewall flag.
      *
