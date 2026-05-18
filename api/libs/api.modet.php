@@ -86,7 +86,7 @@ class MoDet {
     /**
      * Returns current user recordings path
      *
-     * @return void
+     * @return string
      */
     protected function getUserRecordingsDir() {
         $result = '';
