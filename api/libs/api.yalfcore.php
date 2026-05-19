@@ -13,6 +13,13 @@ class YALFCore {
     protected $config = array();
 
     /**
+     * Contains raw alter.ini config as key=>value
+     *
+     * @var array
+     */
+    protected $alterConfig = array();
+
+    /**
      * Contains names of libs to load as path=>layer
      *
      * @var array
@@ -184,6 +191,7 @@ class YALFCore {
      * Some paths, routes etc
      */
     const YALF_CONF_PATH = 'config/yalf.ini';
+    const YALF_ALTER_PATH = 'config/alter.ini';
     const YALF_MENU_PATH = 'config/globalmenu.ini';
     const LIBS_PATH = 'api/libs/';
     const LANG_PATH = 'languages/';
@@ -214,6 +222,9 @@ class YALFCore {
      */
     protected function loadConfig() {
         $this->config = parse_ini_file(self::YALF_CONF_PATH);
+        if (file_exists(self::YALF_ALTER_PATH)) {
+            $this->alterConfig = parse_ini_file(self::YALF_ALTER_PATH);
+        }
     }
 
     /**
@@ -661,6 +672,22 @@ class YALFCore {
                                 }
                             }
                         }
+
+                        //alter option check
+                        if ($renderMenuEntry) {
+                            if (isset($each['NEED_ALTER_OPTION'])) {
+                                if (!empty($each['NEED_ALTER_OPTION'])) {
+                                    if (isset($this->alterConfig[$each['NEED_ALTER_OPTION']])) {
+                                        if (empty($this->alterConfig[$each['NEED_ALTER_OPTION']])) {
+                                            $renderMenuEntry = false; //required alter option disabled
+                                        }
+                                    } else {
+                                        $renderMenuEntry = false;
+                                    }
+                                }
+                            }
+                        }
+
                         if ($renderMenuEntry) {
                             $result .= wf_tag('li', false, $actClass) . wf_Link($each['URL'], wf_img($icon) . ' ' . $name, false) . wf_tag('li', true);
                         }
