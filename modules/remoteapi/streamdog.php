@@ -22,7 +22,7 @@ if (ubRouting::get('action') == 'streamdog') {
         foreach ($allRunningSubStreams as $eachCameraId=>$eachPid) {
             if (!$streamDog->isCameraSubInUse($eachCameraId)) {
                 $liveCams->stopSubStream($eachCameraId);
-                log_register('STREAMDOG SUB ['.$eachCameraId.'] STOPPED NOT IN USE IN '.$streamDog::SUB_TIMEOUT);
+                //log_register('STREAMDOG SUB ['.$eachCameraId.'] STOPPED NOT IN USE IN '.$streamDog::SUB_TIMEOUT);
             }
         }
     }
