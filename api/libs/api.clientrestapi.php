@@ -102,10 +102,45 @@ class ClientRestAPI {
     const GROUTE_AUTHTOKEN = 'authtoken';
 
     /**
+     * User right required for client REST API access
+     */
+    const RIGHT_WALL = 'WALL';
+
+    /**
      * Creates new client REST API instance
      */
     public function __construct() {
         $this->setAvailableObjects();
+    }
+
+    /**
+     * Returns whether LIVE_WALL alter option is enabled
+     *
+     * @return bool
+     */
+    protected function isLiveWallEnabled() {
+        $result = false;
+        global $ubillingConfig;
+        if ($ubillingConfig->getAlterParam(LiveCams::OPTION_WALL)) {
+            $result = true;
+        }
+        return ($result);
+    }
+
+    /**
+     * Returns whether user login has WALL right
+     *
+     * @param string $login
+     *
+     * @return bool
+     */
+    protected function userHasWallRight($login) {
+        $result = false;
+        global $system;
+        if ($system->checkForRight(self::RIGHT_WALL, $login)) {
+            $result = true;
+        }
+        return ($result);
     }
 
     /**
@@ -267,29 +302,36 @@ class ClientRestAPI {
             'error' => 1,
             'message' => __('No object specified')
         );
-        if (!empty($this->objects)) {
-            foreach ($this->objects as $eachObject => $objectMethods) {
-                if (ubRouting::checkGet($eachObject)) {
-                    $methodCallback = ubRouting::get($eachObject);
-                    if (isset($objectMethods[$methodCallback])) {
-                        $methodName = $objectMethods[$methodCallback];
-                        if (method_exists($this, $methodName)) {
-                            $inputData = $this->collectInputData();
-                            $result = $this->$methodName($inputData);
+        if ($this->isLiveWallEnabled()) {
+            if (!empty($this->objects)) {
+                foreach ($this->objects as $eachObject => $objectMethods) {
+                    if (ubRouting::checkGet($eachObject)) {
+                        $methodCallback = ubRouting::get($eachObject);
+                        if (isset($objectMethods[$methodCallback])) {
+                            $methodName = $objectMethods[$methodCallback];
+                            if (method_exists($this, $methodName)) {
+                                $inputData = $this->collectInputData();
+                                $result = $this->$methodName($inputData);
+                            } else {
+                                $result = array(
+                                    'error' => 2,
+                                    'message' => __('Method not exists')
+                                );
+                            }
                         } else {
                             $result = array(
                                 'error' => 2,
                                 'message' => __('Method not exists')
                             );
                         }
-                    } else {
-                        $result = array(
-                            'error' => 2,
-                            'message' => __('Method not exists')
-                        );
                     }
                 }
             }
+        } else {
+            $result = array(
+                'error' => 8,
+                'message' => __('Live wall') . ' ' . __('Disabled')
+            );
         }
         $this->renderReply($result);
     }
@@ -438,34 +480,41 @@ class ClientRestAPI {
             $authResult = $this->authenticateUser($request);
             if ($authResult['error'] == 0) {
                 $login = $authResult['login'];
-                $userChannels = $this->getAccessibleChannels($login);
-                $channels = array();
-                if (!empty($userChannels)) {
-                    $this->loadChannelsRuntime();
-                    foreach ($userChannels as $eachChannelId => $eachCameraId) {
-                        $cameraActive = false;
-                        if (isset($this->allCamerasData[$eachCameraId])) {
-                            if (!empty($this->allCamerasData[$eachCameraId]['CAMERA']['active'])) {
-                                $cameraActive = true;
+                if ($this->userHasWallRight($login)) {
+                    $userChannels = $this->getAccessibleChannels($login);
+                    $channels = array();
+                    if (!empty($userChannels)) {
+                        $this->loadChannelsRuntime();
+                        foreach ($userChannels as $eachChannelId => $eachCameraId) {
+                            $cameraActive = false;
+                            if (isset($this->allCamerasData[$eachCameraId])) {
+                                if (!empty($this->allCamerasData[$eachCameraId]['CAMERA']['active'])) {
+                                    $cameraActive = true;
+                                }
                             }
+                            $activeState = 0;
+                            if ($cameraActive) {
+                                $activeState = 1;
+                            }
+                            $channelComment = $this->cameras->getCameraCommentById($eachCameraId);
+                            $channels[] = array(
+                                'id' => $eachChannelId,
+                                'comment' => $channelComment,
+                                'active' => $activeState,
+                                'recording' => $this->getRunningState($this->runningRecorders, $eachCameraId),
+                                'mainstream' => $this->getRunningState($this->runningMainStreams, $eachCameraId),
+                                'substream' => $this->getRunningState($this->runningSubStreams, $eachCameraId),
+                                'screenshot' => $this->resolveChannelScreenshot($eachChannelId, $cameraActive)
+                            );
                         }
-                        $activeState = 0;
-                        if ($cameraActive) {
-                            $activeState = 1;
-                        }
-                        $channelComment = $this->cameras->getCameraCommentById($eachCameraId);
-                        $channels[] = array(
-                            'id' => $eachChannelId,
-                            'comment' => $channelComment,
-                            'active' => $activeState,
-                            'recording' => $this->getRunningState($this->runningRecorders, $eachCameraId),
-                            'mainstream' => $this->getRunningState($this->runningMainStreams, $eachCameraId),
-                            'substream' => $this->getRunningState($this->runningSubStreams, $eachCameraId),
-                            'screenshot' => $this->resolveChannelScreenshot($eachChannelId, $cameraActive)
-                        );
                     }
+                    $result = array('error' => 0, 'channels' => $channels);
+                } else {
+                    $result = array(
+                        'error' => 9,
+                        'message' => __('Live wall access denied')
+                    );
                 }
-                $result = array('error' => 0, 'channels' => $channels);
             } else {
                 $result = $authResult;
             }

@@ -220,6 +220,8 @@ Implementation reference: `modules/general/pseudostream/index.php`, `LiveCams::g
 | 3 | Missing required fields (e.g. `login`) |
 | 6 | Wrong login, password, or authtoken |
 | 7 | User profile empty or unreadable |
+| 8 | `LIVE_WALL` disabled in `config/alter.ini` |
+| 9 | Authenticated user lacks `WALL` right |
 
 Example:
 
