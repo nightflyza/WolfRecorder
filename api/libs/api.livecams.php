@@ -1042,7 +1042,8 @@ class LiveCams {
             } else {
                 $result .= wf_Link(self::URL_ME . '&' . self::ROUTE_LIVEWALL . '=true', wf_img('skins/surveillance3_32.png', __('Live')));
             }
-            $result .= wf_Link(self::URL_ME . '&' . self::ROUTE_DL_PLAYLIST . '=true', wf_img('skins/list32.png', __('Playlist')));
+            // moved to apps module
+            //$result .= wf_Link(self::URL_ME . '&' . self::ROUTE_DL_PLAYLIST . '=true', wf_img('skins/list32.png', __('Playlist')));
         }
         return ($result);
     }

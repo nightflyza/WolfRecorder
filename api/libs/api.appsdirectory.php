@@ -155,7 +155,7 @@ class AppsDirectory {
             $linkOpts .= ' target="_blank"';
         }
         $appLink = wf_Link($downloadUrl, $linkTitle, false, '', $linkOpts);
-        $cells = wf_TableCell($appLink);
+        $cells = wf_TableCell($appLink,'30%');
         $cells .= wf_TableCell($description);
         $result = wf_TableRow($cells, 'row5');
         return ($result);
