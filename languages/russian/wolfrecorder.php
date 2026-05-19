@@ -351,3 +351,6 @@ $lang['def']['Used']='Использовано';
 $lang['def']['Per user']='На пользователя';
 $lang['def']['Software downloads section'] = 'Раздел загрузки ПО';
 $lang['def']['Apps'] = 'Приложения';
+$lang['def']['Playlist of your cameras'] = 'Плейлист ваших камер';
+$lang['def']['Unable to communicate with apps server'] = 'Невозможно связаться с сервером приложений';
+$lang['def']['Unable to get applications list from server'] = 'Невозможно получить список приложений с сервера';
