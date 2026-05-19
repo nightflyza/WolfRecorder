@@ -40,6 +40,12 @@ LABEL="Page load indicator"
 TYPE="CHECKBOX"
 DEFAULT="1"
 
+[apps_feature]
+OPTION="APPS_ENABLED"
+LABEL="Software downloads section"
+TYPE="CHECKBOX"
+DEFAULT="1"
+
 [channel_shots_embed]
 OPTION=CHANSHOTS_EMBED
 LABEL="Embed channel screenshots into page body"

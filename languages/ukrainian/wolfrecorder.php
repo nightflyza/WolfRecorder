@@ -349,7 +349,8 @@ $lang['def']['Storage of user exported videos']='Сховище відео, зб
 $lang['def']['Users']='Користувачі';
 $lang['def']['Used']='Використано';
 $lang['def']['Per user']='На користувача';
-
+$lang['def']['Software downloads section'] = 'Розділ завантаження ПЗ';
+$lang['def']['Apps'] = 'Застосунки';
 
 
 
