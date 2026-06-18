@@ -16,14 +16,15 @@ if (cfr('MODELS')) {
         $modelCraft::PROUTE_EXPLORE,
         $modelCraft::PROUTE_EXPLORE_IP,
         $modelCraft::PROUTE_EXPLORE_LOGIN,
-        $modelCraft::PROUTE_EXPLORE_PASSWORD
+        $modelCraft::PROUTE_EXPLORE_PASSWORD,
     );
     if (ubRouting::checkPost($exploreRequest)) {
         if (zb_PingICMP(ubRouting::post($modelCraft::PROUTE_EXPLORE_IP))) {
             $pollingResult = $modelCraft->pollDevice(
                 ubRouting::post($modelCraft::PROUTE_EXPLORE_IP),
                 ubRouting::post($modelCraft::PROUTE_EXPLORE_LOGIN),
-                ubRouting::post($modelCraft::PROUTE_EXPLORE_PASSWORD)
+                ubRouting::post($modelCraft::PROUTE_EXPLORE_PASSWORD),
+                ubRouting::post($modelCraft::PROUTE_EXPLORE_ONVIF_PORT)
             );
             if (!empty($pollingResult)) {
                 show_window(__('Device data'), $modelCraft->renderPollingResults($pollingResult));

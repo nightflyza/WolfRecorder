@@ -42,6 +42,7 @@ class ModelCraft {
     const PROUTE_EXPLORE_IP = 'exploredevip';
     const PROUTE_EXPLORE_LOGIN = 'exploredevlogin';
     const PROUTE_EXPLORE_PASSWORD = 'exploredevpassword';
+    const PROUTE_EXPLORE_ONVIF_PORT = 'exploredevonvifport';
     const PROUTE_TPLCREATE_DEV = 'customtemplatedevicename';
     const PROUTE_TPLCREATE_PROTO = 'customtemplateproto';
     const PROUTE_TPLCREATE_MAIN = 'customtemplatemainstream';
@@ -108,16 +109,27 @@ class ModelCraft {
      * @param string $ip The IP address of the camera.
      * @param string $login The login username for accessing the camera.
      * @param string $password The login password for accessing the camera.
+     * @param int $onvifPort ONVIF HTTP service port.
      * 
      * @return array
      */
-    public function pollDevice($ip, $login, $password) {
+    public function pollDevice($ip, $login, $password, $onvifPort = 80) {
         $result = array();
         if (zb_PingICMP($ip)) {
             $this->initOnvif();
             $this->onvif->setIPAddress($ip);
             $this->onvif->setUsername($login);
             $this->onvif->setPassword($password);
+            $onvifPort = ubRouting::filters($onvifPort, 'int');
+            if ($onvifPort <= 0 or $onvifPort > 65535) {
+                $onvifPort = 80;
+            }
+            $onvifUri = 'http://' . $ip;
+            if ($onvifPort != 80) {
+                $onvifUri .= ':' . $onvifPort;
+            }
+            $onvifUri .= '/onvif/device_service';
+            $this->onvif->setMediaUri($onvifUri);
             try {
                 $this->onvif->initialize();
                 $sources = $this->onvif->getSources();
@@ -158,6 +170,9 @@ class ModelCraft {
         $result = '';
         $inputs = wf_HiddenInput(self::PROUTE_EXPLORE, 'true');
         $inputs .= wf_TextInput(self::PROUTE_EXPLORE_IP, __('IP'), ubRouting::post(self::PROUTE_EXPLORE_IP), false, 16, 'ip') . ' ';
+        $portValue = (!empty(ubRouting::checkPost(self::PROUTE_EXPLORE_ONVIF_PORT))) ? ubRouting::post(self::PROUTE_EXPLORE_ONVIF_PORT,'int') : 80;
+     
+        $inputs .= wf_TextInput(self::PROUTE_EXPLORE_ONVIF_PORT, __('Port'), $portValue, false, 4, 'digits') . ' ';
         $inputs .= wf_TextInput(self::PROUTE_EXPLORE_LOGIN, __('Login'), ubRouting::post(self::PROUTE_EXPLORE_LOGIN), false, 12, '') . ' ';
         $inputs .= wf_PasswordInput(self::PROUTE_EXPLORE_PASSWORD, __('Password'), ubRouting::post(self::PROUTE_EXPLORE_PASSWORD), false, 12, true) . ' ';
         $inputs .= wf_Submit(__('Explore'));
