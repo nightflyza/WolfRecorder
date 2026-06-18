@@ -280,7 +280,7 @@ class ApacheZen {
 
                                 if (isset($sourceFiles[1])) {
                                     if (file_exists($sourceFiles[1])) {
-                                        $sourceUrl = self::URL_CODE . 'blob/master/' . $sourceFiles[1];
+                                        $sourceUrl = self::URL_CODE . 'blob/main/' . $sourceFiles[1];
                                         $sourceLink = wf_Link($sourceUrl, $sourceFiles[1], false, '', 'target="_BLANK"');
                                         $cleanMessage = str_replace($sourceFiles[1], $sourceLink, $cleanMessage);
 
