@@ -144,6 +144,11 @@ class ubRouting {
      */
     public static function filters($rawData, $filtering = 'raw', $callback = '') {
         $result = false;
+        if ($filtering != 'raw') {
+            if (is_array($rawData) or is_object($rawData)) {
+                return false;
+            }
+        }
         switch ($filtering) {
             case 'raw':
                 return ($rawData);

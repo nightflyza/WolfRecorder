@@ -306,7 +306,7 @@ class ClientRestAPI {
             if (!empty($this->objects)) {
                 foreach ($this->objects as $eachObject => $objectMethods) {
                     if (ubRouting::checkGet($eachObject)) {
-                        $methodCallback = ubRouting::get($eachObject);
+                        $methodCallback = ubRouting::get($eachObject,'safe');
                         if (isset($objectMethods[$methodCallback])) {
                             $methodName = $objectMethods[$methodCallback];
                             if (method_exists($this, $methodName)) {
