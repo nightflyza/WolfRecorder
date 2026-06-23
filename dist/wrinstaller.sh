@@ -311,6 +311,10 @@ fi
 cp -R ./dist/presets/freebsd/autowrupdate.sh /bin/
 chmod a+x /bin/autowrupdate.sh
 
+# Setting up newsyslog preset
+cp -R ./dist/presets/freebsd/newsyslog.preconf /etc/newsyslog.conf.d/wolfrecorder.conf
+$DIALOG --infobox "newsyslog preset installed" 4 60
+
 # Setting snmpd read only community string
 perl -e "s/SNMPCOMMTPL/${SNMP_COMMUNITY}/g" -pi /usr/local/etc/snmpd.conf
 $DIALOG --infobox "SNMP read only community set: ${SNMP_COMMUNITY}" 4 60
