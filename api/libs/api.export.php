@@ -471,7 +471,6 @@ class Export {
                 $datesTmp[$chunkDate] = $chunkDate;
             }
             if (!empty($datesTmp)) {
-                //TODO: render latest channel screenshot here
                 $chanShots = new ChanShots();
                 $latestScreenShot = $chanShots->getChannelScreenShot($channelId);
                 $grid = '';
@@ -487,10 +486,15 @@ class Export {
 
                 $inputs = $grid;
                 $inputs .= wf_CleanDiv();
-                $inputs .= wf_TextInput(self::PROUTE_TIME_FROM, '', ubRouting::post(self::PROUTE_TIME_FROM), false, 5, '', self::PROUTE_TIME_FROM, self::PROUTE_TIME_FROM, 'style="display:none;"') . ' ';
-                $inputs .= wf_TextInput(self::PROUTE_TIME_TO, '', ubRouting::post(self::PROUTE_TIME_TO), false, 5, '', self::PROUTE_TIME_TO, self::PROUTE_TIME_TO, 'style="display:none;"') . ' ';
+                $timeFromVal = ubRouting::checkPost(self::PROUTE_TIME_FROM) ? ubRouting::post(self::PROUTE_TIME_FROM) : '';
+                $timeToVal = ubRouting::checkPost(self::PROUTE_TIME_TO) ? ubRouting::post(self::PROUTE_TIME_TO) : '';
+                $inputs .= wf_tag('div', false, '', 'style="margin: 2px;"');
+                $inputs .= wf_img('skins/icon_time_small.png').' ';
+                $inputs .= wf_TextInput(self::PROUTE_TIME_FROM, __('from'), $timeFromVal, false, 5, '', self::PROUTE_TIME_FROM, self::PROUTE_TIME_FROM, 'placeholder="09:42" maxlength="5"', true) . ' ';
+                $inputs .= wf_TextInput(self::PROUTE_TIME_TO, __('to'), $timeToVal, false, 5, '', self::PROUTE_TIME_TO, self::PROUTE_TIME_TO, 'placeholder="12:34" maxlength="5"', true);
+                $inputs .= wf_tag('div', true);
                 $sliderCode = file_get_contents('modules/jsc/exportSlider.js');
-                $inputs .= wf_delimiter();
+                $inputs .= wf_delimiter(0);
                 //time range selection slider
                 $inputs .= $sliderCode;
                 $inputs .= wf_delimiter();
@@ -672,7 +676,7 @@ class Export {
      * @param string $dateTo
      * @param int $sizeForecast
      * 
-     * @return void/string
+     * @return void|string
      */
     public function scheduleExportTask($userLogin, $channelId, $dateFrom, $dateTo, $sizeForecast) {
         $result = '';
