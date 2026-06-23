@@ -116,9 +116,12 @@ class CliFF {
             if (isset($rawResult[0])) {
                 $firstLine = $rawResult[0];
                 if (!empty($firstLine) and ispos($firstLine, 'ffmpeg version')) {
-                    $rawVersion = substr($firstLine, 15, 5);
-                    if (!empty($rawVersion)) {
-                        $this->ffmpegVersion = ubRouting::filters($rawVersion, 'int');
+                    if (preg_match('/ffmpeg version\s+([0-9]+(?:\.[0-9]+)*)/', $firstLine, $versionMatch)) {
+                        $versionParts = explode('.', $versionMatch[1]);
+                        $major = isset($versionParts[0]) ? (int) $versionParts[0] : 0;
+                        $minor = isset($versionParts[1]) ? (int) $versionParts[1] : 0;
+                        $patch = isset($versionParts[2]) ? (int) $versionParts[2] : 0;
+                        $this->ffmpegVersion = ($major * 100) + ($minor * 10) + $patch;
                     }
                 }
             }
