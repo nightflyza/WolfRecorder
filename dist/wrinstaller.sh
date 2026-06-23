@@ -62,6 +62,7 @@ $DIALOG --menu "Type of WolfRecorder installation" 10 75 8 \
 clear
 
 $DIALOG --menu "Choose FreeBSD version and architecture" 16 50 8 \
+                   151_6M "FreeBSD 15.1 amd64"\
                    150_6M "FreeBSD 15.0 amd64"\
                    144_6M "FreeBSD 14.4 amd64"\
                    143_6M "FreeBSD 14.3 amd64"\
