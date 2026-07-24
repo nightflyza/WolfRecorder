@@ -211,7 +211,7 @@ class Rotator {
         if ((!empty($chunksList)) and ($expectedSize > 0)) {
             foreach ($chunksList as $eachTimeStamp => $chunksData) {
                 if ($bytesFree < $expectedSize) {
-                    unlink($chunksData['path']);
+                    @unlink($chunksData['path']); // prevents warnings due upgrade process
                     $chunksDeleted++;
                     $bytesFree += $chunksData['size'];
                 }
