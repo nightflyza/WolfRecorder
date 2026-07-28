@@ -33,6 +33,7 @@ class Storages {
     const PROUTE_PATH = 'newstoragepath';
     const PROUTE_NAME = 'newstoragename';
     const ROUTE_DEL = 'deletestorageid';
+    const ROUTE_IOLOAD = 'storagesload';
     const PROUTE_ED_STORAGE = 'editstorageid';
     const PROUTE_ED_NAME = 'editstoragename';
     const URL_ME = '?module=storages';
@@ -324,6 +325,73 @@ class Storages {
                 $actControls = wf_JSAlert(self::URL_ME . '&' . self::ROUTE_DEL . '=' . $each['id'], web_delete_icon(), $this->messages->getDeleteAlert());
                 $actControls .= wf_modalAuto(web_edit_icon(), __('Edit') . ' `' . __($each['name']) . '`', $this->renderEditForm($each['id']));
                 $cells .= wf_TableCell($actControls);
+                $rows .= wf_TableRow($cells, 'row5');
+            }
+
+            $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
+        } else {
+            $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
+        }
+        return ($result);
+    }
+
+    /**
+     * Renders current storages disk IO load (write/read speed and IOPS)
+     *
+     * @return string
+     */
+    public function renderIoLoad() {
+        $result = '';
+        if (!empty($this->allStorages)) {
+            $hwInfo = new SystemHwInfo();
+            $mountPoints = array();
+            foreach ($this->allStorages as $io => $each) {
+                if ($this->checkPath($each['path'])) {
+                    $mountPoints[] = $each['path'];
+                }
+            }
+
+            $allIoStats = array();
+            if (!empty($mountPoints)) {
+                $hwInfo->setMountPoints($mountPoints);
+                $allIoStats = $hwInfo->getAllDiskIoStats(1);
+            }
+
+            $cells = wf_TableCell(__('ID'));
+            $cells .= wf_TableCell(__('Name'));
+            $cells .= wf_TableCell(__('Path'));
+            $cells .= wf_TableCell(__('Device'));
+            $cells .= wf_TableCell(__('Write'));
+            $cells .= wf_TableCell(__('Read'));
+            $cells .= wf_TableCell(__('IOPS'));
+            $rows = wf_TableRow($cells, 'row1');
+
+            foreach ($this->allStorages as $io => $each) {
+                $deviceLabel = '-';
+                $writeLabel = '-';
+                $readLabel = '-';
+                $iopsLabel = '-';
+
+                if (isset($allIoStats[$each['path']])) {
+                    $ioStat = $allIoStats[$each['path']];
+                    if (isset($ioStat['device']) and !empty($ioStat['device'])) {
+                        $deviceLabel = $ioStat['device'];
+                        if (isset($ioStat['device_stats']) and !empty($ioStat['device_stats'])) {
+                            $deviceLabel .= ' (' . $ioStat['device_stats'] . ')';
+                        }
+                    }
+                    $writeLabel = wr_convertSize($ioStat['write_bps']) . '/s';
+                    $readLabel = wr_convertSize($ioStat['read_bps']) . '/s';
+                    $iopsLabel = $ioStat['iops'];
+                }
+
+                $cells = wf_TableCell($each['id']);
+                $cells .= wf_TableCell(__($each['name']));
+                $cells .= wf_TableCell($each['path']);
+                $cells .= wf_TableCell($deviceLabel);
+                $cells .= wf_TableCell($writeLabel);
+                $cells .= wf_TableCell($readLabel);
+                $cells .= wf_TableCell($iopsLabel);
                 $rows .= wf_TableRow($cells, 'row5');
             }
 

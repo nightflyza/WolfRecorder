@@ -29,9 +29,17 @@ if (cfr('STORAGES')) {
         ubRouting::nav($storages::URL_ME);
     }
 
-    show_window(__('Create new storage'), $storages->renderCreationForm());
-    show_window(__('Available storages'), $storages->renderList());
-    show_window(__('Storage of user exported videos'), $storages->renderRecDlStorage());
+    //optional storages IO load view
+    if (ubRouting::checkGet($storages::ROUTE_IOLOAD)) {
+        $ioLoadZen = new ZenFlow('storio', $storages->renderIoLoad(), 3000);
+        show_window(__('Storages load'), $ioLoadZen->render());
+        show_window('', wf_BackLink($storages::URL_ME));
+    } else {
+        show_window(__('Create new storage'), $storages->renderCreationForm());
+        show_window(__('Available storages'), $storages->renderList());
+        show_window(__('Storage of user exported videos'), $storages->renderRecDlStorage());
+        show_window('', wf_Link($storages::URL_ME . '&' . $storages::ROUTE_IOLOAD . '=true', wf_img('skins/icon_disks.png') . ' ' . __('Storages load'), false, 'ubButton'));
+    }
 } else {
     show_error(__('Access denied'));
 }
