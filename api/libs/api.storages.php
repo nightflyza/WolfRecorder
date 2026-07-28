@@ -357,13 +357,16 @@ class Storages {
                 $allIoStats = $hwInfo->getAllDiskIoStats(1);
             }
 
+            $ioColWidth = '15%';
+            $iopsColWidth = '10%';
+
             $cells = wf_TableCell(__('ID'));
             $cells .= wf_TableCell(__('Name'));
             $cells .= wf_TableCell(__('Path'));
             $cells .= wf_TableCell(__('Device'));
-            $cells .= wf_TableCell(__('Write'));
-            $cells .= wf_TableCell(__('Read'));
-            $cells .= wf_TableCell(__('IOPS'));
+            $cells .= wf_TableCell(__('Write'), $ioColWidth);
+            $cells .= wf_TableCell(__('Read'), $ioColWidth);
+            $cells .= wf_TableCell(__('IOPS'), $iopsColWidth);
             $rows = wf_TableRow($cells, 'row1');
 
             foreach ($this->allStorages as $io => $each) {
@@ -389,13 +392,13 @@ class Storages {
                 $cells .= wf_TableCell(__($each['name']));
                 $cells .= wf_TableCell($each['path']);
                 $cells .= wf_TableCell($deviceLabel);
-                $cells .= wf_TableCell($writeLabel);
-                $cells .= wf_TableCell($readLabel);
-                $cells .= wf_TableCell($iopsLabel);
+                $cells .= wf_TableCell($writeLabel, $ioColWidth);
+                $cells .= wf_TableCell($readLabel, $ioColWidth);
+                $cells .= wf_TableCell($iopsLabel, $iopsColWidth);
                 $rows .= wf_TableRow($cells, 'row5');
             }
 
-            $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table');
+            $result .= wf_TableBody($rows, '100%', 0, 'sortable resp-table', 'style="table-layout:fixed;"');
         } else {
             $result .= $this->messages->getStyledMessage(__('Nothing to show'), 'warning');
         }
