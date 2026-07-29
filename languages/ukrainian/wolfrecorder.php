@@ -359,6 +359,7 @@ $lang['def']['Apps'] = 'Застосунки';
 $lang['def']['Unable to communicate with apps server'] = 'Неможливо зв`язатися з сервером застосунків';
 $lang['def']['Unable to get applications list from server'] = 'Неможливо отримати список застосунків із сервера';
 $lang['def']['Playlist of your cameras'] = 'Плейлист ваших камер';
+$lang['def']['s']='с';
 
 
 

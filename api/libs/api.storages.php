@@ -383,8 +383,8 @@ class Storages {
                             $deviceLabel .= ' (' . $ioStat['device_stats'] . ')';
                         }
                     }
-                    $writeLabel = wr_convertSize($ioStat['write_bps']) . '/s';
-                    $readLabel = wr_convertSize($ioStat['read_bps']) . '/s';
+                    $writeLabel = wr_convertSize($ioStat['write_bps']) . '/'.__('s');
+                    $readLabel = wr_convertSize($ioStat['read_bps']) . '/'.__('s');
                     $iopsLabel = $ioStat['iops'];
                 }
 
